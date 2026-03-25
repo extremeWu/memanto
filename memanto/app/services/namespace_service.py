@@ -53,7 +53,9 @@ class NamespaceService:
                 namespace_list = all_namespaces
 
             # Filter MEMANTO namespaces
-            memanto_namespaces = [ns for ns in namespace_list if ns.startswith("memanto_")]
+            memanto_namespaces = [
+                ns for ns in namespace_list if ns.startswith("memanto_")
+            ]
 
             return memanto_namespaces
 

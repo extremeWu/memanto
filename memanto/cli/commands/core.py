@@ -462,7 +462,11 @@ def serve(
     # Start server
     try:
         uvicorn.run(
-            "memanto.app.main:app", host=host, port=port, reload=reload, log_level="info"
+            "memanto.app.main:app",
+            host=host,
+            port=port,
+            reload=reload,
+            log_level="info",
         )
     except KeyboardInterrupt:
         console.print("\n\n[yellow]Server stopped.[/yellow]")

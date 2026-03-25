@@ -23,12 +23,12 @@ MEMANTO_VERSION = "0.1.0"
 
 # ASCII art logo — clean block MemAnto
 LOGO = r"""
- ███╗   ███╗ ███████╗ ███╗   ███╗  █████╗  ███╗   ██╗ ████████╗  ██████╗ 
+ ███╗   ███╗ ███████╗ ███╗   ███╗  █████╗  ███╗   ██╗ ████████╗  ██████╗
  ████╗ ████║ ██╔════╝ ████╗ ████║ ██╔══██╗ ████╗  ██║ ╚══██╔══╝ ██╔═══██╗
  ██╔████╔██║ █████╗   ██╔████╔██║ ███████║ ██╔██╗ ██║    ██║    ██║   ██║
  ██║╚██╔╝██║ ██╔══╝   ██║╚██╔╝██║ ██╔══██║ ██║╚██╗██║    ██║    ██║   ██║
  ██║ ╚═╝ ██║ ███████╗ ██║ ╚═╝ ██║ ██║  ██║ ██║ ╚████║    ██║    ╚██████╔╝
- ╚═╝     ╚═╝ ╚══════╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝    ╚═╝     ╚═════╝ 
+ ╚═╝     ╚═╝ ╚══════╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝    ╚═╝     ╚═════╝
 """.strip("\n")
 
 # All 13 MEMANTO memory types
@@ -61,14 +61,11 @@ def print_logo() -> None:
 
     # Tagline
     tagline = Text()
-    tagline.append(
-        "  Universal Memory Layer for Agentic AI\n", style="bold white"
-    )
+    tagline.append("  Universal Memory Layer for Agentic AI\n", style="bold white")
     tagline.append("  powered by ", style="dim")
     tagline.append("moorcheh.ai", style=BOLD_PRIMARY)
     console.print(tagline)
     console.print()
-
 
 
 def show_welcome_banner(config_manager: ConfigManager) -> None:
