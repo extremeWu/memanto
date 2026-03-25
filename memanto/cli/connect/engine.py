@@ -155,7 +155,9 @@ def _write_dedicated_file(file_path: Path, content: str) -> str:
         existing = file_path.read_text(encoding="utf-8")
         if MEMANTO_SENTINEL in existing:
             # Replace existing section
-            pattern = re.escape(MEMANTO_SENTINEL) + r".*?" + re.escape(MEMANTO_SENTINEL_END)
+            pattern = (
+                re.escape(MEMANTO_SENTINEL) + r".*?" + re.escape(MEMANTO_SENTINEL_END)
+            )
             updated = re.sub(pattern, content.strip(), existing, flags=re.DOTALL)
             file_path.write_text(updated, encoding="utf-8")
             return f"Updated {file_path.name}"
@@ -172,7 +174,9 @@ def _inject_into_file(
         existing = file_path.read_text(encoding="utf-8")
         if MEMANTO_SENTINEL in existing:
             # Replace existing section
-            pattern = re.escape(MEMANTO_SENTINEL) + r".*?" + re.escape(MEMANTO_SENTINEL_END)
+            pattern = (
+                re.escape(MEMANTO_SENTINEL) + r".*?" + re.escape(MEMANTO_SENTINEL_END)
+            )
             updated = re.sub(pattern, section.strip(), existing, flags=re.DOTALL)
             file_path.write_text(updated, encoding="utf-8")
             return f"Updated MEMANTO section in {file_path.name}"

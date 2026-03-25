@@ -64,7 +64,9 @@ def remember(
     active_agent_id, active_session_token = config_manager.get_active_session()
 
     if not active_agent_id or not active_session_token:
-        _error("No active agent.", hint="Run 'memanto agent activate <agent-id>' first.")
+        _error(
+            "No active agent.", hint="Run 'memanto agent activate <agent-id>' first."
+        )
 
     client = get_client()
     agent_id = active_agent_id
@@ -204,7 +206,9 @@ def recall(
     active_agent_id, active_session_token = config_manager.get_active_session()
 
     if not active_agent_id or not active_session_token:
-        _error("No active agent.", hint="Run 'memanto agent activate <agent-id>' first.")
+        _error(
+            "No active agent.", hint="Run 'memanto agent activate <agent-id>' first."
+        )
 
     # Check for mutually exclusive temporal flags
     temporal_flags = [as_of, changed_since, current_only]
@@ -221,7 +225,8 @@ def recall(
             query = "*"  # Default to match all for temporal queries
         else:
             _error(
-                "Missing argument 'QUERY'.", hint="Try 'memanto recall --help' for help."
+                "Missing argument 'QUERY'.",
+                hint="Try 'memanto recall --help' for help.",
             )
 
     client = get_client()
@@ -378,7 +383,9 @@ def answer(
     active_agent_id, active_session_token = config_manager.get_active_session()
 
     if not active_agent_id or not active_session_token:
-        _error("No active agent.", hint="Run 'memanto agent activate <agent-id>' first.")
+        _error(
+            "No active agent.", hint="Run 'memanto agent activate <agent-id>' first."
+        )
 
     client = get_client()
     agent_id = active_agent_id

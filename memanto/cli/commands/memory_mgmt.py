@@ -8,7 +8,10 @@ import typer
 from rich.panel import Panel
 from rich.table import Table
 
-from memanto.app.services.memory_export_service import MEMORY_TYPE_META, MEMORY_TYPE_ORDER
+from memanto.app.services.memory_export_service import (
+    MEMORY_TYPE_META,
+    MEMORY_TYPE_ORDER,
+)
 from memanto.cli.commands._shared import (
     BOLD_PRIMARY,
     BRIGHT,

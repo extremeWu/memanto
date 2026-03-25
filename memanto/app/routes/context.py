@@ -16,7 +16,9 @@ from memanto.app.models import (
     CustomSummarizationRequest,
     SummarizationResponse,
 )
-from memanto.app.services.context_summarization_service import ContextSummarizationService
+from memanto.app.services.context_summarization_service import (
+    ContextSummarizationService,
+)
 from memanto.app.utils.errors import map_error_to_http_exception
 
 router = APIRouter()

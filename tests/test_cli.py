@@ -61,11 +61,15 @@ def mock_all_clients():
     p_la.start()
     patches.append(p_la)
 
-    p_da = patch("memanto.cli.commands.connect.detect_agents_in_project", return_value=[])
+    p_da = patch(
+        "memanto.cli.commands.connect.detect_agents_in_project", return_value=[]
+    )
     p_da.start()
     patches.append(p_da)
 
-    p_mi = patch("memanto.cli.commands.connect.detect_memanto_installed", return_value=[])
+    p_mi = patch(
+        "memanto.cli.commands.connect.detect_memanto_installed", return_value=[]
+    )
     p_mi.start()
     patches.append(p_mi)
 

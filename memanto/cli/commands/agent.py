@@ -65,7 +65,9 @@ def agent_list():
             )
             return
 
-        table = Table(title="MEMANTO Agents", show_header=True, header_style=BOLD_PRIMARY)
+        table = Table(
+            title="MEMANTO Agents", show_header=True, header_style=BOLD_PRIMARY
+        )
         table.add_column("Agent ID", style=BRIGHT)
         table.add_column("Pattern", style=ACCENT)
         table.add_column("Description", style="white")
