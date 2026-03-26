@@ -1,15 +1,12 @@
 """
-MEMANTO Direct Client
+MEMANTO SDK Client
 
-Calls the Moorcheh API directly through existing service classes
+Uses the official moorcheh_sdk to interact with Moorcheh API.
 """
 
 import json
 import logging
-import os
 import shutil
-import urllib.error
-import urllib.request
 from datetime import datetime
 from pathlib import Path
 from typing import Any, cast
@@ -40,182 +37,24 @@ from memanto.cli.config.manager import ConfigManager
 
 logger = logging.getLogger(__name__)
 
-
-# Moorcheh's API Gateway strictly requires lowercase for 'x-api-key'.
-# This string subclass defeats urllib's automatic title-casing.
-class LowerStr(str):
-    def title(self):
-        return self
-
-    def capitalize(self):
-        return self
-
-
-class MoorchehClient:
-    """
-    A lightweight, zero-dependency Moorcheh client using urllib
-    """
-
-    def __init__(self, api_key: str, base_url: str = "https://api.moorcheh.ai/v1"):
-        self.api_key = api_key
-        self.base_url = os.environ.get("MOORCHEH_BASE_URL", base_url).rstrip("/")
-
-    def _request(self, method: str, endpoint: str, json_data: Any = None) -> Any:
-        url = f"{self.base_url}{endpoint}"
-
-        headers = {
-            LowerStr("x-api-key"): self.api_key,
-            "Content-Type": "application/json",
-            "User-Agent": "Moorcheh-Client/1.0",
-        }
-
-        req_data = (
-            json.dumps(json_data).encode("utf-8") if json_data is not None else None
-        )
-        req = urllib.request.Request(url, data=req_data, headers=headers, method=method)
-
-        try:
-            with urllib.request.urlopen(req, timeout=30) as response:
-                if response.status == 204:
-                    return {}
-                return json.loads(response.read().decode("utf-8"))
-        except urllib.error.HTTPError as e:
-            body = e.read().decode("utf-8")
-            # Try to return JSON if available
-            try:
-                err_json = json.loads(body)
-                raise Exception(
-                    f"Moorcheh API Error {e.code}: {err_json.get('message', body)}"
-                )
-            except json.JSONDecodeError:
-                raise Exception(f"Moorcheh API Error {e.code}: {body}")
-        except Exception as e:
-            raise Exception(f"Moorcheh Connection Error: {e}")
-
-    @property
-    def documents(self):
-        class Docs:
-            def __init__(self, client):
-                self.client = client
-
-            def upload(self, namespace_name, documents):
-                return self.client._request(
-                    "POST",
-                    f"/namespaces/{namespace_name}/documents",
-                    {"documents": documents},
-                )
-
-            def delete(self, namespace_name, ids):
-                return self.client._request(
-                    "POST",
-                    f"/namespaces/{namespace_name}/documents/delete",
-                    {"ids": ids},
-                )
-
-            def get(self, namespace_name, ids):
-                return self.client._request(
-                    "POST", f"/namespaces/{namespace_name}/documents/get", {"ids": ids}
-                )
-
-        return Docs(self)
-
-    @property
-    def namespaces(self):
-        class NS:
-            def __init__(self, client):
-                self.client = client
-
-            def create(self, namespace_name, type="text"):
-                return self.client._request(
-                    "POST",
-                    "/namespaces",
-                    {"namespace_name": namespace_name, "type": type},
-                )
-
-            def list(self):
-                return self.client._request("GET", "/namespaces")
-
-        return NS(self)
-
-    @property
-    def similarity_search(self):
-        class Search:
-            def __init__(self, client):
-                self.client = client
-
-            def query(
-                self, namespaces, query, top_k=10, threshold=0.25, kiosk_mode=False
-            ):
-                payload = {
-                    "namespaces": namespaces,
-                    "query": query,
-                    "top_k": top_k,
-                    "kiosk_mode": kiosk_mode,
-                }
-                if kiosk_mode:
-                    payload["threshold"] = threshold
-                return self.client._request("POST", "/search", payload)
-
-        return Search(self)
-
-    @property
-    def answer(self):
-        class Ans:
-            def __init__(self, client):
-                self.client = client
-
-            def generate(
-                self,
-                namespace,
-                query,
-                top_k=5,
-                ai_model="anthropic.claude-sonnet-4-20250514-v1:0",
-                temperature=0.7,
-                threshold=0.25,
-                kiosk_mode=False,
-                header_prompt=None,
-                footer_prompt=None,
-            ):
-                payload = {
-                    "namespace": namespace,
-                    "query": query,
-                    "top_k": top_k,
-                    "type": "text",
-                    "aiModel": ai_model,
-                    "temperature": temperature,
-                    "kiosk_mode": kiosk_mode,
-                    "headerPrompt": header_prompt or "",
-                    "footerPrompt": footer_prompt or "",
-                }
-                if kiosk_mode:
-                    payload["threshold"] = threshold
-                return self.client._request("POST", "/answer", payload)
-
-        return Ans(self)
-
-    def close(self):
-        pass
-
-
-logger = logging.getLogger(__name__)
-
-__all__ = ["DirectClient"]
-
+__all__ = ["SdkClient"]
 
 # Constants
-
 _MAX_BATCH_SIZE = 100
 _MAX_TITLE_LENGTH = 100
 _MAX_CONTENT_LENGTH = 500
 
 
-class DirectClient:
+class SdkClient:
     """
-    Direct SDK client for CLI commands.
+    SDK-based client for CLI commands.
+
+    Mirrors the ``DirectClient`` interface but uses the official
+    ``moorcheh_sdk.MoorchehClient`` instead of the custom raw HTTP wrapper.
 
     All heavy dependencies (``moorcheh_sdk``, ``app.services.*``,
     ``pydantic`` models) are imported lazily on first use so that
-    ``import direct_client`` itself is near-instant.
+    ``import sdk_client`` itself is near-instant.
 
     Raises:
         ValueError: For invalid input (bad agent_id, pattern, etc.).
@@ -230,7 +69,7 @@ class DirectClient:
 
     def __init__(self, api_key: str) -> None:
         """
-        Initialize direct client.
+        Initialize SDK client.
 
         Args:
             api_key: Moorcheh API key (required, non-empty).
@@ -258,9 +97,11 @@ class DirectClient:
     # Lazy initializers
 
     def _get_moorcheh(self):
-        """Return (or create) the ``MoorchehClient`` singleton."""
+        """Return (or create) the ``moorcheh_sdk.MoorchehClient`` singleton."""
         if self._moorcheh is None:
-            logger.debug("Initializing MoorchehClient")
+            from moorcheh_sdk import MoorchehClient
+
+            logger.debug("Initializing moorcheh_sdk.MoorchehClient")
             self._moorcheh = MoorchehClient(api_key=self.api_key)
         return self._moorcheh
 
@@ -467,9 +308,6 @@ class DirectClient:
         """
         Activate an agent session.
 
-        Creates a JWT-based session via ``SessionService`` (same logic
-        the server uses) and stores the token locally.
-
         Args:
             agent_id: Agent to activate.
             duration_hours: Session lifetime in hours (default: from config).
@@ -485,7 +323,7 @@ class DirectClient:
         if not agent:
             raise AgentNotFoundError(f"Agent '{agent_id}' not found")
 
-        logger.debug("Activating agent '%s' for %d hours", agent_id, duration_hours)
+        logger.debug("Activating agent '%s' for %s hours", agent_id, duration_hours)
         session = self._get_session_service().create_session(
             agent_id=agent_id,
             moorcheh_api_key=self.api_key,
@@ -570,7 +408,7 @@ class DirectClient:
         # Check if we have a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
-        logger.debug("Extending session for '%s' by %d hours", agent_id, hours)
+        logger.debug("Extending session for '%s' by %s hours", agent_id, hours)
         session = self._get_session_service().extend_session(agent_id, hours)
         return {
             "session_id": session.session_id,
@@ -604,6 +442,7 @@ class DirectClient:
             confidence: Confidence score 0.0–1.0 (default 0.8).
             tags: Optional list of tags.
             source: Memory source (default ``"user"``).
+            provenance: Memory provenance type.
 
         Returns:
             Dict with ``memory_id``, ``agent_id``, ``namespace``,
@@ -672,9 +511,7 @@ class DirectClient:
 
         Args:
             agent_id: Target agent.
-            memories: List of memory dicts (max 100). Each dict must
-                have ``content`` and may have ``type``, ``title``,
-                ``confidence``, ``tags``.
+            memories: List of memory dicts (max 100).
 
         Returns:
             Batch result dict with ``total_submitted``, ``successful``,
@@ -767,15 +604,14 @@ class DirectClient:
             agent_id: Target agent.
             query: Natural-language search query.
             limit: Max results (1–100, default 5).
-            memory_types: Filter by types (e.g. ``["fact", "decision"]``).
+            memory_types: Filter by types.
             tags: Filter by tags.
             min_confidence: Minimum confidence threshold.
             created_after: Only memories created after this datetime.
             created_before: Only memories created before this datetime.
 
         Returns:
-            Dict with ``agent_id``, ``query``, ``memories`` (list),
-            ``count``.
+            Dict with ``agent_id``, ``query``, ``memories``, ``count``.
         """
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
@@ -892,9 +728,6 @@ class DirectClient:
         """
         Current-state recall (supersession-aware).
 
-        Returns only memories that haven't been superseded,
-        reflecting the agent's latest knowledge.
-
         Args:
             agent_id: Target agent.
             query: Search query.
@@ -937,9 +770,6 @@ class DirectClient:
         """
         Answer a question using RAG (Retrieval-Augmented Generation).
 
-        Retrieves the most relevant memories and passes them as context
-        to the Moorcheh LLM to generate a grounded answer.
-
         Args:
             agent_id: Target agent.
             question: Natural-language question.
@@ -947,7 +777,7 @@ class DirectClient:
             threshold: Confidence threshold for memory relevance.
             temperature: Temperature for the LLM response.
             ai_model: AI model to use for generating the answer.
-            kiosk_mode: When true, filters out low-relevance results; requires threshold.
+            kiosk_mode: When true, filters out low-relevance results.
             header_prompt: Header prompt for the LLM.
             footer_prompt: Footer prompt for the LLM.
 
@@ -1056,7 +886,6 @@ class DirectClient:
         Returns:
             List of unresolved conflict dicts.
         """
-
         if not date:
             date = datetime.now().strftime("%Y-%m-%d")
 
@@ -1092,12 +921,11 @@ class DirectClient:
             action: Resolution action — ``keep_old``, ``keep_new``,
                 ``keep_both``, ``remove_both``, or ``manual``.
             manual_content: Required when action is ``manual``.
-            manual_type: Memory type for manual replacement (default: old memory's type).
+            manual_type: Memory type for manual replacement.
 
         Returns:
             Dict with resolution result.
         """
-
         valid_actions = {"keep_old", "keep_new", "keep_both", "remove_both", "manual"}
         if action not in valid_actions:
             raise ValueError(
@@ -1129,10 +957,9 @@ class DirectClient:
         namespace = scope.to_namespace()
 
         write_service = self._get_write_service()
-        result_details = {"action": action}
+        result_details: dict[str, Any] = {"action": action}
 
         if action == "keep_old":
-            # Keep old, delete new
             if new_id:
                 try:
                     write_service.delete_memory(new_id, namespace)
@@ -1141,7 +968,6 @@ class DirectClient:
                     result_details["warning"] = f"Could not delete new memory: {e}"
 
         elif action == "keep_new":
-            # Keep new, delete old
             if old_id:
                 try:
                     write_service.delete_memory(old_id, namespace)
@@ -1150,11 +976,9 @@ class DirectClient:
                     result_details["warning"] = f"Could not delete old memory: {e}"
 
         elif action == "keep_both":
-            # No-op — both memories remain active
             result_details["note"] = "Both memories kept as-is"
 
         elif action == "remove_both":
-            # Delete both memories
             for mem_id, label in [(old_id, "old"), (new_id, "new")]:
                 if mem_id:
                     try:
@@ -1184,7 +1008,6 @@ class DirectClient:
             mem_type = manual_type or conflict.get("type", "fact")
             if not isinstance(mem_type, str):
                 mem_type = "fact"
-            # Map conflict types to valid memory types
             if mem_type not in _VALID_MEMORY_TYPES:
                 mem_type = "fact"
             resolved_type = cast(MemoryType, mem_type)
@@ -1231,13 +1054,9 @@ class DirectClient:
         """
         Export all memories for an agent into a structured memory.md.
 
-        Queries each of the 13 memory types and generates a Markdown file
-        organized by type.
-
         Args:
             agent_id: Target agent.
-            output_path: Custom output path. Defaults to
-                ``~/.memanto/exports/{agent_id}_memory.md``.
+            output_path: Custom output path.
             limit_per_type: Max memories per type (default 25).
 
         Returns:
@@ -1288,20 +1107,14 @@ class DirectClient:
         """
         Sync agent memories to a project directory's MEMORY.md.
 
-        Uses the cached export at ``~/.memanto/exports/{agent_id}_memory.md``
-        when available. Falls back to a fresh export if
-        the cache file does not exist.
-
         Args:
             agent_id: Target agent.
             project_dir: Path to the project directory.
             limit_per_type: Max memories per type for fresh export (default 25).
 
         Returns:
-            Dict with ``output_path``, ``total_memories``, ``source``
-            (``"cache"`` or ``"fresh"``).
+            Dict with ``output_path``, ``total_memories``, ``source``.
         """
-
         cache_path = Path.home() / ".memanto" / "exports" / f"{agent_id}_memory.md"
         target_path = Path(project_dir) / "MEMORY.md"
         target_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1309,7 +1122,6 @@ class DirectClient:
         if cache_path.exists():
             # Fast path: copy cached export
             shutil.copy2(str(cache_path), str(target_path))
-            # Count memories from the cached file
             content = cache_path.read_text(encoding="utf-8")
             mem_count = content.count("### ")
             return {
@@ -1341,16 +1153,16 @@ class DirectClient:
     # Health Check
     def health_check(self) -> dict[str, Any]:
         """
-        Health check — not applicable in direct mode.
+        Health check — not applicable in SDK direct mode.
 
-        Direct mode bypasses the local server entirely. This method
-        exists only for interface compatibility with ``MemantoAPIClient``.
+        SDK mode bypasses the local server entirely. This method
+        exists only for interface compatibility.
 
         Raises:
             ConnectionError: Always, to signal server unavailability.
         """
         raise ConnectionError(
-            "Direct mode does not use a local server. "
+            "SDK mode does not use a local server. "
             "Run 'memanto serve' to start the server if needed."
         )
 

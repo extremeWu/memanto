@@ -8,6 +8,7 @@ import socket
 import threading
 import time
 
+import httpx
 import typer
 from rich.panel import Panel
 from rich.table import Table
@@ -21,7 +22,6 @@ from memanto.cli.commands._shared import (
     PRIMARY,
     SUCCESS,
     WARNING,
-    MemantoAPIClient,
     _error,
     app,
     config_manager,
@@ -202,8 +202,9 @@ def status():
     server_online = False
 
     try:
-        client = MemantoAPIClient(server_url, api_key)
-        health = client.health_check()
+        response = httpx.get(f"{server_url}/health", timeout=5.0)
+        response.raise_for_status()
+        health = response.json()
         server_online = True
 
         srv_table = Table(show_header=False, box=None, padding=(0, 2))
@@ -255,9 +256,10 @@ def status():
 
     if has_session and server_online:
         try:
-            client.session_token = active_session_token
-            client.agent_id = active_agent_id
-            session_data = client.get_session_info()
+            direct = get_client()
+            direct.session_token = active_session_token
+            direct.agent_id = active_agent_id
+            session_data = direct.get_session_info()
 
             sess_table = Table(show_header=False, box=None, padding=(0, 2))
             sess_table.add_column("Key", style="dim")
@@ -361,11 +363,8 @@ def status():
 
     # Registered Agents
     try:
-        if server_online:
-            agents = client.list_agents()
-        else:
-            direct = get_client()
-            agents = direct.list_agents()
+        direct = get_client()
+        agents = direct.list_agents()
 
         if agents:
             agent_table = Table(
