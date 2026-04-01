@@ -6,8 +6,9 @@ memory type taxonomy, and quick-start commands.
 """
 
 import platform
-
+import time
 from rich.console import Console
+from rich.live import Live
 from rich.rule import Rule
 from rich.table import Table
 from rich.text import Text
@@ -23,13 +24,20 @@ MEMANTO_VERSION = "0.1.0"
 
 # ASCII art logo — clean block MemAnto
 LOGO = r"""
- ███╗   ███╗ ███████╗ ███╗   ███╗  █████╗  ███╗   ██╗ ████████╗  ██████╗
- ████╗ ████║ ██╔════╝ ████╗ ████║ ██╔══██╗ ████╗  ██║ ╚══██╔══╝ ██╔═══██╗
- ██╔████╔██║ █████╗   ██╔████╔██║ ███████║ ██╔██╗ ██║    ██║    ██║   ██║
- ██║╚██╔╝██║ ██╔══╝   ██║╚██╔╝██║ ██╔══██║ ██║╚██╗██║    ██║    ██║   ██║
- ██║ ╚═╝ ██║ ███████╗ ██║ ╚═╝ ██║ ██║  ██║ ██║ ╚████║    ██║    ╚██████╔╝
- ╚═╝     ╚═╝ ╚══════╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝    ╚═╝     ╚═════╝
+          ███╗   ███╗ ███████╗ ███╗   ███╗  █████╗  ███╗   ██╗ ████████╗  ██████╗
+ ▐▛██▜▌   ████╗ ████║ ██╔════╝ ████╗ ████║ ██╔══██╗ ████╗  ██║ ╚══██╔══╝ ██╔═══██╗
+ ▌ ◈◈ ▐   ██╔████╔██║ █████╗   ██╔████╔██║ ███████║ ██╔██╗ ██║    ██║    ██║   ██║
+ ▝▜██▛▘   ██║╚██╔╝██║ ██╔══╝   ██║╚██╔╝██║ ██╔══██║ ██║╚██╗██║    ██║    ██║   ██║
+ ▌▌▘▝▐▐   ██║ ╚═╝ ██║ ███████╗ ██║ ╚═╝ ██║ ██║  ██║ ██║ ╚████║    ██║    ╚██████╔╝
+ ▘    ▝   ╚═╝     ╚═╝ ╚══════╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝    ╚═╝     ╚═════╝
+                            remember · recall · answer
 """.strip("\n")
+
+# Animation frames
+ANT_WALK_1 = " ▌▌▘▝▐▐ "
+ANT_WALK_2 = " ▘▌▌▐▐▝ "
+EYES_NORMAL = "◈◈"
+EYES_WINK   = "-◈"
 
 # All 13 MEMANTO memory types
 MEMORY_TYPES = [
@@ -55,9 +63,24 @@ def print_logo() -> None:
     console.print()
 
     # ── Logo ────────────────────────────────────────────────────────
-    logo_text = Text(LOGO, style=BOLD_PRIMARY)
-    console.print(logo_text)
-    console.print()
+    lines = LOGO.split("\n")
+    
+    with Live(console=console, refresh_per_second=10, transient=False) as live:
+        # Quick 1-second animation (10 frames)
+        for i in range(20):
+            # Walking legs (alternates every frame)
+            current_legs = ANT_WALK_2 if i % 2 == 0 else ANT_WALK_1
+            # Winking eyes (winks on frame 5 and 6)
+            current_eyes = EYES_WINK if i in [5,6.15,16] else EYES_NORMAL
+            
+            # Rebuild the logo lines
+            anim_lines = list(lines)
+            anim_lines[2] = anim_lines[2].replace(EYES_NORMAL, current_eyes)
+            anim_lines[4] = anim_lines[4].replace(ANT_WALK_1, current_legs)
+            
+            logo_text = Text("\n".join(anim_lines), style=BOLD_PRIMARY)
+            live.update(logo_text)
+            time.sleep(0.1)
 
     # Tagline
     tagline = Text()

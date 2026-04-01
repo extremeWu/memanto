@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://www.moorcheh.ai/">
-    <img alt="MEMANTO Logo" src="assets/memanto-logo.png" width="500">
+    <img alt="MEMANTO Logo" src="assets/memanto-dark.svg" width="500">
     </a>
 </p>
 
@@ -35,6 +35,66 @@ MEMANTO is built for teams that want high-quality agent memory without graph-hea
 - **Zero storage cost at idle**: Serverless architecture scales to zero when not in use.
 - **State-of-the-art benchmark performance**: Final evaluation results reached **89.8% on LongMemEval** and **87.1% on LoCoMo**.
 
+## 🏗️ Architecture
+
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'primaryTextColor': '#111827', 'primaryBorderColor': '#e5e7eb', 'lineColor': '#9ca3af', 'secondaryColor': '#f3f4f6', 'tertiaryColor': '#f8fafc'}}}%%
+flowchart LR
+    %% Styles
+    classDef client fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px,color:#334155,rx:6px,ry:6px;
+    classDef memanto fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a,rx:8px,ry:8px;
+    classDef cloud fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#701a75,rx:8px,ry:8px;
+    classDef component fill:#ffffff,stroke:#e2e8f0,stroke-width:1px,color:#475569,rx:4px,ry:4px;
+    classDef helper fill:#fff7ed,stroke:#fb923c,stroke-width:1px,color:#7c2d12,rx:4px,ry:4px;
+
+    %% Client Ecosystem Layer
+    subgraph Ecosystem ["🖥️ Agent Ecosystem (Your Environment)"]
+        direction TB
+        IDEs["🔌 IDE Integrations<br/>(Cursor, Windsurf, Roo, ..)"]:::client
+        CLIs["💻 Agent CLIs<br/>(Claude Code, Cline, ..)"]:::client
+        Custom["🤖 Custom Agents<br/>(Python, JS, LangChain)"]:::client
+        WebUI["📊 Local Web Dashboard<br/>(memanto ui)"]:::client
+    end
+
+    %% Memanto Gateway Layer
+    subgraph LocalGateway ["⚡ Memanto Gateway"]
+        direction TB
+        CLI_Tool["🖥️ Memanto CLI Engine<br/>(memanto cli)"]:::memanto
+        Serve["🚀 Memanto FastAPI Server<br/>(memanto serve)"]:::memanto
+
+        subgraph Helpers ["🔧 Shared Services"]
+            direction TB
+            Session["Session & Auth Manager"]:::helper
+            Sync["File Sync<br/>(MEMORY.md inject)"]:::helper
+        end
+
+        CLI_Tool --- Session
+        CLI_Tool --- Sync
+        Serve --- Session
+        Serve --- Sync
+    end
+
+    %% Moorcheh Cloud Layer
+    subgraph MoorchehCloud ["☁️ Moorcheh.ai Core Cloud"]
+        direction TB
+        API["Moorcheh Engine API"]:::cloud
+        DB[("Zero-Indexing<br/>Semantic Database")]:::component
+        LLM["Native Grounding<br/>& Query RAG LLM"]:::component
+        
+        API <--> DB
+        API <--> LLM
+    end
+
+    %% Client → Gateway Connections
+    IDEs <==>|CLI Commands| CLI_Tool
+    CLIs <==>|CLI Commands| CLI_Tool
+    Custom <==>|REST API Requests| Serve
+    WebUI <==>|Status & Controls| Serve
+
+    %% Gateway → Moorcheh (independent secure paths)
+    CLI_Tool <==>|Secure Authenticated Calls| API
+    Serve <==>|Secure Authenticated Calls| API
+```
 ---
 
 ## 🚀 MEMANTO CLI

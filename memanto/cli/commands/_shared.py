@@ -19,8 +19,7 @@ from memanto.app.utils.temporal_helpers import (  # noqa: F401
     format_local_time,
     parse_relative_time,
 )
-from memanto.cli.client.api_client import MemantoAPIClient  # noqa: F401
-from memanto.cli.client.direct_client import DirectClient
+from memanto.cli.client.sdk_client import SdkClient
 from memanto.cli.config.manager import ConfigManager
 
 # Re-export connect utilities
@@ -88,8 +87,8 @@ def _warn(message: str) -> None:
     console.print(f"[yellow]Warning:[/yellow] {message}")
 
 
-def get_client() -> DirectClient:
-    """Get configured direct client or exit if not initialized."""
+def get_client() -> SdkClient:
+    """Get configured SDK client or exit if not initialized."""
     api_key = config_manager.get_api_key()
 
     if not api_key:
@@ -98,7 +97,7 @@ def get_client() -> DirectClient:
     # Ensure env is set for app services
     os.environ["MOORCHEH_API_KEY"] = api_key
 
-    client = DirectClient(api_key)
+    client = SdkClient(api_key)
 
     # Restore active session if available
     active_agent_id, active_session_token = config_manager.get_active_session()
