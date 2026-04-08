@@ -1,5 +1,5 @@
 """
-MEMANTO CLI - Agent commands (create, list, activate, deactivate, bootstrap).
+MEMANTO CLI - Agent commands (create, list, activate, deactivate, delete, bootstrap).
 """
 
 import json
@@ -132,6 +132,79 @@ def agent_deactivate():
     config_manager.clear_active_session()
 
     console.print(f"[green]OK Agent '{active_agent_id}' deactivated[/green]")
+
+
+@agent_app.command("delete")
+def agent_delete(
+    agent_id: str = typer.Argument(..., help="Agent ID to delete"),
+    force: bool = typer.Option(
+        False, "--force", "-f", help="Skip confirmation prompt"
+    ),
+):
+    """Delete an agent and its local metadata.
+
+    Note: This removes the agent's local metadata only.
+    Memories stored in Moorcheh are NOT deleted.
+
+    Examples:
+        memanto agent delete my-agent
+        memanto agent delete my-agent --force
+    """
+    if not force:
+        console.print(
+            f"[red]Delete agent '{agent_id}'? This cannot be undone.[/red]"
+        )
+        confirmed = typer.confirm("Confirm", default=False)
+        if not confirmed:
+            console.print("[yellow]Aborted.[/yellow]")
+            raise typer.Exit()
+
+    # Ask whether to keep cloud memories
+    console.print()
+    console.print(
+        "[bold]Keep a copy of agent memory on Moorcheh cloud for free?[/bold]\n"
+        "[dim]You can access it anytime at "
+        "[link=https://console.moorcheh.ai/namespaces]https://console.moorcheh.ai/namespaces[/link]"
+        " in your Moorcheh account.[/dim]"
+    )
+    keep_cloud = typer.confirm("Keep cloud memories", default=True)
+
+    # If this agent is currently active, clear the session first
+    active_agent_id, _ = config_manager.get_active_session()
+    if active_agent_id == agent_id:
+        config_manager.clear_active_session()
+        console.print(f"[dim]Active session for '{agent_id}' cleared.[/dim]")
+
+    client = get_client()
+
+    try:
+        with console.status(f"Deleting agent '{agent_id}'...", spinner="dots"):
+            client.delete_agent(agent_id)
+    except Exception as e:
+        msg = str(e)
+        hint = None
+        if "not found" in msg.lower():
+            hint = "Run 'memanto agent list' to see available agents."
+        _error(f"Failed to delete agent '{agent_id}': {msg}", hint=hint)
+
+    if not keep_cloud:
+        namespace = f"memanto_agent_{agent_id}"
+        try:
+            with console.status("Deleting cloud memories...", spinner="dots"):
+                client._get_moorcheh().namespaces.delete(namespace)
+            console.print(
+                f"[green]Agent '{agent_id}' and all cloud memories deleted.[/green]"
+            )
+        except Exception as e:
+            console.print(
+                f"[yellow]Agent deleted locally, but failed to delete cloud namespace: {e}[/yellow]"
+            )
+    else:
+        console.print(
+            f"[green]Agent '{agent_id}' deleted.[/green] "
+            f"[dim]Cloud memories preserved at "
+            f"[link=https://console.moorcheh.ai/namespaces]console.moorcheh.ai/namespaces[/link][/dim]"
+        )
 
 
 @agent_app.command("bootstrap")

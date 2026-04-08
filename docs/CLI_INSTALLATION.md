@@ -267,6 +267,7 @@ memanto agent create AGENT_ID             # Create new agent
 memanto agent list                        # List all agents
 memanto agent activate AGENT_ID           # Start session
 memanto agent deactivate                  # End session
+memanto agent delete AGENT_ID            # Delete agent (prompts to keep/purge cloud memories)
 
 # Memory Operations
 memanto remember "content"                # Store memory (fact)

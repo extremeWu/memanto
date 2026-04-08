@@ -220,6 +220,51 @@ class TestMEMANTOCLI:
         assert result.exit_code == 0
         assert "deactivated" in result.stdout.lower()
 
+    def test_agent_delete_keep_cloud(self, mock_all_clients):
+        """Test 'memanto agent delete --force' keeping cloud memories (default)"""
+        mock_all_clients.delete_agent.return_value = {
+            "status": "deleted",
+            "agent_id": "test-agent",
+        }
+
+        # Answer "y" to keep cloud memories (default)
+        result = runner.invoke(
+            app, ["agent", "delete", "test-agent", "--force"], input="y\n"
+        )
+        assert result.exit_code == 0
+        assert "deleted" in result.stdout.lower()
+        mock_all_clients.delete_agent.assert_called_once_with("test-agent")
+        mock_all_clients._get_moorcheh.return_value.namespaces.delete.assert_not_called()
+
+    def test_agent_delete_purge_cloud(self, mock_all_clients):
+        """Test 'memanto agent delete --force' also deleting cloud namespace"""
+        mock_all_clients.delete_agent.return_value = {
+            "status": "deleted",
+            "agent_id": "test-agent",
+        }
+        mock_moorcheh = MagicMock()
+        mock_all_clients._get_moorcheh.return_value = mock_moorcheh
+
+        # Answer "n" to delete cloud memories too
+        result = runner.invoke(
+            app, ["agent", "delete", "test-agent", "--force"], input="n\n"
+        )
+        assert result.exit_code == 0
+        assert "deleted" in result.stdout.lower()
+        mock_moorcheh.namespaces.delete.assert_called_once_with(
+            "memanto_agent_test-agent"
+        )
+
+    def test_agent_delete_not_found(self, mock_all_clients):
+        """Test 'memanto agent delete' when agent does not exist"""
+        mock_all_clients.delete_agent.side_effect = Exception("Agent not found")
+
+        result = runner.invoke(
+            app, ["agent", "delete", "ghost-agent", "--force"], input="y\n"
+        )
+        assert result.exit_code != 0
+        assert "ghost-agent" in result.stdout
+
     def test_agent_bootstrap(self, mock_all_clients):
         """Test 'memanto agent bootstrap'"""
         mock_all_clients.get_agent.return_value = {
