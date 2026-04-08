@@ -162,7 +162,7 @@ def agent_delete(
     # Ask whether to keep cloud memories
     console.print()
     console.print(
-        "[bold]Keep a copy of agent memory on Moorcheh cloud for free?[/bold]\n"
+        "[bold]Keep a copy of agent memory on Moorcheh cloud?[/bold]\n"
         "[dim]You can access it anytime at "
         "[link=https://console.moorcheh.ai/namespaces]https://console.moorcheh.ai/namespaces[/link]"
         " in your Moorcheh account.[/dim]"

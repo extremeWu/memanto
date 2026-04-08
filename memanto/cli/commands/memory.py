@@ -374,8 +374,8 @@ def recall(
 @app.command()
 def answer(
     question: str = typer.Argument(..., help="Question to ask"),
-    limit: int = typer.Option(
-        5, "--limit", "-n", help="Number of context memories to use"
+    limit: int | None = typer.Option(
+        None, "--limit", "-n", help="Number of context memories to use"
     ),
 ):
     """Answer a question using RAG (Retrieval-Augmented Generation)."""
