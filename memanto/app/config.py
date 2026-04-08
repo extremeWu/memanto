@@ -74,6 +74,15 @@ class Settings(BaseSettings):
     MAX_MEMORY_SIZE: int = 500  # characters
     MAX_TITLE_SIZE: int = 100  # characters
 
+    # AI / Answer Configuration
+    ANSWER_MODEL: str = "anthropic.claude-sonnet-4-20250514-v1:0"
+    ANSWER_TEMPERATURE: float = 0.7
+    ANSWER_LIMIT: int = 5  # number of context memories to retrieve
+    ANSWER_THRESHOLD: float = 0.25  # confidence threshold for memory relevance
+
+    # Recall / Search Configuration
+    RECALL_LIMIT: int = 10  # default top-N results for recall/search
+
     # Validation Configuration
     REQUIRE_VALIDATION_FOR: list[str] = ["fact", "preference"]
     PROVISIONAL_TTL_SECONDS: int = 3600  # 1 hour

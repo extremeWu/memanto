@@ -175,7 +175,7 @@ def recall(
     query: str | None = typer.Argument(
         None, help="Search query (optional for --changed-since)"
     ),
-    limit: int = typer.Option(10, "--limit", "-n", help="Maximum number of results"),
+    limit: int | None = typer.Option(None, "--limit", "-n", help="Maximum number of results"),
     memory_type: str | None = typer.Option(
         None, "--type", "-t", help="Filter by memory type"
     ),

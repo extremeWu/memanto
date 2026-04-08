@@ -10,6 +10,7 @@ from typing import Any, cast
 
 from moorcheh_sdk import MoorchehClient
 
+from memanto.app.config import settings
 from memanto.app.core import create_memory_scope
 from memanto.app.services.session_service import get_session_service
 from memanto.app.utils.errors import MemoryError
@@ -186,7 +187,7 @@ Example response format:
             result = client.answer.generate(
                 namespace=namespace,
                 query=conflict_prompt,
-                ai_model="anthropic.claude-sonnet-4-20250514-v1:0",
+                ai_model=settings.ANSWER_MODEL,
                 top_k=50,
             )
             conflict_text = result.get("answer", "[]")

@@ -11,6 +11,7 @@ from datetime import datetime
 from fastapi import APIRouter, Body, Depends, Query
 
 from memanto.app.clients.moorcheh import get_moorcheh_client
+from memanto.app.config import settings
 from memanto.app.core import MemoryRecord
 from memanto.app.models import BatchRememberRequest
 from memanto.app.models.session import Session
@@ -206,7 +207,7 @@ async def batch_remember(
 async def recall(
     agent_id: str,
     query: str = Query(..., description="Search query"),
-    limit: int = Query(10, description="Max results"),
+    limit: int = Query(None, description="Max results"),
     min_similarity: float | None = Query(
         None, description="Minimum similarity score (0-1)"
     ),
@@ -234,6 +235,9 @@ async def recall(
                 f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
             )
         )
+
+    if limit is None:
+        limit = settings.RECALL_LIMIT
 
     try:
         # Initialize memory read service
@@ -270,13 +274,13 @@ async def recall(
 async def answer(
     agent_id: str,
     question: str = Body(..., embed=True, description="Question to ask"),
-    limit: int = Query(5, description="Number of context memories to use"),
+    limit: int = Query(None, description="Number of context memories to use"),
     threshold: float = Query(
-        0.25, description="Confidence threshold for memory relevance"
+        None, description="Confidence threshold for memory relevance"
     ),
-    temperature: float = Query(0.7, description="Temperature for the LLM response"),
+    temperature: float = Query(None, description="Temperature for the LLM response"),
     aiModel: str = Query(
-        "anthropic.claude-sonnet-4-20250514-v1:0",
+        None,
         description="AI model to use for generating the answer",
     ),
     kiosk_mode: bool = Query(False, description="Kiosk mode setting"),
@@ -306,6 +310,16 @@ async def answer(
                 f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
             )
         )
+
+    # Resolve defaults from settings
+    if limit is None:
+        limit = settings.ANSWER_LIMIT
+    if threshold is None:
+        threshold = settings.ANSWER_THRESHOLD
+    if temperature is None:
+        temperature = settings.ANSWER_TEMPERATURE
+    if aiModel is None:
+        aiModel = settings.ANSWER_MODEL
 
     try:
         # Use namespace from session
@@ -547,7 +561,7 @@ async def recall_as_of(
     agent_id: str,
     query: str = Query(..., description="Search query"),
     as_of: str = Query(..., description="Point-in-time timestamp (ISO format)"),
-    limit: int = Query(10, description="Max results"),
+    limit: int = Query(None, description="Max results"),
     memory_types: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
@@ -572,6 +586,9 @@ async def recall_as_of(
                 f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
             )
         )
+
+    if limit is None:
+        limit = settings.RECALL_LIMIT
 
     try:
         read_service = MemoryReadService(client)
@@ -605,7 +622,7 @@ async def recall_as_of(
 async def recall_changed_since(
     agent_id: str,
     since: str = Query(..., description="Start date for changes (ISO format)"),
-    limit: int = Query(10, description="Max results"),
+    limit: int = Query(None, description="Max results"),
     memory_types: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
@@ -628,6 +645,9 @@ async def recall_changed_since(
                 f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
             )
         )
+
+    if limit is None:
+        limit = settings.RECALL_LIMIT
 
     try:
         read_service = MemoryReadService(client)
@@ -659,7 +679,7 @@ async def recall_changed_since(
 async def recall_current(
     agent_id: str,
     query: str = Query(..., description="Search query"),
-    limit: int = Query(10, description="Max results"),
+    limit: int = Query(None, description="Max results"),
     memory_types: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
@@ -686,6 +706,9 @@ async def recall_current(
                 f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
             )
         )
+
+    if limit is None:
+        limit = settings.RECALL_LIMIT
 
     try:
         read_service = MemoryReadService(client)

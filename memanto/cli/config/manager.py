@@ -142,6 +142,41 @@ class ConfigManager:
         defaults.update(self.load_yaml().get("cli", {}))
         return defaults
 
+    def get_ai_config(self) -> dict:
+        """Get AI/answer config dict with defaults."""
+        defaults = {
+            "model": "anthropic.claude-sonnet-4-20250514-v1:0",
+            "temperature": 0.7,
+            "answer_limit": 5,
+            "threshold": 0.25,
+            "recall_limit": 10,
+        }
+        defaults.update(self.load_yaml().get("ai", {}))
+        return defaults
+
+    def set_ai_config(
+        self,
+        model: str | None = None,
+        temperature: float | None = None,
+        answer_limit: int | None = None,
+        threshold: float | None = None,
+        recall_limit: int | None = None,
+    ) -> None:
+        """Set AI/answer config values."""
+        data = self.load_yaml()
+        ai = data.setdefault("ai", {})
+        if model is not None:
+            ai["model"] = model
+        if temperature is not None:
+            ai["temperature"] = temperature
+        if answer_limit is not None:
+            ai["answer_limit"] = answer_limit
+        if threshold is not None:
+            ai["threshold"] = threshold
+        if recall_limit is not None:
+            ai["recall_limit"] = recall_limit
+        self.save_yaml(data)
+
     # Schedule timing
 
     def get_schedule_time(self) -> str:
