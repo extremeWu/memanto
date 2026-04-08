@@ -230,6 +230,36 @@ memanto agent deactivate
 
 Ends the current agent session.
 
+#### `agent delete` - Delete Agent
+
+```bash
+memanto agent delete AGENT_ID [OPTIONS]
+```
+
+**Arguments:**
+- `AGENT_ID` - ID of the agent to delete
+
+**Options:**
+- `--force, -f` - Skip confirmation prompt (default: false)
+
+**Behavior:**
+1. Shows a red confirmation warning (skipped with `--force`)
+2. Asks whether to keep cloud memories — free storage accessible at [console.moorcheh.ai/namespaces](https://console.moorcheh.ai/namespaces)
+3. If the agent has an active session, it is cleared automatically
+4. Deletes the local agent metadata with a loading spinner
+5. If cloud purge was chosen, also deletes the Moorcheh namespace (with spinner)
+
+> **Note:** Choosing to keep cloud memories means your agent's memories remain safely stored in Moorcheh and can be accessed or re-linked at any time.
+
+**Examples:**
+```bash
+# Delete with interactive prompts
+memanto agent delete my-agent
+
+# Force delete, skip confirmation (still asks about cloud memories)
+memanto agent delete my-agent --force
+```
+
 ---
 
 ### Memory Commands
