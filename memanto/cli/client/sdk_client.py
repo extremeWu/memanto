@@ -590,7 +590,7 @@ class SdkClient:
         self,
         agent_id: str,
         query: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
         tags: list[str] | None = None,
         min_confidence: float | None = None,
@@ -603,7 +603,7 @@ class SdkClient:
         Args:
             agent_id: Target agent.
             query: Natural-language search query.
-            limit: Max results (1–100, default 5).
+            limit: Max results (1–100, defaults to config).
             memory_types: Filter by types.
             tags: Filter by tags.
             min_confidence: Minimum confidence threshold.
@@ -613,6 +613,9 @@ class SdkClient:
         Returns:
             Dict with ``agent_id``, ``query``, ``memories``, ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
+
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -645,7 +648,7 @@ class SdkClient:
         agent_id: str,
         query: str,
         as_of: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
     ) -> dict[str, Any]:
         """
@@ -655,12 +658,15 @@ class SdkClient:
             agent_id: Target agent.
             query: Search query.
             as_of: ISO-8601 date/datetime string.
-            limit: Max results.
+            limit: Max results (defaults to config).
             memory_types: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
+
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -685,7 +691,7 @@ class SdkClient:
         self,
         agent_id: str,
         since: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
     ) -> dict[str, Any]:
         """
@@ -694,12 +700,15 @@ class SdkClient:
         Args:
             agent_id: Target agent.
             since: ISO-8601 date/datetime string.
-            limit: Max results.
+            limit: Max results (defaults to config).
             memory_types: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
+
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -722,7 +731,7 @@ class SdkClient:
         self,
         agent_id: str,
         query: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
     ) -> dict[str, Any]:
         """
@@ -731,12 +740,14 @@ class SdkClient:
         Args:
             agent_id: Target agent.
             query: Search query.
-            limit: Max results.
+            limit: Max results (defaults to config).
             memory_types: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -759,10 +770,10 @@ class SdkClient:
         self,
         agent_id: str,
         question: str,
-        limit: int = 5,
-        threshold: float = 0.25,
-        temperature: float = 0.7,
-        ai_model: str = "anthropic.claude-sonnet-4-20250514-v1:0",
+        limit: int | None = None,
+        threshold: float | None = None,
+        temperature: float | None = None,
+        ai_model: str | None = None,
         kiosk_mode: bool = False,
         header_prompt: str | None = None,
         footer_prompt: str | None = None,
@@ -773,10 +784,10 @@ class SdkClient:
         Args:
             agent_id: Target agent.
             question: Natural-language question.
-            limit: Number of memories to use as context (default 5).
-            threshold: Confidence threshold for memory relevance.
-            temperature: Temperature for the LLM response.
-            ai_model: AI model to use for generating the answer.
+            limit: Number of memories to use as context (defaults to config).
+            threshold: Confidence threshold for memory relevance (defaults to config).
+            temperature: Temperature for the LLM response (defaults to config).
+            ai_model: AI model to use for generating the answer (defaults to config).
             kiosk_mode: When true, filters out low-relevance results.
             header_prompt: Header prompt for the LLM.
             footer_prompt: Footer prompt for the LLM.
@@ -784,6 +795,17 @@ class SdkClient:
         Returns:
             Dict with ``answer``, ``sources``, ``namespace``.
         """
+        # Resolve defaults from config
+        ai_cfg = ConfigManager().get_ai_config()
+        if limit is None:
+            limit = ai_cfg["answer_limit"]
+        if threshold is None:
+            threshold = ai_cfg["threshold"]
+        if temperature is None:
+            temperature = ai_cfg["temperature"]
+        if ai_model is None:
+            ai_model = ai_cfg["model"]
+
         # Ensure there is a valid, non-expired session for this agent
         session = self._get_validated_session_for_agent(agent_id)
 

@@ -168,27 +168,28 @@ class MoorchehClient:
                 self,
                 namespace,
                 query,
-                top_k=5,
-                ai_model="anthropic.claude-sonnet-4-20250514-v1:0",
-                temperature=0.7,
-                threshold=0.25,
+                top_k=None,
+                ai_model=None,
+                temperature=None,
+                threshold=None,
                 kiosk_mode=False,
                 header_prompt=None,
                 footer_prompt=None,
             ):
+                ai_cfg = ConfigManager().get_ai_config()
                 payload = {
                     "namespace": namespace,
                     "query": query,
-                    "top_k": top_k,
+                    "top_k": top_k if top_k is not None else ai_cfg["answer_limit"],
                     "type": "text",
-                    "aiModel": ai_model,
-                    "temperature": temperature,
+                    "aiModel": ai_model if ai_model is not None else ai_cfg["model"],
+                    "temperature": temperature if temperature is not None else ai_cfg["temperature"],
                     "kiosk_mode": kiosk_mode,
                     "headerPrompt": header_prompt or "",
                     "footerPrompt": footer_prompt or "",
                 }
                 if kiosk_mode:
-                    payload["threshold"] = threshold
+                    payload["threshold"] = threshold if threshold is not None else ai_cfg["threshold"]
                 return self.client._request("POST", "/answer", payload)
 
         return Ans(self)
@@ -753,7 +754,7 @@ class DirectClient:
         self,
         agent_id: str,
         query: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
         tags: list[str] | None = None,
         min_confidence: float | None = None,
@@ -766,7 +767,7 @@ class DirectClient:
         Args:
             agent_id: Target agent.
             query: Natural-language search query.
-            limit: Max results (1–100, default 5).
+            limit: Max results (1–100, defaults to config).
             memory_types: Filter by types (e.g. ``["fact", "decision"]``).
             tags: Filter by tags.
             min_confidence: Minimum confidence threshold.
@@ -777,6 +778,9 @@ class DirectClient:
             Dict with ``agent_id``, ``query``, ``memories`` (list),
             ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
+
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -809,7 +813,7 @@ class DirectClient:
         agent_id: str,
         query: str,
         as_of: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
     ) -> dict[str, Any]:
         """
@@ -819,12 +823,15 @@ class DirectClient:
             agent_id: Target agent.
             query: Search query.
             as_of: ISO-8601 date/datetime string.
-            limit: Max results.
+            limit: Max results (defaults to config).
             memory_types: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
+
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -849,7 +856,7 @@ class DirectClient:
         self,
         agent_id: str,
         since: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
     ) -> dict[str, Any]:
         """
@@ -858,12 +865,15 @@ class DirectClient:
         Args:
             agent_id: Target agent.
             since: ISO-8601 date/datetime string.
-            limit: Max results.
+            limit: Max results (defaults to config).
             memory_types: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
+
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -886,7 +896,7 @@ class DirectClient:
         self,
         agent_id: str,
         query: str,
-        limit: int = 5,
+        limit: int | None = None,
         memory_types: list[str] | None = None,
     ) -> dict[str, Any]:
         """
@@ -898,12 +908,15 @@ class DirectClient:
         Args:
             agent_id: Target agent.
             query: Search query.
-            limit: Max results.
+            limit: Max results (defaults to config).
             memory_types: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
         """
+        if limit is None:
+            limit = ConfigManager().get_ai_config()["recall_limit"]
+
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -926,10 +939,10 @@ class DirectClient:
         self,
         agent_id: str,
         question: str,
-        limit: int = 5,
-        threshold: float = 0.25,
-        temperature: float = 0.7,
-        ai_model: str = "anthropic.claude-sonnet-4-20250514-v1:0",
+        limit: int | None = None,
+        threshold: float | None = None,
+        temperature: float | None = None,
+        ai_model: str | None = None,
         kiosk_mode: bool = False,
         header_prompt: str | None = None,
         footer_prompt: str | None = None,
@@ -943,10 +956,10 @@ class DirectClient:
         Args:
             agent_id: Target agent.
             question: Natural-language question.
-            limit: Number of memories to use as context (default 5).
-            threshold: Confidence threshold for memory relevance.
-            temperature: Temperature for the LLM response.
-            ai_model: AI model to use for generating the answer.
+            limit: Number of memories to use as context (defaults to config).
+            threshold: Confidence threshold for memory relevance (defaults to config).
+            temperature: Temperature for the LLM response (defaults to config).
+            ai_model: AI model to use for generating the answer (defaults to config).
             kiosk_mode: When true, filters out low-relevance results; requires threshold.
             header_prompt: Header prompt for the LLM.
             footer_prompt: Footer prompt for the LLM.
@@ -954,6 +967,17 @@ class DirectClient:
         Returns:
             Dict with ``answer``, ``sources``, ``namespace``.
         """
+        # Resolve defaults from config
+        ai_cfg = ConfigManager().get_ai_config()
+        if limit is None:
+            limit = ai_cfg["answer_limit"]
+        if threshold is None:
+            threshold = ai_cfg["threshold"]
+        if temperature is None:
+            temperature = ai_cfg["temperature"]
+        if ai_model is None:
+            ai_model = ai_cfg["model"]
+
         # Ensure there is a valid, non-expired session for this agent
         session = self._get_validated_session_for_agent(agent_id)
 

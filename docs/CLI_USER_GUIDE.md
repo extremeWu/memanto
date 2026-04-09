@@ -314,7 +314,7 @@ memanto recall QUERY [OPTIONS]
 - `QUERY` - Search query (semantic search)
 
 **Options:**
-- `--limit, -n INT` - Maximum results (default: 10)
+- `--limit, -n INT` - Maximum results (default: `recall_limit` from config, factory default 10)
 - `--type, -t TEXT` - Filter by memory type
 - `--min-confidence FLOAT` - Minimum confidence score
 - `--tags TEXT` - Filter by tags (comma-separated)
@@ -365,7 +365,7 @@ memanto answer QUESTION [OPTIONS]
 - `QUESTION` - Question to ask
 
 **Options:**
-- `--limit, -n INT` - Number of context memories to use (default: 5)
+- `--limit, -n INT` - Number of context memories to use (default: `answer_limit` from config, factory default 5)
 
 **Examples:**
 ```bash
@@ -550,6 +550,14 @@ cli:
   smart_parse: true
   color_output: true
   compact_view: false
+
+# AI / Answer & Recall configuration (all optional — defaults shown)
+ai:
+  model: "anthropic.claude-sonnet-4-20250514-v1:0"  # LLM used for answer
+  temperature: 0.7        # LLM temperature (0.0–1.0)
+  answer_limit: 5         # context memories passed to LLM for `answer`
+  threshold: 0.25         # confidence threshold for memory relevance
+  recall_limit: 10        # top-N results returned by `recall`
 
 active_agent_id: "code-assistant"
 active_session_token: "eyJhbGciOiJIUzI1NiI..."

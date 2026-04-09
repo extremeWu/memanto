@@ -175,7 +175,7 @@ def recall(
     query: str | None = typer.Argument(
         None, help="Search query (optional for --changed-since)"
     ),
-    limit: int = typer.Option(10, "--limit", "-n", help="Maximum number of results"),
+    limit: int | None = typer.Option(None, "--limit", "-n", help="Maximum number of results"),
     memory_type: str | None = typer.Option(
         None, "--type", "-t", help="Filter by memory type"
     ),
@@ -374,8 +374,8 @@ def recall(
 @app.command()
 def answer(
     question: str = typer.Argument(..., help="Question to ask"),
-    limit: int = typer.Option(
-        5, "--limit", "-n", help="Number of context memories to use"
+    limit: int | None = typer.Option(
+        None, "--limit", "-n", help="Number of context memories to use"
     ),
 ):
     """Answer a question using RAG (Retrieval-Augmented Generation)."""
