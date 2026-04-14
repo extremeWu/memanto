@@ -112,6 +112,9 @@ cd memanto
 
 # Start server
 memanto serve
+
+# Or run with Docker
+docker-compose up -d
 ```
 
 By default, call the endpoints on your local server (for example: `"http://127.0.0.1:8000"`).

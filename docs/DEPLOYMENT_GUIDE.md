@@ -55,35 +55,14 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 
 ## 🐳 Docker Deployment
 
-### Dockerfile
-```dockerfile
-FROM python:3.11-slim
-
-WORKDIR /app
-
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
-COPY app/ ./app/
-COPY *.py ./
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8000/health || exit 1
-
-# Run application
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
+Memanto includes a production-ready `Dockerfile` and `docker-compose.yml` in the root of the repository.
 
 ### Docker Commands
 ```bash
-# Build image
+# 1. Build the image
 docker build -t memanto:latest .
 
-# Run container
+# 2. Run the container
 docker run -d \
   --name memanto \
   -p 8000:8000 \
@@ -97,22 +76,17 @@ curl http://localhost:8000/health
 ```
 
 ### Docker Compose
-```yaml
-version: '3.8'
-services:
-  memanto:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - MOORCHEH_API_KEY=${MOORCHEH_API_KEY}
-      - LOG_LEVEL=INFO
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+Using the included `docker-compose.yml` makes running the application even easier.
+
+```bash
+# First, ensure your .env file has the required variables
+cp .env.example .env
+
+# Start the service in detached mode
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
 ```
 
 ## ☸️ Kubernetes Deployment
