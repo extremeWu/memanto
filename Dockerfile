@@ -30,7 +30,7 @@ COPY memanto/ ./memanto/
 RUN uv pip install --system --no-cache --no-deps .
 
 # ── Security: run as non-root ─────────────────────────────────────────────────
-RUN useradd --no-create-home --shell /bin/false --uid 1001 memanto
+RUN useradd -m --shell /bin/false --uid 1001 memanto
 USER memanto
 
 EXPOSE 8000
