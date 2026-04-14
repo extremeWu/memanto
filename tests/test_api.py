@@ -406,3 +406,79 @@ class TestMEMANTOAPI:
         )
         assert response.status_code == 200
         assert response.json()["temporal_mode"] == "current_only"
+
+    @pytest.mark.asyncio
+    async def test_upload_file_with_session(self, client, auth_headers, mock_moorcheh):
+        """Test file upload to agent's memory namespace"""
+        # Setup agent and session
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+
+        # Mock documents.upload_file result
+        mock_moorcheh.documents.upload_file.return_value = {
+            "success": True,
+            "message": "File uploaded successfully",
+            "fileName": "notes.txt",
+            "fileSize": 1024,
+        }
+
+        # Upload a small text file
+        headers = {**auth_headers, "X-Session-Token": token}
+        file_content = b"This is a test memory document."
+        response = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/upload-file",
+            headers=headers,
+            files={"file": ("notes.txt", file_content, "text/plain")},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["agent_id"] == self.TEST_AGENT_ID
+        assert data["file_name"] == "notes.txt"
+        assert data["status"] == "uploaded"
+
+    @pytest.mark.asyncio
+    async def test_upload_file_unsupported_extension(self, client, auth_headers):
+        """Test that unsupported file types are rejected"""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+
+        headers = {**auth_headers, "X-Session-Token": token}
+        response = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/upload-file",
+            headers=headers,
+            files={"file": ("script.exe", b"binary content", "application/octet-stream")},
+        )
+
+        assert response.status_code == 400
+
+    @pytest.mark.asyncio
+    async def test_upload_file_requires_session(self, client, auth_headers):
+        """Test that upload requires a valid session token"""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+
+        response = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/upload-file",
+            headers=auth_headers,  # no X-Session-Token
+            files={"file": ("notes.txt", b"content", "text/plain")},
+        )
+
+        assert response.status_code in (401, 403, 422)

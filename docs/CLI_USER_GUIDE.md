@@ -24,6 +24,7 @@ MEMANTO CLI provides a command-line interface for interacting with MEMANTO (Univ
 
 - Create and manage AI agents
 - Store and retrieve agent memories
+- Upload documents and files into an agent's memory namespace
 - Perform semantic search across memories
 - Ask questions using RAG (Retrieval-Augmented Generation)
 - Manage agent sessions
@@ -303,6 +304,39 @@ python -m cli.main remember "Must complete security audit by end of month" \
 Memory ID: mem_abc123xyz
 Type: decision | Confidence: 0.95
 ```
+
+#### `upload` - Upload a File to Memory
+
+```bash
+memanto upload FILE_PATH
+```
+
+**Arguments:**
+- `FILE_PATH` - Path to the file to upload
+
+**Supported formats:** `.pdf`, `.docx`, `.xlsx`, `.json`, `.txt`, `.csv`, `.md`
+
+The file is processed by Moorcheh — its content is chunked and embedded, making it instantly searchable via `memanto recall`. When you recall memories, file-sourced results are labelled `· file upload · summary` or `· file upload · chunk` in the panel title so you can distinguish them from manually stored memories.
+
+**Examples:**
+```bash
+# Upload a PDF document
+memanto upload report.pdf
+
+# Upload a markdown file
+memanto upload SECURITY.md
+```
+
+**Output:**
+```
+OK File uploaded successfully!
+File: SECURITY.md
+Size: 0.01 MB
+Namespace: agent:my-agent
+Completed in 3.21s
+```
+
+---
 
 #### `recall` - Search Memories
 

@@ -6,9 +6,12 @@ Replaces /api/v1/agents/{agent_id}/remember with session-based auth.
 """
 
 import asyncio
+import os
+import tempfile
 from datetime import datetime
+from pathlib import Path
 
-from fastapi import APIRouter, Body, Depends, Query
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
 
 from memanto.app.clients.moorcheh import get_moorcheh_client
 from memanto.app.config import settings
@@ -197,6 +200,77 @@ async def batch_remember(
             "successful": result["successful"],
             "failed": result["failed"],
             "results": result["results"],
+        }
+
+    except Exception as e:
+        raise map_error_to_http_exception(e)
+
+
+@router.post("/{agent_id}/upload-file")
+async def upload_file(
+    agent_id: str,
+    file: UploadFile = File(..., description="File to upload (.pdf, .docx, .xlsx, .json, .txt, .csv, .md)"),
+    session: Session = Depends(get_current_session),
+    client=Depends(get_moorcheh_client),
+):
+    """
+    Upload a file directly to the agent's memory namespace (Session-based)
+
+    Supported formats: .pdf, .docx, .xlsx, .json, .txt, .csv, .md
+    Maximum file size: 5GB
+
+    The file is processed by Moorcheh to extract text and generate embeddings,
+    making its content searchable via recall.
+
+    Requires:
+    - Authorization: Bearer {moorcheh_api_key}
+    - X-Session-Token: {session_token}
+    - Content-Type: multipart/form-data
+    """
+    if session.agent_id != agent_id:
+        raise map_error_to_http_exception(
+            Exception(
+                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
+            )
+        )
+
+    # Validate file extension before reading
+    ALLOWED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".json", ".txt", ".csv", ".md"}
+    original_name = file.filename or "upload"
+    suffix = Path(original_name).suffix.lower()
+    if suffix not in ALLOWED_EXTENSIONS:
+        allowed_str = ", ".join(sorted(ALLOWED_EXTENSIONS))
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type '{suffix}' is not supported. Allowed types: {allowed_str}",
+        )
+
+    try:
+        namespace = session.namespace
+
+        # Write upload to a temp file so moorcheh SDK can read it
+        # Use original filename so the SDK records it as the source
+        file_bytes = await file.read()
+        tmp_dir = tempfile.mkdtemp()
+        tmp_path = os.path.join(tmp_dir, original_name)
+        try:
+            with open(tmp_path, "wb") as tmp:
+                tmp.write(file_bytes)
+            result = await asyncio.to_thread(
+                client.documents.upload_file, namespace, tmp_path
+            )
+        finally:
+            import shutil
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+        return {
+            "agent_id": agent_id,
+            "session_id": session.session_id,
+            "namespace": namespace,
+            "file_name": original_name,
+            "file_size": result.get("fileSize"),
+            "status": "uploaded" if result.get("success") else "failed",
+            "message": result.get("message", ""),
         }
 
     except Exception as e:

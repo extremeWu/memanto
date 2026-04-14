@@ -89,6 +89,7 @@ Use memory types to categorize what you store so retrieval is cleaner and more c
 | Local server + web dashboard | `memanto serve`, `memanto ui` | Run the MEMANTO API locally and open an interactive browser UI. |
 | Agent lifecycle management | `memanto agent ...` | Create/list/delete agents, activate/deactivate sessions, and run `agent bootstrap` for an intelligence snapshot. |
 | Memory capture at scale | `memanto remember` | Store single memories with metadata or batch-ingest up to 100 records from JSON. |
+| File upload to memory | `memanto upload` | Upload documents (.pdf, .docx, .xlsx, .json, .txt, .csv, .md) directly into an agent's memory namespace — content becomes instantly searchable via `recall`. |
 | Advanced retrieval modes | `memanto recall` | Run standard search plus temporal queries (`--as-of`, `--changed-since`, `--current-only`) with filters. |
 | Grounded QA over memory | `memanto answer` | Generate RAG answers using retrieved memory context. |
 | Daily intelligence workflows | `memanto daily-summary`, `memanto conflicts` | Generate summaries, detect contradictions, and resolve conflicts interactively. |
@@ -133,6 +134,8 @@ By default, call the endpoints on your local server (for example: `"http://127.0
 
 ### Memory Operations
 - `POST /api/v2/agents/{agent_id}/remember` - Store a new memory into the agent's semantic database
+- `POST /api/v2/agents/{agent_id}/batch-remember` - Batch-store up to 100 memories in one request
+- `POST /api/v2/agents/{agent_id}/upload-file` - Upload a file (.pdf, .docx, .xlsx, .json, .txt, .csv, .md) — content is chunked and made searchable
 - `GET /api/v2/agents/{agent_id}/recall` - Run an exact semantic search against the agent's memories
 - `POST /api/v2/agents/{agent_id}/answer` - Generate a grounded RAG answer based on the agent's memories
 
