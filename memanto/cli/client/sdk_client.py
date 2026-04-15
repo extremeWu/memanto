@@ -586,6 +586,57 @@ class SdkClient:
 
         return result
 
+    def upload_file(self, agent_id: str, file_path: str) -> dict[str, Any]:
+        """
+        Upload a file directly to the agent's memory namespace.
+
+        Supported formats: .pdf, .docx, .xlsx, .json, .txt, .csv, .md
+        Maximum file size: 5GB
+
+        Args:
+            agent_id: Target agent.
+            file_path: Local path to the file to upload.
+
+        Returns:
+            Dict with ``agent_id``, ``namespace``, ``success``, ``message``,
+            ``file_name``, ``file_size``.
+
+        Raises:
+            ValueError: If the file does not exist or has an unsupported extension.
+            SessionError: If no active session exists for the agent.
+        """
+        from pathlib import Path
+
+        path = Path(file_path)
+        if not path.exists():
+            raise ValueError(f"File not found: {file_path}")
+
+        ALLOWED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".json", ".txt", ".csv", ".md"}
+        suffix = path.suffix.lower()
+        if suffix not in ALLOWED_EXTENSIONS:
+            allowed_str = ", ".join(sorted(ALLOWED_EXTENSIONS))
+            raise ValueError(
+                f"File type '{suffix}' is not supported. Allowed types: {allowed_str}"
+            )
+
+        session = self._get_validated_session_for_agent(agent_id)
+        namespace = session.namespace
+
+        logger.debug("Uploading file '%s' to namespace '%s'", path.name, namespace)
+        result = self._get_moorcheh().documents.upload_file(
+            namespace_name=namespace,
+            file_path=path,
+        )
+
+        return {
+            "agent_id": agent_id,
+            "namespace": namespace,
+            "success": result.get("success", False),
+            "message": result.get("message", ""),
+            "file_name": result.get("fileName", path.name),
+            "file_size": result.get("fileSize", 0),
+        }
+
     def recall(
         self,
         agent_id: str,

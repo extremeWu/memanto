@@ -55,7 +55,33 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/remember?memory_type=
   -H "X-Session-Token: YOUR_SESSION_TOKEN"
 ```
 
-### 4. Recall Memories
+### 4. Upload a File (Optional)
+
+Upload a document directly into the agent's memory — content is chunked and made searchable via `recall`.
+
+```bash
+curl -X POST "http://localhost:8000/api/v2/agents/my-agent/upload-file" \
+  -H "Authorization: Bearer YOUR_MOORCHEH_API_KEY" \
+  -H "X-Session-Token: YOUR_SESSION_TOKEN" \
+  -F "file=@/path/to/document.pdf"
+```
+
+**Response:**
+```json
+{
+  "agent_id": "my-agent",
+  "session_id": "sess_abc123",
+  "namespace": "memanto_agent_my-agent",
+  "file_name": "document.pdf",
+  "file_size": 204800,
+  "status": "uploaded",
+  "message": "File uploaded successfully"
+}
+```
+
+**Supported formats:** `.pdf`, `.docx`, `.xlsx`, `.json`, `.txt`, `.csv`, `.md`
+
+### 5. Recall Memories
 
 ```bash
 curl -X GET "http://localhost:8000/api/v2/agents/my-agent/recall?query=first+memory&limit=5" \
@@ -63,7 +89,7 @@ curl -X GET "http://localhost:8000/api/v2/agents/my-agent/recall?query=first+mem
   -H "X-Session-Token: YOUR_SESSION_TOKEN"
 ```
 
-### 5. Ask Questions (RAG)
+### 6. Ask Questions (RAG)
 
 ```bash
 curl -X POST "http://localhost:8000/api/v2/agents/my-agent/answer?question=What+is+my+first+memory" \
@@ -126,7 +152,16 @@ memory = client.post(
 )
 print("Memory stored:", memory.json())
 
-# 5. Recall memories
+# 5. Upload a file (optional)
+with open("document.pdf", "rb") as f:
+    upload = client.post(
+        f"/api/v2/agents/{AGENT_ID}/upload-file",
+        headers=headers,
+        files={"file": ("document.pdf", f, "application/pdf")}
+    )
+print("Upload status:", upload.json()["status"])
+
+# 7. Recall memories
 memories = client.get(
     f"/api/v2/agents/{AGENT_ID}/recall",
     headers=headers,
@@ -134,7 +169,7 @@ memories = client.get(
 )
 print("Found memories:", len(memories.json()["memories"]))
 
-# 6. Ask question
+# 8. Ask question
 answer = client.post(
     f"/api/v2/agents/{AGENT_ID}/answer",
     headers=headers,

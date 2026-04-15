@@ -171,6 +171,70 @@ def remember(
 
 
 @app.command()
+def upload(
+    file_path: str = typer.Argument(..., help="Path to the file to upload"),
+):
+    """Upload a file to the active agent's memory namespace.
+
+    Supported formats: .pdf, .docx, .xlsx, .json, .txt, .csv, .md
+
+    Examples:
+        memanto upload report.pdf
+        memanto upload notes.txt
+    """
+    import os
+    from pathlib import Path
+
+    start = time.perf_counter()
+    active_agent_id, active_session_token = config_manager.get_active_session()
+
+    if not active_agent_id or not active_session_token:
+        _error(
+            "No active agent.", hint="Run 'memanto agent activate <agent-id>' first."
+        )
+
+    path = Path(file_path)
+    if not path.exists():
+        _error(f"File not found: {file_path}", hint="Provide a valid file path.")
+
+    ALLOWED_EXTENSIONS = {".pdf", ".docx", ".xlsx", ".json", ".txt", ".csv", ".md"}
+    suffix = path.suffix.lower()
+    if suffix not in ALLOWED_EXTENSIONS:
+        allowed_str = ", ".join(sorted(ALLOWED_EXTENSIONS))
+        _error(
+            f"File type '{suffix}' is not supported.",
+            hint=f"Allowed types: {allowed_str}",
+        )
+
+    client = get_client()
+    agent_id = active_agent_id
+    file_size_mb = path.stat().st_size / (1024 * 1024)
+
+    try:
+        with console.status(
+            f"[cyan]Uploading [bold]{path.name}[/bold] ({file_size_mb:.2f} MB)...",
+            spinner="dots",
+        ):
+            result = client.upload_file(agent_id=agent_id, file_path=str(path))
+        elapsed = time.perf_counter() - start
+
+        if result.get("success"):
+            console.print(f"[green]OK File uploaded successfully![/green]")
+        else:
+            console.print(f"[yellow]Upload completed with status: {result.get('message')}[/yellow]")
+
+        console.print(f"[dim]File: {result.get('file_name', path.name)}[/dim]")
+        reported_size = result.get("file_size")
+        if reported_size:
+            console.print(f"[dim]Size: {reported_size / (1024 * 1024):.2f} MB[/dim]")
+        console.print(f"[dim]Namespace: {result.get('namespace', 'unknown')}[/dim]")
+        console.print(f"[dim]Completed in {elapsed:.2f}s[/dim]")
+
+    except Exception as e:
+        _error(f"Failed to upload file: {e}")
+
+
+@app.command()
 def recall(
     query: str | None = typer.Argument(
         None, help="Search query (optional for --changed-since)"
@@ -332,11 +396,19 @@ def recall(
             status = memory.get("status") or "active"
             change_type = memory.get("change_type")
 
+            # Determine memory source from ID pattern
+            id_str = memory.get("id", "unknown")
+            if "_summary_" in id_str:
+                source_tag = "[yellow] · file upload · summary [/yellow]"
+            elif "_chunk_" in id_str:
+                source_tag = "[yellow] · file upload · chunk [/yellow]"
+            else:
+                source_tag = "[cyan] · memory [/cyan]"
+
             # Create panel for each memory
             panel_content = f"[bold]{title}[/bold]\n\n{content[:200]}{'...' if len(content) > 200 else ''}\n\n"
 
             # Show ID and confidence (computed if available)
-            id_str = memory.get("id", "unknown")
             if comp_conf is not None:
                 panel_content += f"[dim]ID: {id_str} | Type: {mem_type} | Confidence: {comp_conf:.2f} (computed) | Score: {score:.3f}[/dim]"
             else:
@@ -344,6 +416,11 @@ def recall(
 
             if created:
                 panel_content += f"\n[dim]Created: {format_local_time(created)}[/dim]"
+            elif "_summary_" in id_str or "_chunk_" in id_str:
+                file_source = memory.get("source") or ""
+                if file_source:
+                    panel_content += f"\n[dim]Source file: {file_source}[/dim]"
+                panel_content += "\n[dim]Created: not available (file upload)[/dim]"
 
             # Show status for non-standard queries
             if temporal_mode != "standard" and status != "active":
@@ -361,7 +438,7 @@ def recall(
                 border_style = SUCCESS
 
             console.print(
-                Panel(panel_content, title=f"Memory {i}", border_style=border_style)
+                Panel(panel_content, title=f"Memory {i} {source_tag}", border_style=border_style)
             )
             console.print()
 

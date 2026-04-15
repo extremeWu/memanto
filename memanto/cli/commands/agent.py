@@ -141,10 +141,10 @@ def agent_delete(
         False, "--force", "-f", help="Skip confirmation prompt"
     ),
 ):
-    """Delete an agent and its local metadata.
+    """Delete an agent and optionally purge its cloud memories.
 
-    Note: This removes the agent's local metadata only.
-    Memories stored in Moorcheh are NOT deleted.
+    Removes local agent metadata and optionally deletes the Moorcheh namespace.
+    You will be prompted whether to keep or purge cloud memories.
 
     Examples:
         memanto agent delete my-agent
