@@ -405,13 +405,18 @@ def status():
 
 @app.command()
 def serve(
-    host: str = typer.Option("0.0.0.0", "--host", help="Server host"),
-    port: int = typer.Option(8000, "--port", help="Server port"),
+    host: str = typer.Option(None, "--host", help="Server host (defaults to config)"),
+    port: int = typer.Option(None, "--port", help="Server port (defaults to config)"),
     reload: bool = typer.Option(
         False, "--reload", help="Enable auto-reload for development"
     ),
 ):
     """Start MEMANTO server."""
+    server_cfg = config_manager.get_server_config()
+    host = host or server_cfg.get("url", "0.0.0.0")
+    if host == "localhost":
+        host = "0.0.0.0"  # Typically want 0.0.0.0 for bind
+    port = port or server_cfg.get("port", 8000)
 
     console.print(
         Panel.fit(
@@ -480,11 +485,17 @@ def serve(
 
 @app.command()
 def ui(
-    host: str = typer.Option("0.0.0.0", "--host", help="Server host"),
-    port: int = typer.Option(8000, "--port", help="Server port"),
+    host: str = typer.Option(None, "--host", help="Server host (defaults to config)"),
+    port: int = typer.Option(None, "--port", help="Server port (defaults to config)"),
 ):
     """Start MEMANTO server and open the Web UI Dashboard."""
     import webbrowser
+
+    server_cfg = config_manager.get_server_config()
+    host = host or server_cfg.get("url", "0.0.0.0")
+    if host == "localhost":
+        host = "0.0.0.0"
+    port = port or server_cfg.get("port", 8000)
 
     # Check if configured
     api_key = config_manager.get_api_key()
