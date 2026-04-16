@@ -148,7 +148,7 @@ class ConfigManager:
         answer = data.get("answer", {})
 
         defaults = {
-            "model": "anthropic.claude-sonnet-4-20250514-v1:0",
+            "model": "anthropic.claude-sonnet-4-6",
             "temperature": 0.7,
             "answer_limit": 15,
             "threshold": 0.01,

@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     MAX_TITLE_SIZE: int = 100  # characters
 
     # Answer Configuration
-    ANSWER_MODEL: str = "anthropic.claude-sonnet-4-20250514-v1:0"
+    ANSWER_MODEL: str = "anthropic.claude-sonnet-4-6"
     ANSWER_TEMPERATURE: float = 0.7
     ANSWER_LIMIT: int = 15  # number of context memories to retrieve
     ANSWER_THRESHOLD: float = 0.01  # confidence threshold for memory relevance
