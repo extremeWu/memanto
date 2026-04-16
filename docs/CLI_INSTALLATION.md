@@ -375,7 +375,7 @@ server:
   auto_start: false
 
 moorcheh:
-  api_key_encrypted: "gAAAAABf..."  # Fernet encrypted
+  api_key_encrypted: "gAAAAABf..."  # Fernet encrypted Moorcheh API key
 
 session:
   default_duration_hours: 4
@@ -386,17 +386,21 @@ cli:
   smart_parse: true
   color_output: true
 
-# AI / Answer & Recall configuration (all optional — defaults shown)
-ai:
+# Answer configuration (all optional — defaults shown)
+answer:
   model: "anthropic.claude-sonnet-4-20250514-v1:0"  # LLM used for answer
   temperature: 0.7        # LLM temperature (0.0–1.0)
   answer_limit: 5         # context memories passed to LLM for `answer`
   threshold: 0.25         # confidence threshold for memory relevance
-  recall_limit: 10        # top-N results returned by `recall`
 
-active_agent_id: "my-assistant"
+# Recall configuration
+recall:
+  limit: 10               # top-N results returned by `recall`
+
+active_agent_id: "code-assistant"
 active_session_token: "eyJhbGciOiJIUzI1NiI..."
 ```
+
 
 **Security:**
 - API key encrypted with Fernet (symmetric encryption)

@@ -3,7 +3,7 @@
 ## Reporting Security Vulnerabilities
 
 If you discover a security vulnerability in MEMANTO, please report it to:
-- **Email**: security@moorcheh.ai
+- **Email**: support@moorcheh.ai
 - **Subject**: [MEMANTO Security] Brief description
 
 **Please do not** open public GitHub issues for security vulnerabilities.
@@ -187,7 +187,7 @@ pip install --upgrade <package>
 
 For security questions or concerns:
 - **General**: Dr. Majid Fekri, CTO Moorcheh.ai
-- **Security Issues**: security@moorcheh.ai
+- **Security Issues**: support@moorcheh.ai
 - **Moorcheh Platform**: https://moorcheh.ai/security
 
 ---

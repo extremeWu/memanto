@@ -585,13 +585,16 @@ cli:
   color_output: true
   compact_view: false
 
-# AI / Answer & Recall configuration (all optional — defaults shown)
-ai:
+# Answer configuration (all optional — defaults shown)
+answer:
   model: "anthropic.claude-sonnet-4-20250514-v1:0"  # LLM used for answer
   temperature: 0.7        # LLM temperature (0.0–1.0)
   answer_limit: 5         # context memories passed to LLM for `answer`
   threshold: 0.25         # confidence threshold for memory relevance
-  recall_limit: 10        # top-N results returned by `recall`
+
+# Recall configuration
+recall:
+  limit: 10               # top-N results returned by `recall`
 
 active_agent_id: "code-assistant"
 active_session_token: "eyJhbGciOiJIUzI1NiI..."

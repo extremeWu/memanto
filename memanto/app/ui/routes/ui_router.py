@@ -37,6 +37,8 @@ async def get_ui_config():
     server_cfg = _config_manager.get_server_config()
     session_cfg = _config_manager.get_session_config()
     cli_cfg = _config_manager.get_cli_config()
+    answer_cfg = _config_manager.get_answer_config()
+    recall_cfg = _config_manager.get_recall_config()
     schedule_time = _config_manager.get_schedule_time()
     active_agent_id, active_session_token = _config_manager.get_active_session()
 
@@ -53,6 +55,8 @@ async def get_ui_config():
         },
         "session": session_cfg,
         "cli": cli_cfg,
+        "answer": answer_cfg,
+        "recall": recall_cfg,
         "schedule_time": schedule_time,
         "active_agent_id": active_agent_id,
         "has_active_session": bool(active_session_token),
@@ -65,10 +69,10 @@ async def update_ui_config(updates: dict):
     """
     Update non-sensitive MEMANTO configuration from the Web UI.
 
-    Accepts: schedule_time, session settings, CLI settings.
+    Accepts: schedule_time, session settings, CLI settings, answer settings, recall settings.
     Does NOT allow updating API key or active session through this endpoint.
     """
-    allowed_keys = {"schedule_time", "session", "cli", "server"}
+    allowed_keys = {"schedule_time", "session", "cli", "server", "answer", "recall"}
     rejected = set(updates.keys()) - allowed_keys
     if rejected:
         raise HTTPException(
@@ -94,11 +98,26 @@ async def update_ui_config(updates: dict):
         _config_manager.save_yaml(data)
 
     if "server" in updates and isinstance(updates["server"], dict):
-        server = updates["server"]
-        url = server.get("url")
-        port = server.get("port")
-        if url and port:
-            _config_manager.set_server_config(url, int(port))
+        data = _config_manager.load_yaml()
+        if "server" not in data:
+            data["server"] = {}
+        data["server"].update(updates["server"])
+        _config_manager.save_yaml(data)
+
+    if "answer" in updates and isinstance(updates["answer"], dict):
+        ans = updates["answer"]
+        _config_manager.set_answer_config(
+            model=ans.get("model"),
+            temperature=float(ans["temperature"]) if "temperature" in ans else None,
+            answer_limit=int(ans["answer_limit"]) if "answer_limit" in ans else None,
+            threshold=float(ans["threshold"]) if "threshold" in ans else None,
+        )
+
+    if "recall" in updates and isinstance(updates["recall"], dict):
+        rec = updates["recall"]
+        _config_manager.set_recall_config(
+            limit=int(rec["limit"]) if "limit" in rec else None
+        )
 
     return {"status": "updated", "updated_keys": list(updates.keys())}
 

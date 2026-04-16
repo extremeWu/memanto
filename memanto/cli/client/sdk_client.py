@@ -665,7 +665,7 @@ class SdkClient:
             Dict with ``agent_id``, ``query``, ``memories``, ``count``.
         """
         if limit is None:
-            limit = ConfigManager().get_ai_config()["recall_limit"]
+            limit = ConfigManager().get_recall_config()["limit"]
 
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
@@ -716,7 +716,7 @@ class SdkClient:
             Dict with ``memories`` and ``count``.
         """
         if limit is None:
-            limit = ConfigManager().get_ai_config()["recall_limit"]
+            limit = ConfigManager().get_recall_config()["limit"]
 
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
@@ -758,7 +758,7 @@ class SdkClient:
             Dict with ``memories`` and ``count``.
         """
         if limit is None:
-            limit = ConfigManager().get_ai_config()["recall_limit"]
+            limit = ConfigManager().get_recall_config()["limit"]
 
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
@@ -798,7 +798,7 @@ class SdkClient:
             Dict with ``memories`` and ``count``.
         """
         if limit is None:
-            limit = ConfigManager().get_ai_config()["recall_limit"]
+            limit = ConfigManager().get_recall_config()["limit"]
         # Ensure there is a valid, non-expired session for this agent
         self._get_validated_session_for_agent(agent_id)
 
@@ -847,15 +847,15 @@ class SdkClient:
             Dict with ``answer``, ``sources``, ``namespace``.
         """
         # Resolve defaults from config
-        ai_cfg = ConfigManager().get_ai_config()
+        ans_cfg = ConfigManager().get_answer_config()
         if limit is None:
-            limit = ai_cfg["answer_limit"]
+            limit = ans_cfg["answer_limit"]
         if threshold is None:
-            threshold = ai_cfg["threshold"]
+            threshold = ans_cfg["threshold"]
         if temperature is None:
-            temperature = ai_cfg["temperature"]
+            temperature = ans_cfg["temperature"]
         if ai_model is None:
-            ai_model = ai_cfg["model"]
+            ai_model = ans_cfg["model"]
 
         # Ensure there is a valid, non-expired session for this agent
         session = self._get_validated_session_for_agent(agent_id)

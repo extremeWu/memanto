@@ -987,7 +987,7 @@
             <div class="sidebar-logo">
                 <div class="logo-stack">
                     <a href="/" style="display: block;">
-                        <img src="/ui/static/logo.png" alt="MEMANTO Logo"
+                        <img src="/ui/static/logo.svg" alt="MEMANTO Logo"
                             style="width: 150px; height: auto; object-fit: contain; filter: none; opacity: 1;">
                     </a>
                     <p>Memory Layer by <a href="https://moorcheh.ai" target="_blank">Moorcheh.ai</a></p>
@@ -1228,8 +1228,11 @@
                 </div>
                 <div class="cards-row" id="analyticsCards"></div>
                 <div class="charts-row">
-                    <div class="chart-box" style="width: 100%; max-width: 100%; margin-bottom: 20px;">
-                        <div class="panel-title">Usage Over Time</div><canvas id="chartUsage" height="80"></canvas>
+                    <div class="chart-box" style="margin-bottom: 20px;">
+                        <div class="panel-title">Usage Over Time</div><canvas id="chartUsage"></canvas>
+                    </div>
+                    <div class="chart-box" style="margin-bottom: 20px;">
+                        <div class="panel-title">Memory by Source</div><canvas id="chartSource"></canvas>
                     </div>
                 </div>
                 <div class="charts-row">
@@ -1238,6 +1241,12 @@
                     </div>
                     <div class="chart-box">
                         <div class="panel-title">Confidence Distribution</div><canvas id="chartConf"></canvas>
+                    </div>
+                </div>
+                <div class="charts-row" style="margin-top: 20px; grid-template-columns: 1fr;">
+                    <div class="chart-box">
+                        <div class="panel-title">Top Memory Tags</div>
+                        <div id="tagsCloud"></div>
                     </div>
                 </div>
             </section>
@@ -1606,14 +1615,33 @@
         // ================================================================
         // CONFIG
         // ================================================================
+
+        function cfgToggle(id, label, checked) {
+            return `<label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:0;text-transform:none;letter-spacing:0;font-weight:400;font-size:13px;color:var(--text-secondary)">
+                <span style="position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0">
+                    <input type="checkbox" id="${id}" ${checked ? 'checked' : ''} style="opacity:0;width:0;height:0;position:absolute">
+                    <span style="position:absolute;cursor:pointer;inset:0;background:${checked ? 'var(--accent)' : 'var(--border)'};border-radius:22px;transition:0.25s">
+                        <span style="position:absolute;content:'';height:16px;width:16px;left:${checked ? '20px' : '3px'};bottom:3px;background:white;border-radius:50%;transition:0.25s"></span>
+                    </span>
+                </span>
+                ${label}
+            </label>`;
+        }
+
         async function loadConfig() {
             try {
                 S.config = await api('GET', '/api/ui/config');
                 const c = S.config;
+                const srv = c.server || {};
+                const sess = c.session || {};
+                const cli = c.cli || {};
+                const ans = c.answer || {};
+                const rec = c.recall || {};
+
                 document.getElementById('configContent').innerHTML = `
-            <div class="panel" style="margin-bottom:0">
-            <table class="config-table" style="width:100%"><tbody>
-            <tr><td>API Key</td><td>
+            <!-- API KEY -->
+            <div class="panel">
+                <div class="panel-title">🔑 API Key</div>
                 <div id="apiKeyRow">
                     ${c.api_key_configured ?
                         `<div class="api-key-display">
@@ -1629,18 +1657,83 @@
                         </div>`
                     }
                 </div>
-            </td></tr>
-            <tr><td>Active Agent</td><td><strong style="color:var(--accent)">${c.active_agent_id || '—'}</strong></td></tr>
-            <tr><td>Active Session</td><td>${c.has_active_session ? '<span class="badge badge-success">Yes</span>' : '<span class="badge badge-warning">No</span>'}</td></tr>
-            <tr><td>Server URL</td><td><code style="font-family:var(--font-mono);color:var(--text-secondary)">${c.server?.url || 'localhost'}:${c.server?.port || 8000}</code></td></tr>
-            <tr><td>Schedule Time</td><td><input id="cfgSchedule" value="${c.schedule_time || '23:55'}" style="width:100px;display:inline-block"> <button class="btn btn-sm btn-secondary" onclick="saveConfig()">Save</button></td></tr>
-            <tr><td>Session Duration</td><td>${c.session?.default_duration_hours || 6} hours</td></tr>
-            <tr><td>Auto Renew</td><td>${c.session?.auto_renew_enabled ? '<span style="color:var(--success)">✓ Enabled</span>' : '<span style="color:var(--error)">✗ Disabled</span>'}</td></tr>
-            <tr><td>Interactive Mode</td><td>${c.cli?.interactive_mode ? '<span style="color:var(--success)">✓</span>' : '<span style="color:var(--error)">✗</span>'}</td></tr>
-            <tr><td>Smart Parse</td><td>${c.cli?.smart_parse ? '<span style="color:var(--success)">✓</span>' : '<span style="color:var(--error)">✗</span>'}</td></tr>
-            <tr><td>Config Directory</td><td><code style="font-family:var(--font-mono);color:var(--text-dim)">~/.memanto/</code></td></tr>
-            </tbody></table>
+            </div>
+            <!-- STATUS (read-only) -->
+            <div class="panel">
+                <div class="panel-title">📊 Status</div>
+                <table class="config-table" style="width:100%"><tbody>
+                <tr><td>Active Agent</td><td><strong style="color:var(--accent)">${c.active_agent_id || '—'}</strong></td></tr>
+                <tr><td>Active Session</td><td>${c.has_active_session ? '<span class="badge badge-success">Yes</span>' : '<span class="badge badge-warning">No</span>'}</td></tr>
+                <tr><td>Config Directory</td><td><code style="font-family:var(--font-mono);color:var(--text-dim)">~/.memanto/</code></td></tr>
+                </tbody></table>
+            </div>
+            <!-- SERVER -->
+            <div class="panel">
+                <div class="panel-title">🖥️ Server</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Host / URL</label><input id="cfgServerUrl" value="${srv.url || 'localhost'}"></div>
+                    <div class="form-group"><label>Port</label><input type="number" id="cfgServerPort" value="${srv.port || 8000}" min="1" max="65535"></div>
+                </div>
+            </div>
+            <!-- SESSION MANAGEMENT -->
+            <div class="panel">
+                <div class="panel-title">⏱️ Session Management</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Default Duration (hours)</label><input type="number" id="cfgSessDuration" value="${sess.default_duration_hours ?? 6}" min="1" max="72"></div>
+                    <div class="form-group"><label>Extend Threshold (minutes)</label><input type="number" id="cfgSessExtendThreshold" value="${sess.extend_threshold_minutes ?? 30}" min="1" max="120"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Auto-Renew Interval (hours)</label><input type="number" id="cfgSessRenewInterval" value="${sess.auto_renew_interval_hours ?? 6}" min="1" max="24"></div>
+                    <div class="form-group"></div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
+                    ${cfgToggle('cfgSessAutoRenew', 'Auto-renew sessions before expiry', sess.auto_renew_enabled ?? true)}
+                </div>
+            </div>
+            <!-- ANSWER CONFIG -->
+            <div class="panel">
+                <div class="panel-title">🤖 Answer Config</div>
+                <div class="form-group"><label>Model</label><input id="cfgAiModel" value="${ans.model || 'anthropic.claude-sonnet-4-20250514-v1:0'}" placeholder="e.g. anthropic.claude-sonnet-4-20250514-v1:0"></div>
+                <div class="form-row">
+                    <div class="form-group"><label>Temperature</label><input type="number" id="cfgAiTemp" value="${ans.temperature ?? 0.7}" min="0" max="2" step="0.05"></div>
+                    <div class="form-group"><label>Answer Limit (context memories)</label><input type="number" id="cfgAiAnswerLimit" value="${ans.answer_limit ?? 5}" min="1" max="50"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>Relevance Threshold</label><input type="number" id="cfgAiThreshold" value="${ans.threshold ?? 0.25}" min="0" max="1" step="0.05"></div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+            <!-- TOP N LIMIT -->
+            <div class="panel">
+                <div class="panel-title">🎯 Top N Limit</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Recall Limit (search results)</label><input type="number" id="cfgRecallLimit" value="${rec.limit ?? 10}" min="1" max="100"></div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+            <!-- SCHEDULE -->
+            <div class="panel">
+                <div class="panel-title">📅 Schedule</div>
+                <div class="form-group"><label>Daily Summary & Conflict Scan Time (HH:MM)</label><input id="cfgSchedule" value="${c.schedule_time || '23:55'}" placeholder="HH:MM" style="width:120px"></div>
+            </div>
+            <!-- SAVE -->
+            <div style="display:flex;gap:12px;margin-top:8px">
+                <button class="btn btn-primary" id="btnSaveCfg" onclick="saveAllConfig()">💾 Save All Settings</button>
+                <button class="btn btn-secondary" onclick="loadConfig()">↺ Reset</button>
             </div>`;
+
+                // Wire up toggle switches for visual feedback
+                document.querySelectorAll('#configContent input[type=checkbox]').forEach(cb => {
+                    cb.addEventListener('change', function () {
+                        const knob = this.nextElementSibling;
+                        if (knob) {
+                            knob.style.background = this.checked ? 'var(--accent)' : 'var(--border)';
+                            const dot = knob.querySelector('span');
+                            if (dot) dot.style.left = this.checked ? '20px' : '3px';
+                        }
+                    });
+                });
+
             } catch (e) {
                 document.getElementById('configContent').innerHTML = `<p style="color:var(--error)">Failed to load config: ${e.message}</p>`;
             }
@@ -1674,13 +1767,41 @@
             } catch (e) { toast('Failed to save API key: ' + e.message, 'error'); }
         }
 
-        async function saveConfig() {
+        async function saveAllConfig() {
+            const btn = document.getElementById('btnSaveCfg');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Saving...';
             try {
-                const schedule = document.getElementById('cfgSchedule').value.trim();
-                await api('PATCH', '/api/ui/config', { schedule_time: schedule });
-                toast('Configuration saved!');
+                const payload = {
+                    schedule_time: document.getElementById('cfgSchedule').value.trim(),
+                    server: {
+                        url: document.getElementById('cfgServerUrl').value.trim(),
+                        port: parseInt(document.getElementById('cfgServerPort').value) || 8000,
+                    },
+                    session: {
+                        default_duration_hours: parseInt(document.getElementById('cfgSessDuration').value) || 6,
+                        extend_threshold_minutes: parseInt(document.getElementById('cfgSessExtendThreshold').value) || 30,
+                        auto_renew_enabled: document.getElementById('cfgSessAutoRenew').checked,
+                        auto_renew_interval_hours: parseInt(document.getElementById('cfgSessRenewInterval').value) || 6,
+                    },
+                    answer: {
+                        model: document.getElementById('cfgAiModel').value.trim(),
+                        temperature: parseFloat(document.getElementById('cfgAiTemp').value) || 0.7,
+                        answer_limit: parseInt(document.getElementById('cfgAiAnswerLimit').value) || 5,
+                        threshold: parseFloat(document.getElementById('cfgAiThreshold').value) || 0.25,
+                    },
+                    recall: {
+                        limit: parseInt(document.getElementById('cfgRecallLimit').value) || 10,
+                    },
+                };
+                await api('PATCH', '/api/ui/config', payload);
+                toast('All settings saved successfully!');
+                S.config = await api('GET', '/api/ui/config');
             } catch (e) { toast('Save failed: ' + e.message, 'error'); }
+            btn.disabled = false; btn.innerHTML = '💾 Save All Settings';
         }
+
+        // Legacy alias
+        async function saveConfig() { await saveAllConfig(); }
 
         // ================================================================
         // CONFLICTS
@@ -1800,10 +1921,26 @@
                 const typeCounts = {};
                 const confBuckets = { 'High (0.8-1.0)': 0, 'Medium (0.5-0.8)': 0, 'Low (0-0.5)': 0 };
                 const usageBuckets = {};
+                const sourceBuckets = {};
+                const tagCounts = {};
                 let totalConf = 0;
                 mems.forEach(m => {
                     const t = m.type || 'unknown';
                     typeCounts[t] = (typeCounts[t] || 0) + 1;
+                    
+                    const s = m.source || 'unknown';
+                    sourceBuckets[s] = (sourceBuckets[s] || 0) + 1;
+                    
+                    if (m.tags && Array.isArray(m.tags)) {
+                        m.tags.forEach(tag => {
+                            if (tag) tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                        });
+                    } else if (m.tags && typeof m.tags === 'string') {
+                        m.tags.split(',').map(tag => tag.trim()).forEach(tag => {
+                            if (tag) tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+                        });
+                    }
+
                     const c = parseFloat(m.confidence) || 0;
                     totalConf += c;
                     if (c >= 0.8) confBuckets['High (0.8-1.0)']++;
@@ -1829,9 +1966,12 @@
         `;
 
                 const colors = ['#06b6d4', '#6366f1', '#22c55e', '#f59e0b', '#ec4899', '#8b5cf6', '#f97316'];
+                const sourceColors = ['#ec4899', '#f97316', '#8b5cf6', '#06b6d4', '#22c55e'];
+                
                 if (S.charts.usage) S.charts.usage.destroy();
                 if (S.charts.type) S.charts.type.destroy();
                 if (S.charts.conf) S.charts.conf.destroy();
+                if (S.charts.source) S.charts.source.destroy();
 
                 const sortedDates = Object.keys(usageBuckets).sort();
                 const usageData = sortedDates.map(d => usageBuckets[d]);
@@ -1848,15 +1988,63 @@
                     options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#8a8a9a', padding: 16, font: { family: 'Inter' } } } } }
                 });
 
+                S.charts.source = new Chart(document.getElementById('chartSource'), {
+                    type: 'doughnut',
+                    data: { labels: Object.keys(sourceBuckets), datasets: [{ data: Object.values(sourceBuckets), backgroundColor: sourceColors.slice(0, Object.keys(sourceBuckets).length), borderWidth: 0 }] },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: '#8a8a9a', padding: 16, font: { family: 'Inter' } } } } }
+                });
+
                 S.charts.conf = new Chart(document.getElementById('chartConf'), {
                     type: 'bar',
                     data: { labels: Object.keys(confBuckets), datasets: [{ label: 'Memories', data: Object.values(confBuckets), backgroundColor: ['#22c55e', '#f59e0b', '#ef4444'], borderRadius: 8, borderWidth: 0 }] },
                     options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8a8a9a', font: { family: 'Inter' } }, grid: { display: false } }, y: { ticks: { color: '#8a8a9a', font: { family: 'Inter' } }, grid: { color: 'rgba(26,26,37,0.5)' } } } }
                 });
+
+                // Generate Word Cloud
+                const tagsContainer = document.getElementById('tagsCloud');
+                const sortedTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 30);
+                if (sortedTags.length === 0) {
+                    tagsContainer.innerHTML = '<p style="color:var(--text-dim);padding:20px;text-align:center">No tags found</p>';
+                } else {
+                    const maxCount = Math.max(...sortedTags.map(t => t[1]));
+                    let cloudHtml = '<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:20px;">';
+                    sortedTags.forEach(([tag, count]) => {
+                        const ratio = count / maxCount; // 0.0 to 1.0
+                        const size = Math.max(11, 11 + ratio * 18); // 11px to 29px
+                        const opacity = Math.max(0.4, ratio); // 0.4 to 1.0
+                        cloudHtml += `<span title="${count} memories" style="font-size:${size}px;color:rgba(6,182,212,${opacity});font-weight:600;font-family:var(--font-mono);border:1px solid rgba(6,182,212,${opacity*0.3});padding:4px 12px;border-radius:20px;background:rgba(6,182,212,${opacity*0.05});background-clip:padding-box;line-height:1;margin:4px">${escHtml(tag)} <small style="font-size:0.65em;opacity:0.7">(${count})</small></span>`;
+                    });
+                    cloudHtml += '</div>';
+                    tagsContainer.innerHTML = cloudHtml;
+                }
             } catch (e) {
                 cards.innerHTML = `<p style="color:var(--error);padding:20px">Failed to load analytics: ${e.message}</p>`;
             }
         }
+        // Poll server health to auto-close window if terminal stops
+        setInterval(async () => {
+            try {
+                await fetch('/health', { method: 'GET', keepalive: false, cache: 'no-store' });
+            } catch (e) {
+                // Fetch throws if connection refused / server goes down
+                console.warn("Server offline! Attempting to close window.");
+                try { window.close(); } catch (err) { }
+
+                // Fallback overlay if browser blocks window.close()
+                if (!document.getElementById('disconnected-overlay')) {
+                    const overlay = document.createElement('div');
+                    overlay.id = 'disconnected-overlay';
+                    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:var(--font-sans)';
+                    overlay.innerHTML = `
+                        <div style="font-size:48px;margin-bottom:16px">🔌</div>
+                        <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:600">Server Disconnected</h2>
+                        <p style="color:var(--text-secondary);margin:0">The MEMANTO server was stopped.</p>
+                        <p style="color:var(--text-dim);margin:6px 0 0 0">You can safely close this window.</p>
+                    `;
+                    document.body.appendChild(overlay);
+                }
+            }
+        }, 2000);
 
         // Boot
         init();
