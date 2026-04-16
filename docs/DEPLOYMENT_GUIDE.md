@@ -34,7 +34,7 @@ RATE_LIMIT_WRITES=60             # Writes per minute per tenant
 RATE_LIMIT_READS=120             # Reads per minute per tenant
 RATE_LIMIT_ANSWERS=30            # Answer generations per minute
 
-# AI / Answer & Recall configuration (all optional — defaults shown)
+# Answer & Recall configuration (all optional — defaults shown)
 ANSWER_MODEL=anthropic.claude-sonnet-4-20250514-v1:0  # LLM model for answer
 ANSWER_TEMPERATURE=0.7            # LLM temperature (0.0–1.0)
 ANSWER_LIMIT=5                    # context memories passed to LLM for answer
@@ -450,4 +450,4 @@ python app/main.py
 **Deployment Status**: ✅ Production Ready  
 **Last Updated**: January 2026  
 **Project Team**: Dr. Majid Fekri, CTO and co-founder of Moorcheh.ai  
-**Support**: Enterprise deployment support available
+**Support**: Enterprise deployment support available.

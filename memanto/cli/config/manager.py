@@ -142,39 +142,56 @@ class ConfigManager:
         defaults.update(self.load_yaml().get("cli", {}))
         return defaults
 
-    def get_ai_config(self) -> dict:
-        """Get AI/answer config dict with defaults."""
+    def get_answer_config(self) -> dict:
+        """Get Answer config dict with defaults."""
+        data = self.load_yaml()
+        answer = data.get("answer", {})
+
         defaults = {
             "model": "anthropic.claude-sonnet-4-20250514-v1:0",
             "temperature": 0.7,
-            "answer_limit": 5,
-            "threshold": 0.25,
-            "recall_limit": 10,
+            "answer_limit": 15,
+            "threshold": 0.01,
         }
-        defaults.update(self.load_yaml().get("ai", {}))
+        defaults.update(answer)
         return defaults
 
-    def set_ai_config(
+    def set_answer_config(
         self,
         model: str | None = None,
         temperature: float | None = None,
         answer_limit: int | None = None,
         threshold: float | None = None,
-        recall_limit: int | None = None,
     ) -> None:
-        """Set AI/answer config values."""
+        """Set Answer config values."""
         data = self.load_yaml()
-        ai = data.setdefault("ai", {})
+        answer = data.setdefault("answer", {})
         if model is not None:
-            ai["model"] = model
+            answer["model"] = model
         if temperature is not None:
-            ai["temperature"] = temperature
+            answer["temperature"] = temperature
         if answer_limit is not None:
-            ai["answer_limit"] = answer_limit
+            answer["answer_limit"] = answer_limit
         if threshold is not None:
-            ai["threshold"] = threshold
-        if recall_limit is not None:
-            ai["recall_limit"] = recall_limit
+            answer["threshold"] = threshold
+
+        self.save_yaml(data)
+
+    def get_recall_config(self) -> dict:
+        """Get Recall/Top-N config dict with defaults."""
+        data = self.load_yaml()
+        recall = data.get("recall", {})
+
+        defaults = {"limit": 10}
+        defaults.update(recall)
+        return defaults
+
+    def set_recall_config(self, limit: int | None = None) -> None:
+        """Set Recall config values."""
+        data = self.load_yaml()
+        recall = data.setdefault("recall", {})
+        if limit is not None:
+            recall["limit"] = limit
         self.save_yaml(data)
 
     # Schedule timing

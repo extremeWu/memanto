@@ -1626,7 +1626,8 @@
                 const srv = c.server || {};
                 const sess = c.session || {};
                 const cli = c.cli || {};
-                const ai = c.ai || {};
+                const ans = c.answer || {};
+                const rec = c.recall || {};
 
                 document.getElementById('configContent').innerHTML = `
             <!-- API KEY -->
@@ -1680,17 +1681,25 @@
                     ${cfgToggle('cfgSessAutoRenew', 'Auto-renew sessions before expiry', sess.auto_renew_enabled ?? true)}
                 </div>
             </div>
-            <!-- AI / RAG -->
+            <!-- ANSWER CONFIG -->
             <div class="panel">
-                <div class="panel-title">🤖 AI / RAG Configuration</div>
-                <div class="form-group"><label>Model</label><input id="cfgAiModel" value="${ai.model || 'anthropic.claude-sonnet-4-20250514-v1:0'}" placeholder="e.g. anthropic.claude-sonnet-4-20250514-v1:0"></div>
+                <div class="panel-title">🤖 Answer Config</div>
+                <div class="form-group"><label>Model</label><input id="cfgAiModel" value="${ans.model || 'anthropic.claude-sonnet-4-20250514-v1:0'}" placeholder="e.g. anthropic.claude-sonnet-4-20250514-v1:0"></div>
                 <div class="form-row">
-                    <div class="form-group"><label>Temperature</label><input type="number" id="cfgAiTemp" value="${ai.temperature ?? 0.7}" min="0" max="2" step="0.05"></div>
-                    <div class="form-group"><label>Answer Limit (context memories)</label><input type="number" id="cfgAiAnswerLimit" value="${ai.answer_limit ?? 5}" min="1" max="50"></div>
+                    <div class="form-group"><label>Temperature</label><input type="number" id="cfgAiTemp" value="${ans.temperature ?? 0.7}" min="0" max="2" step="0.05"></div>
+                    <div class="form-group"><label>Answer Limit (context memories)</label><input type="number" id="cfgAiAnswerLimit" value="${ans.answer_limit ?? 5}" min="1" max="50"></div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label>Relevance Threshold</label><input type="number" id="cfgAiThreshold" value="${ai.threshold ?? 0.25}" min="0" max="1" step="0.05"></div>
-                    <div class="form-group"><label>Recall Limit (search results)</label><input type="number" id="cfgAiRecallLimit" value="${ai.recall_limit ?? 10}" min="1" max="100"></div>
+                    <div class="form-group"><label>Relevance Threshold</label><input type="number" id="cfgAiThreshold" value="${ans.threshold ?? 0.25}" min="0" max="1" step="0.05"></div>
+                    <div class="form-group"></div>
+                </div>
+            </div>
+            <!-- TOP N LIMIT -->
+            <div class="panel">
+                <div class="panel-title">🎯 Top N Limit</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Recall Limit (search results)</label><input type="number" id="cfgRecallLimit" value="${rec.limit ?? 10}" min="1" max="100"></div>
+                    <div class="form-group"></div>
                 </div>
             </div>
             <!-- SCHEDULE -->
@@ -1765,12 +1774,14 @@
                         auto_renew_enabled: document.getElementById('cfgSessAutoRenew').checked,
                         auto_renew_interval_hours: parseInt(document.getElementById('cfgSessRenewInterval').value) || 6,
                     },
-                    ai: {
+                    answer: {
                         model: document.getElementById('cfgAiModel').value.trim(),
                         temperature: parseFloat(document.getElementById('cfgAiTemp').value) || 0.7,
                         answer_limit: parseInt(document.getElementById('cfgAiAnswerLimit').value) || 5,
                         threshold: parseFloat(document.getElementById('cfgAiThreshold').value) || 0.25,
-                        recall_limit: parseInt(document.getElementById('cfgAiRecallLimit').value) || 10,
+                    },
+                    recall: {
+                        limit: parseInt(document.getElementById('cfgRecallLimit').value) || 10,
                     },
                 };
                 await api('PATCH', '/api/ui/config', payload);
