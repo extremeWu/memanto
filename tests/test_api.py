@@ -461,7 +461,9 @@ class TestMEMANTOAPI:
         response = await client.post(
             f"/api/v2/agents/{self.TEST_AGENT_ID}/upload-file",
             headers=headers,
-            files={"file": ("script.exe", b"binary content", "application/octet-stream")},
+            files={
+                "file": ("script.exe", b"binary content", "application/octet-stream")
+            },
         )
 
         assert response.status_code == 400
