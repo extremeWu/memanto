@@ -82,7 +82,10 @@ Conventions:
 
 ### Session Start
 ```bash
+# recall — load raw context (instructions, decisions, goals) to guide this session
 memanto recall "instructions decisions goals" --limit 20
+
+# answer — get a direct synthesized summary of pending commitments
 memanto answer "What are my pending commitments?"
 ```
 
@@ -97,10 +100,27 @@ memanto remember "Learned that batch ops reduce API calls 100x." --type learning
 memanto remember "User corrected: prefer pytest over unittest." --type learning --tags "correction,testing" --confidence 1.0 --provenance "corrected" --source "claude_code"
 ```
 
-### Before Answering Uncertain Questions
+### Choosing Between recall and answer
+
+These are **equal-priority tools**. Pick the right one — do NOT always default to `recall`.
+
+| Situation | Use |
+|-----------|-----|
+| Need raw memory chunks to read and apply as context | `recall` |
+| Need a direct synthesized answer to give (or act on) | `answer` |
+| Building context before a complex multi-step task | `recall` |
+| User asks "what did we decide / prefer / commit to?" | `answer` |
+| Comparing multiple matching memories | `recall` |
+| Need one grounded yes/no or summary response | `answer` |
+
+**Decision rule**: If your next step is *"read these memories and act"* → `recall`. If your next step is *"answer this question directly"* → `answer`. Both save tokens equally — `answer` synthesizes so you don't have to.
+
 ```bash
-memanto recall "topic of the question"
-memanto answer "What did we decide about X?"
+# Use recall — need raw context to work from
+memanto recall "authentication approach" --limit 10
+
+# Use answer — need a direct synthesized answer
+memanto answer "What auth approach did we decide on and why?"
 ```
 
 ## Pitfalls to Avoid
@@ -111,16 +131,29 @@ memanto answer "What did we decide about X?"
 4. **Duplicates** — Search first (`memanto recall`), then store if not found
 5. **Missing tags** — Always include tags for retrieval
 
+## recall vs answer: Choose the Right Tool
+
+**Equal priority** — do NOT always default to `recall`. Pick based on what you need next:
+
+| Use `recall` when... | Use `answer` when... |
+|---------------------|---------------------|
+| You need raw memory chunks as context | You need one direct synthesized response |
+| Building context before a complex task | User asks "what did we decide / prefer?" |
+| Comparing or reviewing multiple memories | Getting a grounded summary or yes/no |
+| Next step: *read these and act on them* | Next step: *deliver this as the answer* |
+
+**Short rule**: need context to work from → `recall`. Need a ready answer → `answer`. Both save the agent tokens and time — `answer` synthesizes so you don't have to read and merge manually.
+
 ## Command Reference
 
 ```bash
 # Store memory
 memanto remember "content" --type TYPE --tags "tag1,tag2" --confidence 0.9 --provenance "inferred" --source "claude_code"
 
-# Search memories
+# Raw memory search (use for context-building, multi-step tasks)
 memanto recall "query" --limit 10 --type TYPE --min-confidence 0.8
 
-# Ask questions (RAG)
+# Synthesized answer (use for direct questions, "what did we decide about X?")
 memanto answer "question"
 
 # Sync memories to project
@@ -158,11 +191,12 @@ from all previous sessions. You MUST follow any instructions and preferences fou
 
 When the user asks a question you are unsure about, or asks about past context,
 decisions, or preferences, you MUST search memory first before saying you don't know.
-Run in {tool_phrase}:
-- `memanto recall "query"` — search by semantic similarity
-- `memanto answer "question"` — RAG-powered answers grounded in memory
 
-Do NOT say "I don't have context on that" without running these commands first.
+**Choose ONE and run it using {tool_phrase}** — both are equal-priority options:
+- `memanto recall "query"` — use when you need **raw memory context** to read and apply (building context, comparing options, multi-step tasks)
+- `memanto answer "question"` — use when you need a **direct synthesized answer** (user asked what we decided, what I prefer, what was committed to)
+
+Do NOT always default to `recall`. Do NOT say "I don't have context on that" without running one of these first.
 
 ### MANDATORY: Store Memories Proactively
 
@@ -185,10 +219,12 @@ Do NOT wait until asked. If the user says "I prefer tabs over spaces", immediate
 
 ```bash
 memanto remember "content" --type <type> --confidence <0.0-1.0> --provenance <provenance> --source <agent_name>  # Store a memory
-memanto recall "query"                       # Search memories
-memanto answer "question"                    # RAG-powered answer from memory
+memanto recall "query"                       # Raw memory search — use when you need context to work from
+memanto answer "question"                    # Synthesized answer — use when you need a direct answer
 memanto memory sync --project-dir .          # Re-sync MEMORY.md
 ```
+
+> `recall` vs `answer`: **recall** returns raw memory chunks (best for context-building, multi-step work). **answer** returns one synthesized response (best for direct questions). Equal priority — pick by need.
 
 Memory types: fact, preference, instruction, decision, event, goal, commitment,
 observation, learning, relationship, context, artifact, error.
@@ -270,11 +306,13 @@ You MUST follow any instructions and preferences found there.
 
 ## MANDATORY: Search Memory Before Giving Up
 
-When unsure about past context, decisions, or preferences, search memory first:
+When unsure about past context, decisions, or preferences, choose ONE based on need:
 ```bash
-memanto recall "query"
-memanto answer "question"
+memanto recall "query"      # raw context — use when you need memories to read and apply
+memanto answer "question"   # synthesized answer — use when you need a direct answer
 ```
+
+Do NOT always default to `recall`. Both are equal-priority options — `recall` for context-building, `answer` for direct questions.
 
 ## MANDATORY: Store Memories Proactively
 
