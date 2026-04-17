@@ -119,8 +119,24 @@ def _first_run_setup() -> None:
     console.print()
 
 
+def version_callback(value: bool):
+    if value:
+        from memanto.app import __version__
+        typer.echo(f"memanto version: {__version__}")
+        raise typer.Exit()
+
+
 @app.callback(invoke_without_command=True)
-def main_callback(ctx: typer.Context):
+def main_callback(
+    ctx: typer.Context,
+    version: bool = typer.Option(
+        None,
+        "--version",
+        help="Show the application's version and exit.",
+        callback=version_callback,
+        is_eager=True,
+    ),
+):
     """MEMANTO CLI - Universal Memory Layer for Agentic AI"""
     if ctx.invoked_subcommand is None:
         # Print logo
@@ -146,7 +162,7 @@ def status():
     Displays environment, server health, configuration, active session,
     and registered agents at a glance.
     """
-    memanto_version = "0.1.0"
+    from memanto.app import __version__ as memanto_version
 
     # Header
     console.print(
