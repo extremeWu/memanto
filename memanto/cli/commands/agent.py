@@ -137,9 +137,7 @@ def agent_deactivate():
 @agent_app.command("delete")
 def agent_delete(
     agent_id: str = typer.Argument(..., help="Agent ID to delete"),
-    force: bool = typer.Option(
-        False, "--force", "-f", help="Skip confirmation prompt"
-    ),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation prompt"),
 ):
     """Delete an agent and optionally purge its cloud memories.
 
@@ -151,9 +149,7 @@ def agent_delete(
         memanto agent delete my-agent --force
     """
     if not force:
-        console.print(
-            f"[red]Delete agent '{agent_id}'? This cannot be undone.[/red]"
-        )
+        console.print(f"[red]Delete agent '{agent_id}'? This cannot be undone.[/red]")
         confirmed = typer.confirm("Confirm", default=False)
         if not confirmed:
             console.print("[yellow]Aborted.[/yellow]")

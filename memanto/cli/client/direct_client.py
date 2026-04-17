@@ -183,13 +183,17 @@ class MoorchehClient:
                     "top_k": top_k if top_k is not None else ans_cfg["answer_limit"],
                     "type": "text",
                     "aiModel": ai_model if ai_model is not None else ans_cfg["model"],
-                    "temperature": temperature if temperature is not None else ans_cfg["temperature"],
+                    "temperature": temperature
+                    if temperature is not None
+                    else ans_cfg["temperature"],
                     "kiosk_mode": kiosk_mode,
                     "headerPrompt": header_prompt or "",
                     "footerPrompt": footer_prompt or "",
                 }
                 if kiosk_mode:
-                    payload["threshold"] = threshold if threshold is not None else ans_cfg["threshold"]
+                    payload["threshold"] = (
+                        threshold if threshold is not None else ans_cfg["threshold"]
+                    )
                 return self.client._request("POST", "/answer", payload)
 
         return Ans(self)

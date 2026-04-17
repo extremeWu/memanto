@@ -182,7 +182,6 @@ def upload(
         memanto upload report.pdf
         memanto upload notes.txt
     """
-    import os
     from pathlib import Path
 
     start = time.perf_counter()
@@ -219,9 +218,11 @@ def upload(
         elapsed = time.perf_counter() - start
 
         if result.get("success"):
-            console.print(f"[green]OK File uploaded successfully![/green]")
+            console.print("[green]OK File uploaded successfully![/green]")
         else:
-            console.print(f"[yellow]Upload completed with status: {result.get('message')}[/yellow]")
+            console.print(
+                f"[yellow]Upload completed with status: {result.get('message')}[/yellow]"
+            )
 
         console.print(f"[dim]File: {result.get('file_name', path.name)}[/dim]")
         reported_size = result.get("file_size")
@@ -239,7 +240,9 @@ def recall(
     query: str | None = typer.Argument(
         None, help="Search query (optional for --changed-since)"
     ),
-    limit: int | None = typer.Option(None, "--limit", "-n", help="Maximum number of results"),
+    limit: int | None = typer.Option(
+        None, "--limit", "-n", help="Maximum number of results"
+    ),
     memory_type: str | None = typer.Option(
         None, "--type", "-t", help="Filter by memory type"
     ),
@@ -438,7 +441,11 @@ def recall(
                 border_style = SUCCESS
 
             console.print(
-                Panel(panel_content, title=f"Memory {i} {source_tag}", border_style=border_style)
+                Panel(
+                    panel_content,
+                    title=f"Memory {i} {source_tag}",
+                    border_style=border_style,
+                )
             )
             console.print()
 

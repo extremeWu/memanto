@@ -122,6 +122,7 @@ def _first_run_setup() -> None:
 def version_callback(value: bool):
     if value:
         from memanto.app import __version__
+
         typer.echo(f"memanto version: {__version__}")
         raise typer.Exit()
 
@@ -187,7 +188,6 @@ def status():
 
     # Configuration
     is_configured = config_manager.is_configured()
-    api_key = config_manager.get_api_key()
     server_cfg = config_manager.get_server_config()
 
     cfg_table = Table(show_header=False, box=None, padding=(0, 2))

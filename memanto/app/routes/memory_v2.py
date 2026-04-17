@@ -209,7 +209,9 @@ async def batch_remember(
 @router.post("/{agent_id}/upload-file")
 async def upload_file(
     agent_id: str,
-    file: UploadFile = File(..., description="File to upload (.pdf, .docx, .xlsx, .json, .txt, .csv, .md)"),
+    file: UploadFile = File(
+        ..., description="File to upload (.pdf, .docx, .xlsx, .json, .txt, .csv, .md)"
+    ),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -261,6 +263,7 @@ async def upload_file(
             )
         finally:
             import shutil
+
             shutil.rmtree(tmp_dir, ignore_errors=True)
 
         return {
