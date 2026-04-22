@@ -68,9 +68,13 @@ def session_info():
 
 @session_app.command("extend")
 def session_extend(
-    hours: int = typer.Option(4, "--hours", "-h", help="Number of hours to extend"),
+    hours: int = typer.Option(6, "--hours", "-h", help="Number of hours to extend"),
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation"),
 ):
     """Extend the current session."""
+    if not force and not typer.confirm(f"Extend current session by {hours} hours?"):
+        raise typer.Exit(0)
+
     active_agent_id, _ = config_manager.get_active_session()
 
     if not active_agent_id:

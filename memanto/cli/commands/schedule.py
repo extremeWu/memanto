@@ -2,6 +2,7 @@
 MEMANTO CLI - Schedule commands (enable, disable, status).
 """
 
+import typer
 from rich.panel import Panel
 
 from memanto.cli.commands._shared import (
@@ -32,8 +33,13 @@ def schedule_enable():
 
 
 @schedule_app.command("disable")
-def schedule_disable():
+def schedule_disable(
+    force: bool = typer.Option(False, "--force", "-f", help="Skip confirmation"),
+):
     """Disable auto-generated daily summaries."""
+
+    if not force and not typer.confirm("Disable automatic daily summaries?"):
+        raise typer.Exit(0)
 
     manager = ScheduleManager()
     result = manager.disable()
