@@ -100,7 +100,7 @@ async def get_agent(
     return agent
 
 
-@router.delete("/agents/{agent_id}", status_code=204)
+@router.delete("/agents/{agent_id}", status_code=200)
 async def delete_agent(
     agent_id: str, moorcheh_api_key: str = Depends(get_moorcheh_api_key)
 ):
@@ -112,6 +112,7 @@ async def delete_agent(
     """
     try:
         agent_service.delete_agent(agent_id)
+        return {"message": f"Agent '{agent_id}' successfully deleted"}
     except AgentNotFoundError as e:
         raise map_error_to_http_exception(e)
 
