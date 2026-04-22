@@ -42,7 +42,7 @@ app.include_router(
 )
 app.include_router(memory.router, prefix="/api/v1/memory", tags=["Memory (Internal)"])
 app.include_router(
-    context.router, prefix="/api/v1/context", tags=["Context (Internal)"]
+    context.router, prefix="/api/v2/context", tags=["Context"]
 )
 
 # Web UI Dashboard
