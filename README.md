@@ -5,7 +5,7 @@
 </p>
 
 <div align="center">
-  <h1>MemAnto - Universal Memory Layer for Agentic AI</h1>
+  <h1>Memanto - Memory that AI agents love!</h1>
 </div>
 
 <p align="center">
