@@ -29,8 +29,8 @@ router = APIRouter()
 @router.post("/{agent_id}/remember")
 async def remember(
     agent_id: str,
+    content: str = Body(..., embed=True, description="Memory content"),
     memory_type: str = Query(..., description="Type of memory"),
-    content: str = Query(..., description="Memory content"),
     title: str | None = Query(None, description="Memory title (optional, defaults to truncated content)"),
     confidence: float = Query(0.8, description="Confidence score (0-1)"),
     tags: str | None = Query(None, description="Comma-separated tags"),
