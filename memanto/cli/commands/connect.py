@@ -440,10 +440,7 @@ def connect_remove(
         memanto connect remove --all
     """
     if all_agents:
-        scope = "globally" if is_global else f"in {Path(project_dir).resolve()}"
-        if not typer.confirm(f"Remove MEMANTO from ALL agents {scope}?"):
-            raise typer.Exit(0)
-
+        "globally" if is_global else f"in {Path(project_dir).resolve()}"
         agents_to_remove = [a.name for a in list_agents()]
     elif agent_name:
         if agent_name not in AGENT_REGISTRY:

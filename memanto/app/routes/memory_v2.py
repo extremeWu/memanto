@@ -29,9 +29,11 @@ router = APIRouter()
 @router.post("/{agent_id}/remember")
 async def remember(
     agent_id: str,
-    memory_type: str = Query(..., description="Type of memory"),
-    title: str = Query(..., description="Memory title"),
-    content: str = Query(..., description="Memory content"),
+    content: str = Body(..., embed=True, description="Memory content"),
+    memory_type: str = Query("fact", description="Type of memory"),
+    title: str | None = Query(
+        None, description="Memory title (optional, defaults to truncated content)"
+    ),
     confidence: float = Query(0.8, description="Confidence score (0-1)"),
     tags: str | None = Query(None, description="Comma-separated tags"),
     source: str = Query("agent", description="Source of memory"),
@@ -75,10 +77,14 @@ async def remember(
 
         from memanto.app.constants import MemoryType, ProvenanceType
 
+        resolved_title = title or (
+            f"{content[:50]}..." if len(content) > 50 else content
+        )
+
         # Create memory record with scope fields and provenance
         memory = MemoryRecord(
             type=cast(MemoryType, memory_type),
-            title=title,
+            title=resolved_title,
             content=content,
             scope_type="agent",
             scope_id=agent_id,

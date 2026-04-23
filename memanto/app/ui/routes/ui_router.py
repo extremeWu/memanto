@@ -44,7 +44,6 @@ async def get_ui_config():
 
     return {
         "api_key_configured": bool(api_key),
-        "api_key": api_key,
         "api_key_preview": f"{api_key[:8]}...{api_key[-4:]}"
         if api_key and len(api_key) > 12
         else ("***" if api_key else None),
@@ -60,7 +59,6 @@ async def get_ui_config():
         "schedule_time": schedule_time,
         "active_agent_id": active_agent_id,
         "has_active_session": bool(active_session_token),
-        "session_token": active_session_token,
     }
 
 

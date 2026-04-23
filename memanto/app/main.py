@@ -41,9 +41,7 @@ app.include_router(
     namespaces.router, prefix="/api/v1/namespaces", tags=["Namespaces (Internal)"]
 )
 app.include_router(memory.router, prefix="/api/v1/memory", tags=["Memory (Internal)"])
-app.include_router(
-    context.router, prefix="/api/v1/context", tags=["Context (Internal)"]
-)
+app.include_router(context.router, prefix="/api/v2/context", tags=["Context"])
 
 # Web UI Dashboard
 app.include_router(ui_router, tags=["Web UI"])
