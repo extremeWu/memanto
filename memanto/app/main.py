@@ -13,7 +13,7 @@ from memanto.app.ui.routes.ui_router import router as ui_router
 
 # Create FastAPI app
 app = FastAPI(
-    title="MemAnto - Universal Memory Layer for Agentic AI",
+    title="Memanto - Memory that AI Agents Love!",
     description="A memory layer service for agentic AI systems using Moorcheh SDK",
     version=__version__,
     docs_url="/docs",
@@ -52,7 +52,7 @@ mount_ui_static(app)
 async def root():
     return {
         "service": "MEMANTO",
-        "description": "Universal Memory Layer for Agentic AI",
+        "description": "Memory that AI Agents Love!",
         "version": __version__,
         "docs": "/docs",
     }

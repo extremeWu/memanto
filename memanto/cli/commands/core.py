@@ -138,7 +138,7 @@ def main_callback(
         is_eager=True,
     ),
 ):
-    """MEMANTO CLI - Universal Memory Layer for Agentic AI"""
+    """MEMANTO CLI - Memory that AI Agents Love!"""
     if ctx.invoked_subcommand is None:
         # Print logo
         print_logo()
@@ -169,7 +169,7 @@ def status():
     console.print(
         Panel.fit(
             f"[{BOLD_PRIMARY}]MEMANTO Status Dashboard[/{BOLD_PRIMARY}]\n"
-            f"Universal Memory Layer for Agentic AI  •  v{memanto_version}",
+            f"Memory that AI Agents Love!  •  v{memanto_version}",
             border_style=PRIMARY,
         )
     )
@@ -566,7 +566,7 @@ def ui(
 
     console.print(
         Panel.fit(
-            f"[{BOLD_PRIMARY}]MemAnto Dashboard Starting...[/{BOLD_PRIMARY}]\n"
+            f"[{BOLD_PRIMARY}]Memanto Dashboard Starting...[/{BOLD_PRIMARY}]\n"
             f"Server: {host}:{port}",
             border_style=PRIMARY,
         )

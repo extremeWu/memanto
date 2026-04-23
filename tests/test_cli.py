@@ -92,7 +92,7 @@ class TestMEMANTOCLI:
         """Test 'memanto --help'"""
         result = runner.invoke(app, ["--help"])
         assert result.exit_code == 0
-        assert "Universal Memory Layer for Agentic AI" in result.stdout
+        assert "Memory that agents Love!" in result.stdout
 
     def test_status_command(self, mock_all_clients):
         """Test 'memanto status'"""

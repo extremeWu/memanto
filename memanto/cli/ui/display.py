@@ -23,7 +23,7 @@ from memanto.cli.ui.theme import (
 
 MEMANTO_VERSION = "0.1.0"
 
-# ASCII art logo — clean block MemAnto
+# ASCII art logo — clean block Memanto
 LOGO = r"""
           ███╗   ███╗ ███████╗ ███╗   ███╗  █████╗  ███╗   ██╗ ████████╗  ██████╗
  ▐▛██▜▌   ████╗ ████║ ██╔════╝ ████╗ ████║ ██╔══██╗ ████╗  ██║ ╚══██╔══╝ ██╔═══██╗
@@ -85,7 +85,7 @@ def print_logo() -> None:
 
     # Tagline
     tagline = Text()
-    tagline.append("  Universal Memory Layer for Agentic AI\n", style="bold white")
+    tagline.append("  Memory that AI Agents Love!\n", style="bold white")
     tagline.append("  powered by ", style="dim")
     tagline.append("moorcheh.ai", style=BOLD_PRIMARY)
     console.print(tagline)
