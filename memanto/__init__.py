@@ -1,3 +1,3 @@
 """
-MemAnto - Universal Memory Layer for Agentic AI
+Memanto - Memory that agents Love!
 """

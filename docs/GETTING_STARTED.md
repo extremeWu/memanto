@@ -8,7 +8,7 @@
 
 ## What is MEMANTO?
 
-MEMANTO (Universal Memory Layer for Agentic AI) is a production-ready FastAPI service that gives your AI agents persistent memory across conversations, sessions, and workflows.
+MEMANTO (Memory that agents Love!) is a production-ready FastAPI service that gives your AI agents persistent memory across conversations, sessions, and workflows.
 
 **Think of it as**: A PostgreSQL database, but optimized for AI agents - with semantic search, AI-powered summarization, and built specifically for agent workflows.
 
