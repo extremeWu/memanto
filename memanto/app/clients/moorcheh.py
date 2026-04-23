@@ -3,7 +3,6 @@ Moorcheh Client Singleton
 """
 
 from fastapi import Depends
-from fastapi.params import Depends as DependsType
 from moorcheh_sdk import AsyncMoorchehClient, MoorchehClient
 
 from memanto.app.config import settings

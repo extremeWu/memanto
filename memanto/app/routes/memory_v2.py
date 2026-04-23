@@ -30,7 +30,7 @@ router = APIRouter()
 async def remember(
     agent_id: str,
     content: str = Body(..., embed=True, description="Memory content"),
-    memory_type: str = Query(..., description="Type of memory"),
+    memory_type: str = Query("fact", description="Type of memory"),
     title: str | None = Query(
         None, description="Memory title (optional, defaults to truncated content)"
     ),
