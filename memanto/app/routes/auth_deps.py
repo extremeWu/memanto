@@ -4,7 +4,7 @@ Authentication Dependencies for V2 API
 Shared authentication utilities to avoid circular imports.
 """
 
-from fastapi import Header, HTTPException
+from fastapi import Depends, Header, HTTPException
 
 from memanto.app.models.session import Session
 from memanto.app.services.session_service import get_session_service
@@ -48,6 +48,40 @@ def get_moorcheh_api_key(authorization: str | None = Header(None)) -> str:
     raise HTTPException(
         status_code=401, detail="Missing API key in authorization header and no configured default"
     )
+
+
+async def verify_moorcheh_api_key(
+    api_key: str = Depends(get_moorcheh_api_key)
+) -> str:
+    """
+    Verify Moorcheh API key by making a lightweight request.
+
+    Args:
+        api_key: The API key to verify
+
+    Returns:
+        The verified API key
+        
+    Raises:
+        HTTPException: If the API key is invalid or request fails
+    """
+    from memanto.app.clients.moorcheh import get_async_moorcheh_client
+    from moorcheh_sdk.exceptions import AuthenticationError
+
+    client = get_async_moorcheh_client(api_key)
+    try:
+        await client.namespaces.list()
+    except AuthenticationError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid Moorcheh API key"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to verify Moorcheh API key: {str(e)}"
+        )
+    return api_key
 
 
 def get_current_session(

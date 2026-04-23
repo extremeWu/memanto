@@ -43,7 +43,7 @@ class MoorchehClientSingleton:
             if self._async_client is None:
                 self._async_client = AsyncMoorchehClient(api_key=settings.MOORCHEH_API_KEY)
             return self._async_client
-            
+
         return AsyncMoorchehClient(api_key=key_to_use)
 
     def reset_client(self):

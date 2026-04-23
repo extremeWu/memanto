@@ -2,7 +2,7 @@ import os
 import shutil
 import tempfile
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -75,15 +75,17 @@ def mock_moorcheh():
     with (
         patch("memanto.app.services.agent_service.MoorchehClient") as mock_agent_client,
         patch("memanto.app.clients.moorcheh.MoorchehClient") as mock_moorcheh_cls,
+        patch("memanto.app.clients.moorcheh.AsyncMoorchehClient") as mock_async_moorcheh_cls,
     ):
         # Setup mock instance
         mock_instance = MagicMock()
         mock_agent_client.return_value = mock_instance
         mock_moorcheh_cls.return_value = mock_instance
+        mock_async_moorcheh_cls.return_value = mock_instance
 
         # Default mock returns
         mock_instance.namespaces.create.return_value = {"status": "created"}
-        mock_instance.namespaces.list.return_value = {"namespaces": []}
+        mock_instance.namespaces.list = AsyncMock(return_value={"namespaces": []})
 
         yield mock_instance
 
