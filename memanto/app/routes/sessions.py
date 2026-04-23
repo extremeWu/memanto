@@ -33,8 +33,8 @@ router = APIRouter()
 from memanto.app.routes import memory_v2  # noqa: E402
 from memanto.app.routes.auth_deps import (  # noqa: E402
     get_current_session,
-    verify_moorcheh_api_key,
     get_session_service,
+    verify_moorcheh_api_key,
 )
 
 router.include_router(

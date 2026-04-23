@@ -41,7 +41,9 @@ class MoorchehClientSingleton:
         # If using default key, use singleton
         if key_to_use == settings.MOORCHEH_API_KEY:
             if self._async_client is None:
-                self._async_client = AsyncMoorchehClient(api_key=settings.MOORCHEH_API_KEY)
+                self._async_client = AsyncMoorchehClient(
+                    api_key=settings.MOORCHEH_API_KEY
+                )
             return self._async_client
 
         return AsyncMoorchehClient(api_key=key_to_use)
@@ -56,15 +58,15 @@ class MoorchehClientSingleton:
 moorcheh_client = MoorchehClientSingleton()
 
 
-def get_moorcheh_client(api_key: str | DependsType = Depends(get_moorcheh_api_key)) -> MoorchehClient:
+def get_moorcheh_client(
+    api_key: str = Depends(get_moorcheh_api_key),
+) -> MoorchehClient:
     """Dependency injection function"""
-    if isinstance(api_key, DependsType):
-        api_key = None
     return moorcheh_client.get_client(api_key)
 
 
-def get_async_moorcheh_client(api_key: str | DependsType = Depends(get_moorcheh_api_key)) -> AsyncMoorchehClient:
+def get_async_moorcheh_client(
+    api_key: str = Depends(get_moorcheh_api_key),
+) -> AsyncMoorchehClient:
     """Dependency injection function for async client"""
-    if isinstance(api_key, DependsType):
-        api_key = None
     return moorcheh_client.get_async_client(api_key)

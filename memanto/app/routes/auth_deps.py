@@ -46,13 +46,12 @@ def get_moorcheh_api_key(authorization: str | None = Header(None)) -> str:
         return settings.MOORCHEH_API_KEY
 
     raise HTTPException(
-        status_code=401, detail="Missing API key in authorization header and no configured default"
+        status_code=401,
+        detail="Missing API key in authorization header and no configured default",
     )
 
 
-async def verify_moorcheh_api_key(
-    api_key: str = Depends(get_moorcheh_api_key)
-) -> str:
+async def verify_moorcheh_api_key(api_key: str = Depends(get_moorcheh_api_key)) -> str:
     """
     Verify Moorcheh API key by making a lightweight request.
 
@@ -61,25 +60,22 @@ async def verify_moorcheh_api_key(
 
     Returns:
         The verified API key
-        
+
     Raises:
         HTTPException: If the API key is invalid or request fails
     """
-    from memanto.app.clients.moorcheh import get_async_moorcheh_client
     from moorcheh_sdk.exceptions import AuthenticationError
+
+    from memanto.app.clients.moorcheh import get_async_moorcheh_client
 
     client = get_async_moorcheh_client(api_key)
     try:
         await client.namespaces.list()
     except AuthenticationError:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid Moorcheh API key"
-        )
+        raise HTTPException(status_code=401, detail="Invalid Moorcheh API key")
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to verify Moorcheh API key: {str(e)}"
+            status_code=500, detail=f"Failed to verify Moorcheh API key: {str(e)}"
         )
     return api_key
 

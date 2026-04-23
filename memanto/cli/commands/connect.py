@@ -431,9 +431,6 @@ def connect_remove(
     all_agents: bool = typer.Option(
         False, "--all", help="Remove MEMANTO from all agents"
     ),
-    force: bool = typer.Option(
-        False, "--force", "-f", help="Skip confirmation"
-    ),
 ):
     """Remove MEMANTO integration from an agent.
 
@@ -443,10 +440,7 @@ def connect_remove(
         memanto connect remove --all
     """
     if all_agents:
-        scope = "globally" if is_global else f"in {Path(project_dir).resolve()}"
-        if not force and not typer.confirm(f"Remove MEMANTO from ALL agents {scope}?"):
-            raise typer.Exit(0)
-
+        "globally" if is_global else f"in {Path(project_dir).resolve()}"
         agents_to_remove = [a.name for a in list_agents()]
     elif agent_name:
         if agent_name not in AGENT_REGISTRY:

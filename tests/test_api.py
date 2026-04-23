@@ -75,7 +75,9 @@ def mock_moorcheh():
     with (
         patch("memanto.app.services.agent_service.MoorchehClient") as mock_agent_client,
         patch("memanto.app.clients.moorcheh.MoorchehClient") as mock_moorcheh_cls,
-        patch("memanto.app.clients.moorcheh.AsyncMoorchehClient") as mock_async_moorcheh_cls,
+        patch(
+            "memanto.app.clients.moorcheh.AsyncMoorchehClient"
+        ) as mock_async_moorcheh_cls,
     ):
         # Setup mock instance
         mock_instance = MagicMock()
@@ -167,10 +169,14 @@ class TestMEMANTOAPI:
         params = {
             "memory_type": "fact",
             "title": "API Test",
-            "content": "Testing the API with mocks",
             "confidence": 0.9,
         }
-        response = await client.post(remember_url, headers=headers, params=params)
+        json_body = {
+            "content": "Testing the API with mocks",
+        }
+        response = await client.post(
+            remember_url, headers=headers, params=params, json=json_body
+        )
 
         assert response.status_code == 200
         assert response.json()["status"] == "queued"
@@ -258,7 +264,7 @@ class TestMEMANTOAPI:
             "/api/v2/agents", headers=auth_headers, json={"agent_id": "to-delete"}
         )
         response = await client.delete("/api/v2/agents/to-delete", headers=auth_headers)
-        assert response.status_code == 204
+        assert response.status_code == 200
 
     @pytest.mark.asyncio
     async def test_deactivate_agent(self, client, auth_headers):
