@@ -16,9 +16,9 @@ from memanto.app.utils.errors import (
 )
 
 
-def get_moorcheh_api_key(authorization: str = Header(...)) -> str:
+def get_moorcheh_api_key(authorization: str | None = Header(None)) -> str:
     """
-    Extract Moorcheh API key from Authorization header
+    Extract Moorcheh API key from Authorization header or use configured default
 
     Args:
         authorization: Authorization header (Bearer {api_key})
@@ -27,25 +27,31 @@ def get_moorcheh_api_key(authorization: str = Header(...)) -> str:
         API key
 
     Raises:
-        HTTPException: If authorization header is invalid
+        HTTPException: If authorization header is invalid or no key is found
     """
-    if not authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid authorization header. Use: Bearer {api_key}",
-        )
+    if authorization:
+        if not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid authorization header. Use: Bearer {api_key}",
+            )
 
-    api_key = authorization.replace("Bearer ", "").strip()
-    if not api_key:
-        raise HTTPException(
-            status_code=401, detail="Missing API key in authorization header"
-        )
+        api_key = authorization.replace("Bearer ", "").strip()
+        if api_key:
+            return api_key
 
-    return api_key
+    from memanto.app.config import settings
+
+    if settings.MOORCHEH_API_KEY:
+        return settings.MOORCHEH_API_KEY
+
+    raise HTTPException(
+        status_code=401, detail="Missing API key in authorization header and no configured default"
+    )
 
 
 def get_current_session(
-    authorization: str = Header(...), x_session_token: str | None = Header(None)
+    authorization: str | None = Header(None), x_session_token: str | None = Header(None)
 ) -> Session:
     """
     Get and validate current session
