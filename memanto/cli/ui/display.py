@@ -85,7 +85,7 @@ def print_logo() -> None:
 
     # Tagline
     tagline = Text()
-    tagline.append("  Memory that agents Love!\n", style="bold white")
+    tagline.append("  Memory that AI Agents Love!\n", style="bold white")
     tagline.append("  powered by ", style="dim")
     tagline.append("moorcheh.ai", style=BOLD_PRIMARY)
     console.print(tagline)

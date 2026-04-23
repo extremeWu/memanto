@@ -1,3 +1,3 @@
 """
-Memanto - Memory that agents Love!
+Memanto - Memory that AI Agents Love!
 """

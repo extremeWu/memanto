@@ -5,7 +5,7 @@
 </p>
 
 <div align="center">
-  <h1>Memanto - Memory that AI agents love!</h1>
+  <h1>Memanto - Memory that AI Agents Love!</h1>
 </div>
 
 <p align="center">
