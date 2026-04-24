@@ -157,15 +157,16 @@ def show_welcome_banner(config_manager: ConfigManager) -> None:
     console.print(Rule("Quick Start", style=PRIMARY))
 
     commands = [
-        ("memanto status", "Full dashboard"),
+        ("memanto serve", "Start API server"),
         ("memanto agent create <agent_name_or_id>", "Create a new memanto agent"),
-        ("memanto agent activate <agent_name_or_id>", "Begin a session"),
         ('memanto remember "..."', "Store a memory"),
         ('memanto recall "..."', "Search memories"),
         ('memanto answer "..."', "Ask a question (RAG)"),
+        ("memanto ui", "Open the web dashboard UI"),
+        ("memanto status", "Full dashboard"),
+        ("memanto agent list", "List your agents"),
         ("memanto connect list", "See agent integrations"),
         ("memanto connect <agent>", "Connect to an AI agent"),
-        ("memanto serve", "Start API server"),
     ]
 
     cmd_table = Table(show_header=False, box=None, padding=(0, 1), show_edge=False)
