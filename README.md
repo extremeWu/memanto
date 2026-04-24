@@ -56,12 +56,20 @@ pip install memanto
 memanto
 ```
 
-### 2. Test Agent Memories
+### 2. Start MEMANTO Server (keep this terminal running)
 ```bash
-# Create and activate an agent session
-memanto agent create customer-support
-memanto agent activate customer-support
+memanto serve
+```
 
+### 3. In a New Terminal, Create an Agent
+```bash
+memanto agent create customer-support
+```
+
+`memanto agent create` now starts a session automatically, so you can begin storing and recalling memory immediately.
+
+### 4. Test Agent Memories
+```bash
 # Store memories with specific semantic types
 memanto remember "The user prefers dark mode for the dashboard."
 memanto remember "User's timezone is PST."

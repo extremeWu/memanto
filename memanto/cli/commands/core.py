@@ -477,6 +477,10 @@ def serve(
     console.print(f"[dim]Server URL: http://{display_host}:{port}[/dim]")
     console.print(f"[dim]API Docs: http://{display_host}:{port}/docs[/dim]")
     console.print(f"[dim]Health Check: http://{display_host}:{port}/health[/dim]")
+    console.print(
+        "\n[bold]Next step:[/bold] Open a new terminal and run [bright_white]memanto agent create <agent-id>[/bright_white]."
+    )
+    console.print("[dim]A session will start automatically after agent creation.[/dim]")
     console.print("\n[bold]Server is running. Press CTRL+C to stop.[/bold]\n")
 
     # Start server

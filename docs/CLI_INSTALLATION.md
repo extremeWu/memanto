@@ -143,7 +143,6 @@ Server is running. Press CTRL+C to stop.
 **Terminal 2 - Use CLI:**
 ```bash
 memanto agent create my-agent
-memanto agent activate my-agent
 memanto remember "First memory"
 ```
 
