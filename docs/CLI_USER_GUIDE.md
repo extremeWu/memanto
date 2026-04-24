@@ -101,19 +101,19 @@ Next steps:
   3. Start storing memories: memanto remember 'your memory here'
 ```
 
-### 2. Create an Agent
+### 2. Start MEMANTO Server (Terminal 1)
+
+```bash
+memanto serve
+```
+
+### 3. Create an Agent (Terminal 2)
 
 ```bash
 memanto agent create my-agent --pattern tool
 ```
 
-### 3. Activate the Agent
-
-```bash
-memanto agent activate my-agent
-```
-
-This starts a session (default: 4 hours).
+This also starts a session automatically (default: 6 hours).
 
 ### 4. Store a Memory
 

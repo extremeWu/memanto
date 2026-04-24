@@ -38,15 +38,27 @@ def agent_create(
     ),
     description: str | None = typer.Option(None, help="Agent description"),
 ):
-    """Create a new agent."""
+    """Create a new agent and start a session immediately."""
     client = get_client()
 
     try:
         client.create_agent(agent_id, pattern, description)
+        activation = client.activate_agent(agent_id, 6)
+        config_manager.set_active_session(agent_id, activation["session_token"])
+
         console.print(f"[green]OK Agent '{agent_id}' created successfully![/green]")
         console.print(f"[dim]Pattern: {pattern}[/dim]")
         if description:
             console.print(f"[dim]Description: {description}[/dim]")
+        console.print(
+            "[green]OK Session started automatically for this agent.[/green]"
+        )
+        console.print(
+            f"[dim]Session expires: {activation.get('expires_at', 'unknown')}[/dim]"
+        )
+        console.print(
+            "[dim]You can now run: memanto remember \"...\" and memanto recall \"...\"[/dim]"
+        )
     except Exception as e:
         _error(f"Failed to create agent: {e}")
 

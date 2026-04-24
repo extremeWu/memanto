@@ -17,20 +17,23 @@ AI agents need memory to provide context-aware, personalized responses. MEMANTO 
 
 ---
 
-## Quick Start (3 Commands)
+## Quick Start (4 Commands)
 
 ```bash
-# 1. Activate your agent
-memanto agent activate your-agent-id
+# 1. Start MEMANTO server (one terminal)
+memanto serve
 
-# 2. Remember something
+# 2. In a new terminal, create your agent
+memanto agent create your-agent-id
+
+# 3. Remember something
 memanto remember "User prefers dark mode" --type preference --source your-agent-id
 
-# 3. Recall it later
+# 4. Recall it later
 memanto recall "dark mode"
 ```
 
-**That's it!** Your agent now has persistent memory.
+**That's it!** `memanto agent create` starts the session automatically.
 
 ---
 

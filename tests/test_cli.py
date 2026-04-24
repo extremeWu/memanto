@@ -111,6 +111,12 @@ class TestMEMANTOCLI:
             "agent_id": "test-agent",
             "namespace": "memanto_agent_test-agent",
         }
+        mock_all_clients.activate_agent.return_value = {
+            "session_id": "sess-test",
+            "session_token": "test-token",
+            "agent_id": "test-agent",
+            "expires_at": "2026-03-19T20:00:00Z",
+        }
 
         result = runner.invoke(
             app, ["agent", "create", "test-agent", "--pattern", "support"]
@@ -122,6 +128,8 @@ class TestMEMANTOCLI:
         assert result.exit_code == 0
         assert "test-agent" in result.stdout
         assert "created successfully" in result.stdout.lower()
+        assert "session started automatically" in result.stdout.lower()
+        mock_all_clients.activate_agent.assert_called_once_with("test-agent", 6)
 
     def test_agent_list(self, mock_all_clients):
         """Test 'memanto agent list'"""
