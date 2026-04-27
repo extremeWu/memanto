@@ -121,9 +121,9 @@ Optional:
 
 ---
 
-## Server Management
+## REST API Management
 
-### Recommended: Embedded Server Mode (`memanto serve`)
+### Recommended: Embedded API Mode (`memanto serve`)
 
 **Basic CLI Usage (No server required):**
 ```bash
@@ -143,7 +143,7 @@ curl http://localhost:8000/api/v2/agents/my-agent/recall?query=memory
 ```
 
 **Pros:**
-- ✅ Single command to start everything
+- ✅ Single command to start the API and CLI together
 - ✅ Beautiful terminal UI
 - ✅ Built-in port conflict detection
 - ✅ Clean shutdown with CTRL+C
