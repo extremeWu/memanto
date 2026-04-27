@@ -121,7 +121,7 @@ def remember(
 
             if failed == 0:
                 console.print(
-                    f"[green]OK Stored {successful}/{total} memories successfully![/green]"
+                    f"[green]Stored {successful}/{total} memories successfully![/green]"
                 )
             else:
                 console.print(
@@ -161,7 +161,7 @@ def remember(
             )
         elapsed = time.perf_counter() - start
 
-        console.print("[green]OK Memory stored successfully![/green]")
+        console.print("[green]Memory stored successfully![/green]")
         console.print(f"[dim]Memory ID: {result.get('memory_id', 'unknown')}[/dim]")
         console.print(f"[dim]Type: {memory_type} | Confidence: {confidence}[/dim]")
         console.print(f"[dim]Completed in {elapsed:.2f}s[/dim]")
@@ -218,7 +218,7 @@ def upload(
         elapsed = time.perf_counter() - start
 
         if result.get("success"):
-            console.print("[green]OK File uploaded successfully![/green]")
+            console.print("[green]File uploaded successfully![/green]")
         else:
             console.print(
                 f"[yellow]Upload completed with status: {result.get('message')}[/yellow]"
@@ -551,7 +551,7 @@ def daily_summary(
         # Display Summary Status
         if summary.get("status") == "success":
             console.print(
-                f"[green]OK Daily summary generated:[/green] {summary.get('summary_path')}"
+                f"[green]Daily summary generated:[/green] {summary.get('summary_path')}"
             )
         else:
             console.print(f"[yellow]! Summary:[/yellow] {summary.get('status')}")
@@ -560,7 +560,7 @@ def daily_summary(
         if conflicts.get("status") == "success":
             count = conflicts.get("conflict_count", 0)
             console.print(
-                f"[green]OK Conflict report generated:[/green] {conflicts.get('json_path')}"
+                f"[green]Conflict report generated:[/green] {conflicts.get('json_path')}"
             )
             if count > 0:
                 console.print(f"[yellow]  ! {count} conflict(s) detected[/yellow]")
@@ -580,7 +580,7 @@ def daily_summary(
             if export.get("status") != "error":
                 export_count = export.get("total_memories", 0)
                 console.print(
-                    f"[green]OK Memory export generated:[/green] {export_count} memories saved to cache"
+                    f"[green]Memory export generated:[/green] {export_count} memories saved to cache"
                 )
             else:
                 console.print(

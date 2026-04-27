@@ -376,6 +376,7 @@ POST /api/v2/agents/{agent_id}/remember?tenant_id=any-value
 1. **Activate session**: `POST /api/v2/agents/{agent_id}/activate`
 2. **Authorize**: Use `X-Session-Token` for subsequent operations
 3. **Automatic isolation**: All memory operations (`remember`, `recall`, `answer`) are automatically scoped to the active agent.
+4. **CLI Convenience**: In the CLI, `memanto agent create` automatically performs activation for you.
 ```
 
 ### Namespace Migration

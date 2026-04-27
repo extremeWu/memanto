@@ -198,10 +198,10 @@ def status():
 
     server_url = f"http://{server_cfg['url']}:{server_cfg['port']}"
     if is_configured:
-        cfg_table.add_row("Server URL", server_url)
+        cfg_table.add_row("Local REST API URL", server_url)
         cfg_table.add_row("API Key", "[green]● configured[/green]")
     else:
-        cfg_table.add_row("Server URL", "[dim]not set[/dim]")
+        cfg_table.add_row("Local REST API URL", "[dim]not set[/dim]")
         cfg_table.add_row("API Key", "[red]● not configured[/red]")
 
     console.print(Panel(cfg_table, title="Configuration", border_style=PRIMARY))
@@ -231,7 +231,7 @@ def status():
 
         h_status = health.get("status", "unknown")
         if h_status == "healthy":
-            srv_table.add_row("Status", "[green]● healthy[/green]")
+            srv_table.add_row("Status", "[green]● online[/green]")
         elif h_status == "degraded":
             srv_table.add_row("Status", "[yellow]● degraded[/yellow]")
         else:
@@ -250,7 +250,7 @@ def status():
         console.print(
             Panel(
                 srv_table,
-                title="Server",
+                title="Local REST API",
                 border_style=SUCCESS if h_status == "healthy" else WARNING,
             )
         )
@@ -258,10 +258,10 @@ def status():
     except Exception:
         console.print(
             Panel(
-                f"[red]● Server unreachable[/red] at {server_url}\n"
+                f"[red]● Local REST API server offline[/red] at {server_url}\n"
                 f"[dim]Start it with:[/dim] [{BRIGHT}]memanto serve[/{BRIGHT}]",
-                title="Server",
-                border_style=ERROR,
+                title="Local REST API",
+                border_style=PRIMARY,
             )
         )
         console.print()
@@ -436,7 +436,7 @@ def serve(
 
     console.print(
         Panel.fit(
-            f"[{BOLD_PRIMARY}]MEMANTO Server Starting...[/{BOLD_PRIMARY}]\n"
+            f"[{BOLD_PRIMARY}]MEMANTO REST API Starting...[/{BOLD_PRIMARY}]\n"
             f"Host: {host}:{port}",
             border_style=PRIMARY,
         )
@@ -473,7 +473,7 @@ def serve(
         )
 
     display_host = "localhost" if host == "0.0.0.0" else host
-    console.print("\n[green]Starting MEMANTO server...[/green]")
+    console.print("\n[green]Starting local REST API...[/green]")
     console.print(f"[dim]Server URL: http://{display_host}:{port}[/dim]")
     console.print(f"[dim]API Docs: http://{display_host}:{port}/docs[/dim]")
     console.print(f"[dim]Health Check: http://{display_host}:{port}/health[/dim]")

@@ -42,7 +42,7 @@ MEMANTO is built for teams that want high-quality agent memory without graph-hea
 
 ## 🚀 MEMANTO CLI
 
-MEMANTO comes with a powerful, developer-friendly Command Line Interface. You can initialize your environment, start the server, and manage your agent's memories completely from your terminal!
+MEMANTO comes with a powerful, developer-friendly Command Line Interface. You can manage your agent's memories completely from your terminal—no local server required!
 
 You need a Moorcheh API key to use MEMANTO. Create one in the [Moorcheh Dashboard](https://console.moorcheh.ai/api-keys).
 
@@ -56,20 +56,11 @@ pip install memanto
 memanto
 ```
 
-### 2. Start MEMANTO Server (keep this terminal running)
+### 2. Test Agent Memories
 ```bash
-memanto serve
-```
-
-### 3. In a New Terminal, Create an Agent
-```bash
+# Create and auto-activate an agent session
 memanto agent create customer-support
-```
 
-`memanto agent create` now starts a session automatically, so you can begin storing and recalling memory immediately.
-
-### 4. Test Agent Memories
-```bash
 # Store memories with specific semantic types
 memanto remember "The user prefers dark mode for the dashboard."
 memanto remember "User's timezone is PST."
@@ -95,7 +86,7 @@ Use memory types to categorize what you store so retrieval is cleaner and more c
 | Capability | Commands | What it does |
 |---|---|---|
 | System status dashboard | `memanto status` | View environment, configuration, server health, active session, and registered agents. |
-| Local server + web dashboard | `memanto serve`, `memanto ui` | Run the MEMANTO API locally and open an interactive browser UI. |
+| Local REST API + Web UI | `memanto serve`, `memanto ui` | Run the MEMANTO REST API locally and open an interactive browser UI. (Optional for CLI usage). |
 | Agent lifecycle management | `memanto agent ...` | Create/list/delete agents, activate/deactivate sessions, and run `agent bootstrap` for an intelligence snapshot. |
 | Memory capture at scale | `memanto remember` | Store single memories with metadata or batch-ingest up to 100 records from JSON. |
 | File upload to memory | `memanto upload` | Upload documents (.pdf, .docx, .xlsx, .json, .txt, .csv, .md) directly into an agent's memory namespace — content becomes instantly searchable via `recall`. |

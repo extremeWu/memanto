@@ -623,9 +623,10 @@ memanto recall "query" --limit 10 --type TYPE --min-confidence 0.8
 memanto answer "question"
 
 # Session management
-memanto agent activate my-agent
+memanto agent create my-agent       # Create and auto-activate
+memanto agent activate my-agent     # Activate existing
 memanto session info
-memanto session extend --hours 4
+memanto session extend --hours 6
 ```
 
 ### Python Integration

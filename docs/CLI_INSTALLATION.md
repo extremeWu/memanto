@@ -58,18 +58,23 @@ memanto --help
 4. Create a new API key
 5. Copy the key
 
-#### Step 2: Initialize & Start
+#### Step 2: Initialize & Setup
 
 ```bash
-# Initialize MEMANTO
-memanto init
-# Enter your API key when prompted
-
-# Start MEMANTO (single command - server + CLI!)
-memanto serve
+# Initialize MEMANTO (Sets up your API key)
+memanto
 ```
 
-**That's it!** The server is now running. Open a new terminal for CLI commands.
+**That's it!** You are ready to use the CLI. No local server is required for CLI commands.
+
+### Optional: Start the REST API Server
+
+If you want to use the MEMANTO REST API from other applications or via `curl`:
+
+```bash
+# Start the local FastAPI server
+memanto serve
+```
 
 ### Alternative: Manual Server Management
 
@@ -102,11 +107,11 @@ Server version: 1.0.0
 Configuration saved to: ~/.memanto/config.yaml
 
 Next steps:
-  1. Start MEMANTO: memanto serve
-  2. In another terminal, create an agent: memanto agent create my-agent
+  1. Create and activate an agent: memanto agent create my-agent
+  2. Start storing memories: memanto remember "Hello"
 
-Or use the quick workflow:
-  memanto serve (starts server)
+Optional:
+  memanto serve (starts local REST API server)
 ```
 
 **What happens:**
@@ -116,38 +121,29 @@ Or use the quick workflow:
 
 ---
 
-## Server Management
+## REST API Management
 
-### Recommended: Embedded Server Mode (`memanto serve`)
+### Recommended: Embedded API Mode (`memanto serve`)
 
-**Terminal 1 - Start Server:**
-```bash
-memanto serve
-```
-
-**Output:**
-```
-+--------------------------+
-| MEMANTO Server Starting... |
-| Host: 0.0.0.0:8000       |
-+--------------------------+
-
-Starting MEMANTO server...
-Server URL: http://localhost:8000
-API Docs: http://localhost:8000/docs
-Health Check: http://localhost:8000/health
-
-Server is running. Press CTRL+C to stop.
-```
-
-**Terminal 2 - Use CLI:**
+**Basic CLI Usage (No server required):**
 ```bash
 memanto agent create my-agent
 memanto remember "First memory"
 ```
 
+**Using the REST API (requires `memanto serve`):**
+If you need to access MEMANTO via HTTP (e.g., from a web app), start the server:
+
+```bash
+# Terminal 1
+memanto serve
+
+# Terminal 2 (or from your app)
+curl http://localhost:8000/api/v2/agents/my-agent/recall?query=memory
+```
+
 **Pros:**
-- ✅ Single command to start everything
+- ✅ Single command to start the API and CLI together
 - ✅ Beautiful terminal UI
 - ✅ Built-in port conflict detection
 - ✅ Clean shutdown with CTRL+C
@@ -171,7 +167,6 @@ python -m app.main
 **Terminal 2 - CLI:**
 ```bash
 memanto agent create my-agent
-memanto agent activate my-agent
 memanto remember "First memory"
 ```
 
@@ -187,21 +182,23 @@ memanto remember "First memory"
 ### Complete Workflow Example
 
 ```bash
-# 1. Create an agent (one-time)
+# 1. Create and activate an agent (one-time)
 memanto agent create my-assistant --pattern tool --description "My AI assistant"
 
 # Output:
 # OK Agent 'my-assistant' created successfully!
 # Pattern: tool
 # Description: My AI assistant
+# OK Session started automatically for this agent.
+# Session expires: 2025-12-28T16:30:00
 
-# 2. Activate the agent (starts a session)
-memanto agent activate my-assistant --duration-hours 4
+# 2. (Optional) Reactivate or change duration
+memanto agent activate my-assistant --duration-hours 8
 
 # Output:
 # OK Agent 'my-assistant' activated!
-# Session duration: 4 hours
-# Session expires: 2025-12-28T10:30:00
+# Session duration: 6 hours
+# Session expires: 2025-12-28T18:30:00
 
 # 3. Store memories
 memanto remember "User prefers dark mode" --type preference --tags "ui,settings"
@@ -258,13 +255,13 @@ memanto agent deactivate
 ### All Available Commands
 
 ```bash
-# Initialization
-memanto init                              # Setup CLI with API key
+# Setup
+memanto                                   # Setup CLI with API key
 
 # Agent Management
-memanto agent create AGENT_ID             # Create new agent
+memanto agent create AGENT_ID             # Create and activate new agent
 memanto agent list                        # List all agents
-memanto agent activate AGENT_ID           # Start session
+memanto agent activate AGENT_ID           # Activate (or reactivate) session
 memanto agent deactivate                  # End session
 memanto agent delete AGENT_ID            # Delete agent (prompts to keep/purge cloud memories)
 
@@ -296,7 +293,7 @@ memanto COMMAND --help                    # Show command help
 ```
 ┌─────────────────┐
 │   User Types    │
-│  memanto init     │
+│  memanto          │
 └────────┬────────┘
          │
          ▼
@@ -377,7 +374,7 @@ moorcheh:
   api_key_encrypted: "gAAAAABf..."  # Fernet encrypted Moorcheh API key
 
 session:
-  default_duration_hours: 4
+  default_duration_hours: 6
   auto_extend: true
 
 cli:
@@ -461,7 +458,7 @@ memanto agent list
 memanto agent activate AGENT_ID
 ```
 
-### "MEMANTO not initialized" Error
+### "MEMANTO not configured" Error
 
 **Cause:** CLI not configured
 
@@ -481,7 +478,7 @@ memanto
 memanto agent activate AGENT_ID
 
 # Option 2: Extend (if still valid)
-memanto session extend --hours 4
+memanto session extend --hours 6
 ```
 
 ### Windows Unicode Errors

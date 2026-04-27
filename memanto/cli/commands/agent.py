@@ -46,11 +46,11 @@ def agent_create(
         activation = client.activate_agent(agent_id, 6)
         config_manager.set_active_session(agent_id, activation["session_token"])
 
-        console.print(f"[green]OK Agent '{agent_id}' created successfully![/green]")
+        console.print(f"[green]Agent '{agent_id}' created successfully![/green]")
         console.print(f"[dim]Pattern: {pattern}[/dim]")
         if description:
             console.print(f"[dim]Description: {description}[/dim]")
-        console.print("[green]OK Session started automatically for this agent.[/green]")
+        console.print("[green]Session started automatically for this agent.[/green]")
         console.print(
             f"[dim]Session expires: {activation.get('expires_at', 'unknown')}[/dim]"
         )
