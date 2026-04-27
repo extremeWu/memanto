@@ -18,7 +18,6 @@ from memanto.cli.commands._shared import (
     BOLD_BRIGHT,
     BOLD_PRIMARY,
     BRIGHT,
-    ERROR,
     PRIMARY,
     SUCCESS,
     WARNING,
