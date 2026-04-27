@@ -379,7 +379,7 @@ def connect_list(
     installed_global = {a.name for a in detect_memanto_installed_global()}
 
     table = Table(show_header=True, header_style=BOLD_PRIMARY)
-    table.add_column("Agent", style=BRIGHT)
+    table.add_column("Agent Name", style=PRIMARY)
     table.add_column("Detected", justify="center", width=10)
     table.add_column("Local", justify="center", width=10)
     table.add_column("Global", justify="center", width=10)
@@ -395,7 +395,7 @@ def connect_list(
         global_icon = "[green]●[/green]" if is_global else "[dim]○[/dim]"
 
         table.add_row(
-            agent.display_name,
+            agent.name,
             det_icon,
             local_icon,
             global_icon,
