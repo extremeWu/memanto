@@ -38,8 +38,8 @@ The CLI uses the MEMANTO API with session-based authentication and provides a be
 ### Prerequisites
 
 - Python 3.10 or higher
-- MEMANTO server running (default: http://localhost:8000)
-- Moorcheh API key
+- MEMANTO REST API server (optional, only if using HTTP endpoints)
+- Moorcheh API key (required for cloud connectivity)
 
 ### Install Dependencies
 
@@ -96,26 +96,19 @@ Server version: 0.1.0
 Configuration saved to: /home/user/.memanto/config.yaml
 
 Next steps:
-  1. Create an agent: memanto agent create my-agent
-  2. Activate the agent: memanto agent activate my-agent
-  3. Start storing memories: memanto remember 'your memory here'
+  1. Create and activate an agent: memanto agent create my-agent
+  2. Start storing memories: memanto remember 'your memory here'
 ```
 
-### 2. Start MEMANTO Server (Terminal 1)
-
-```bash
-memanto serve
-```
-
-### 3. Create an Agent (Terminal 2)
+### 2. Create and Activate an Agent
 
 ```bash
 memanto agent create my-agent --pattern tool
 ```
 
-This also starts a session automatically (default: 6 hours).
+This creates the agent and starts a session immediately (default: 6 hours). You don't need to run `agent activate` manually after creation.
 
-### 4. Store a Memory
+### 3. Store a Memory
 
 ```bash
 memanto remember "Implemented authentication using JWT tokens" \
@@ -124,13 +117,13 @@ memanto remember "Implemented authentication using JWT tokens" \
   --confidence 0.9
 ```
 
-### 5. Search Memories
+### 4. Search Memories
 
 ```bash
 memanto recall "authentication" --limit 5
 ```
 
-### 6. Ask a Question
+### 5. Ask a Question
 
 ```bash
 memanto answer "How did we implement authentication?"
@@ -162,7 +155,7 @@ memanto answer "How did we implement authentication?"
 
 ### Agent Commands
 
-#### `agent create` - Create New Agent
+#### `agent create` - Create and Activate New Agent
 
 ```bash
 memanto agent create AGENT_ID [OPTIONS]
@@ -175,12 +168,17 @@ memanto agent create AGENT_ID [OPTIONS]
 - `--pattern TEXT` - Agent pattern: tool, chat, research, or custom (default: tool)
 - `--description TEXT` - Optional description
 
+**Behavior:**
+1. Creates the agent namespace in Moorcheh.
+2. Automatically activates a session for the new agent (default: 6 hours).
+3. Saves the session token to your local configuration.
+
 **Examples:**
 ```bash
-# Create a tool-using agent
+# Create and activate a tool-using agent
 python -m cli.main agent create code-assistant --pattern tool
 
-# Create a research agent with description
+# Create and activate a research agent with description
 memanto agent create researcher \
   --pattern research \
   --description "Agent for literature review and research"
@@ -212,7 +210,7 @@ memanto agent activate AGENT_ID [OPTIONS]
 - `AGENT_ID` - ID of agent to activate
 
 **Options:**
-- `--duration-hours INT` - Session duration in hours (default: 4)
+- `--duration-hours INT` - Session duration in hours (default: 6)
 
 **Examples:**
 ```bash
@@ -454,7 +452,7 @@ memanto session extend [OPTIONS]
 ```
 
 **Options:**
-- `--hours, -h INT` - Hours to extend (default: 4)
+- `--hours, -h INT` - Hours to extend (default: 6)
 
 **Example:**
 ```bash
@@ -534,11 +532,8 @@ memanto answer "What are our code review requirements?"
 ### Research Assistant
 
 ```bash
-# Create research agent
+# Create and auto-activate research agent
 memanto agent create research-assistant --pattern research
-
-# Activate
-memanto agent activate research-assistant
 
 # Store research findings
 memanto remember "Paper XYZ shows 30% improvement in model accuracy" \
@@ -576,7 +571,7 @@ moorcheh:
   api_key_encrypted: "gAAAAABf..."  # Fernet encrypted
 
 session:
-  default_duration_hours: 4
+  default_duration_hours: 6
   auto_extend: true
 
 cli:
@@ -611,13 +606,13 @@ active_session_token: "eyJhbGciOiJIUzI1NiI..."
 
 ## Troubleshooting
 
-### "MEMANTO not initialized" Error
+### "MEMANTO not configured" Error
 
-**Problem**: Running commands before initialization
+**Problem**: Running commands before setup
 
 **Solution**:
 ```bash
-memanto init
+memanto
 ```
 
 ### "No active agent" Error
@@ -635,23 +630,22 @@ memanto agent activate <agent-id>
 
 ### Connection Failed
 
-**Problem**: Cannot reach MEMANTO server
+**Problem**: Cannot reach Moorcheh/MEMANTO services.
 
 **Check**:
-1. Is the server running?
-   ```bash
-   curl http://localhost:8000/health
-   ```
-
-2. Is the port correct?
+1. **Network**: Do you have internet access? (CLI talks directly to Moorcheh Cloud).
+2. **API Key**: Is your key valid?
    ```bash
    memanto config show
    ```
 
-3. Reinitialize with correct settings:
+3. **Reconfigure**:
    ```bash
-   memanto init --server-url localhost --server-port 8000
+   memanto --api-key YOUR_KEY
    ```
+
+   # (This is only needed if you are using a custom server/endpoint)
+   memanto config set server.url http://your-server:8000
 
 ### API Key Issues
 
@@ -660,8 +654,8 @@ memanto agent activate <agent-id>
 **Solution**:
 ```bash
 # Get new API key from Moorcheh dashboard
-# Reinitialize
-python -m cli.main init --api-key <new-key>
+# Reconfigure
+memanto --api-key <new-key>
 ```
 
 ### Session Expired
@@ -674,7 +668,7 @@ python -m cli.main init --api-key <new-key>
 memanto agent activate <agent-id>
 
 # Or extend existing session (if still valid)
-memanto session extend --hours 4
+memanto session extend --hours 6
 ```
 
 ---
@@ -684,14 +678,14 @@ memanto session extend --hours 4
 ### Complete Project Setup
 
 ```bash
-# 1. Initialize
+# 1. Setup
 memanto
 
-# 2. Create project-specific agent
+# 2. Create and auto-activate project-specific agent
 memanto agent create project-alpha --pattern tool \
   --description "Agent for Project Alpha development"
 
-# 3. Activate for long session
+# 3. (Optional) Reactivate or change duration
 memanto agent activate project-alpha --duration-hours 8
 
 # 4. Store initial context
@@ -724,10 +718,9 @@ memanto agent create dev --pattern tool
 memanto agent activate dev
 memanto remember "Implemented feature X" --type fact
 
-# Switch to research agent
+# Switch to research agent (auto-activates)
 memanto agent deactivate
 memanto agent create research --pattern research
-memanto agent activate research
 memanto remember "Found paper on optimization technique Y" --type fact
 
 # Switch back

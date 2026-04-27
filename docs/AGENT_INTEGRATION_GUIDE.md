@@ -17,23 +17,22 @@ AI agents need memory to provide context-aware, personalized responses. MEMANTO 
 
 ---
 
-## Quick Start (4 Commands)
+## Quick Start (3 Commands)
 
 ```bash
-# 1. Start MEMANTO server (one terminal)
-memanto serve
-
-# 2. In a new terminal, create your agent
+# 1. Create/Activate your agent
 memanto agent create your-agent-id
+# OR if already created:
+# memanto agent activate your-agent-id
 
-# 3. Remember something
+# 2. Remember something
 memanto remember "User prefers dark mode" --type preference --source your-agent-id
 
-# 4. Recall it later
+# 3. Recall it later
 memanto recall "dark mode"
 ```
 
-**That's it!** `memanto agent create` starts the session automatically.
+**That's it!** Your agent now has persistent memory.
 
 ---
 
@@ -45,14 +44,15 @@ memanto recall "dark mode"
 # Install MEMANTO
 pip install memanto
 
-# Initialize with Moorcheh API key
-memanto init
+# Setup environment with Moorcheh API key
+memanto
 
-# Start MEMANTO server
+# Optional: Start MEMANTO REST API server
+# (Only needed if you want to use the REST API endpoints elsewhere)
 memanto serve
 ```
 
-**Note**: Users run `memanto serve` once. Your agent just calls `memanto` commands.
+**Note**: No local server is required for CLI commands. Your agent just calls `memanto` commands directly.
 
 ---
 
@@ -69,7 +69,9 @@ class AgentMemory:
 
     def __init__(self, agent_id: str):
         self.agent_id = agent_id
-        # Activate agent session
+        # Create/Activate agent session
+        # Use 'create' if new, or 'activate' if existing.
+        # This example assumes activation for an existing agent.
         subprocess.run(["memanto", "agent", "activate", agent_id], check=True)
 
     def remember(self, content: str, memory_type: str = "fact", tags: str = None, confidence: float = 0.8, provenance: str = "explicit_statement", source: str = None):
@@ -451,9 +453,11 @@ def safe_recall(query: str, limit: int = 5):
 
 ## Best Practices
 
-### 1. Always Activate Agent First
-```python
 # Good
+subprocess.run(["memanto", "agent", "create", "my-agent"], check=True) # Automatically activates
+subprocess.run(["memanto", "remember", "content"], check=True)
+
+# Also good (if already created)
 subprocess.run(["memanto", "agent", "activate", "my-agent"], check=True)
 subprocess.run(["memanto", "remember", "content"], check=True)
 
@@ -505,6 +509,9 @@ memory.remember(user_msg, "event")
 
 **Solution**:
 ```python
+# Create if it doesn't exist (auto-activates)
+subprocess.run(["memanto", "agent", "create", "your-agent"], check=True)
+# OR activate if it already exists
 subprocess.run(["memanto", "agent", "activate", "your-agent"], check=True)
 ```
 
