@@ -166,6 +166,32 @@ By default, call the endpoints on your local server (for example: `"http://127.0
 
 ---
 
+## 📄 Research & Results
+
+MEMANTO is backed by peer-reviewed research. For benchmark results, methodology, and technical details, see our paper on Hugging Face:
+
+**[Memanto: Typed Semantic Memory with Information-Theoretic Retrieval for Long-Horizon Agents](https://huggingface.co/papers/2604.22085)**
+
+> 🌟 **If you find this project useful, please upvote the paper on Hugging Face!** It helps the research reach more people in the community.
+
+You can also explore our models and resources on the **[Moorcheh Hugging Face organization page](https://huggingface.co/moorcheh)**.
+
+If you use MEMANTO in your research, please cite:
+
+```bibtex
+@misc{abtahi2026memantotypedsemanticmemory,
+      title={Memanto: Typed Semantic Memory with Information-Theoretic Retrieval for Long-Horizon Agents}, 
+      author={Seyed Moein Abtahi and Rasa Rahnema and Hetkumar Patel and Neel Patel and Majid Fekri and Tara Khani},
+      year={2026},
+      eprint={2604.22085},
+      archivePrefix={arXiv},
+      primaryClass={cs.AI},
+      url={https://arxiv.org/abs/2604.22085}, 
+}
+```
+
+---
+
 ## 📞 Support & Documentation
 
 Have questions or feedback? We're here to help:
@@ -176,4 +202,3 @@ Have questions or feedback? We're here to help:
 ---
 
 **MIT License**
-
