@@ -29,6 +29,8 @@ from memanto.cli.commands._shared import (
     print_logo,
     show_welcome_banner,
 )
+
+
 def _first_run_setup() -> None:
     """Interactive first-run setup: collect API key."""
 
