@@ -29,11 +29,8 @@ from memanto.cli.commands._shared import (
     print_logo,
     show_welcome_banner,
 )
-from memanto.cli.schedule_manager import ScheduleManager
-
-
 def _first_run_setup() -> None:
-    """Interactive first-run setup: collect API key and schedule time."""
+    """Interactive first-run setup: collect API key."""
 
     console.print(
         Panel.fit(
@@ -45,7 +42,7 @@ def _first_run_setup() -> None:
     console.print()
 
     # API Key
-    console.print(f"[{BOLD_BRIGHT}]Step 1:[/{BOLD_BRIGHT}] Moorcheh API Key")
+    console.print(f"[{BOLD_BRIGHT}]Moorcheh API Key[/{BOLD_BRIGHT}]")
     console.print("[dim]Get yours free at https://console.moorcheh.ai[/dim]")
     api_key = typer.prompt("  Enter your Moorcheh API key", hide_input=True)
 
@@ -57,49 +54,6 @@ def _first_run_setup() -> None:
     console.print("[green]  ✓ API key saved[/green]")
     console.print()
 
-    # Schedule time (for daily summary + conflict detection)
-    console.print(
-        f"[{BOLD_BRIGHT}]Step 2:[/{BOLD_BRIGHT}] Daily Summary & Conflict Check"
-    )
-    console.print(
-        "[dim]MEMANTO can auto-generate a daily summary and detect conflicts.[/dim]"
-    )
-    schedule_time = typer.prompt(
-        "  Schedule time (HH:MM, 24h format)",
-        default="23:55",
-    ).strip()
-
-    # Basic validation
-    try:
-        parts = schedule_time.split(":")
-        h, m = int(parts[0]), int(parts[1])
-        if not (0 <= h <= 23 and 0 <= m <= 59):
-            raise ValueError
-        schedule_time = f"{h:02d}:{m:02d}"
-    except (ValueError, IndexError):
-        console.print("[yellow]  Invalid time format, using default 23:55[/yellow]")
-        schedule_time = "23:55"
-
-    config_manager.set_schedule_time(schedule_time)
-    console.print(f"[green]  ✓ Schedule set to {schedule_time}[/green]")
-    console.print()
-
-    # Auto-enable daily schedule
-    try:
-        scheduler = ScheduleManager()
-        sched_result = scheduler.enable(schedule_time)
-        if sched_result.get("status") == "success":
-            console.print(
-                f"[green]  ✓ Daily automation enabled at {schedule_time}[/green]"
-            )
-        else:
-            console.print(
-                f"[yellow]  ⚠ Could not enable schedule: {sched_result.get('message')}[/yellow]"
-            )
-    except Exception:
-        console.print("[yellow]  ⚠ Schedule auto-enable skipped[/yellow]")
-    console.print()
-
     # Write basic default configs to config.yaml
     config_manager.set_server_config("127.0.0.1", 8000)
     config_manager.set_cli_config(interactive_mode=True, smart_parse=True)
@@ -109,8 +63,7 @@ def _first_run_setup() -> None:
         Panel(
             "[bold green]Setup complete![/bold green]\n\n"
             f"[dim]Config:[/dim] {config_manager.config_dir}\n"
-            f"[dim]API Key:[/dim] [green]●[/green] configured\n"
-            f"[dim]Schedule:[/dim] {schedule_time} daily",
+            f"[dim]API Key:[/dim] [green]●[/green] configured",
             title="Ready",
             border_style=SUCCESS,
         )
