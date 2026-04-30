@@ -91,19 +91,41 @@ def mock_moorcheh():
         mock_instance.namespaces.create.return_value = {"status": "created"}
         mock_instance.namespaces.list.return_value = {"namespaces": []}
         mock_instance.documents.get.return_value = {"documents": []}
-        mock_instance.documents.upload.return_value = {"status": "success", "id": "mem-1"}
-        mock_instance.documents.upload_file.return_value = {"success": True, "fileSize": 1024}
-        mock_instance.similarity_search.query.return_value = {"results": [], "total_found": 0}
-        mock_instance.answer.generate.return_value = {"answer": "Mocked answer", "sources": []}
+        mock_instance.documents.upload.return_value = {
+            "status": "success",
+            "id": "mem-1",
+        }
+        mock_instance.documents.upload_file.return_value = {
+            "success": True,
+            "fileSize": 1024,
+        }
+        mock_instance.similarity_search.query.return_value = {
+            "results": [],
+            "total_found": 0,
+        }
+        mock_instance.answer.generate.return_value = {
+            "answer": "Mocked answer",
+            "sources": [],
+        }
 
         # Async mock returns
-        mock_async_instance.namespaces.create = AsyncMock(return_value={"status": "created"})
+        mock_async_instance.namespaces.create = AsyncMock(
+            return_value={"status": "created"}
+        )
         mock_async_instance.namespaces.list = AsyncMock(return_value={"namespaces": []})
         mock_async_instance.documents.get = AsyncMock(return_value={"documents": []})
-        mock_async_instance.documents.upload = AsyncMock(return_value={"status": "success", "id": "mem-1"})
-        mock_async_instance.documents.upload_file = AsyncMock(return_value={"success": True, "fileSize": 1024})
-        mock_async_instance.similarity_search.query = AsyncMock(return_value={"results": [], "total_found": 0})
-        mock_async_instance.answer.generate = AsyncMock(return_value={"answer": "Mocked answer", "sources": []})
+        mock_async_instance.documents.upload = AsyncMock(
+            return_value={"status": "success", "id": "mem-1"}
+        )
+        mock_async_instance.documents.upload_file = AsyncMock(
+            return_value={"success": True, "fileSize": 1024}
+        )
+        mock_async_instance.similarity_search.query = AsyncMock(
+            return_value={"results": [], "total_found": 0}
+        )
+        mock_async_instance.answer.generate = AsyncMock(
+            return_value={"answer": "Mocked answer", "sources": []}
+        )
 
         yield mock_instance
 
