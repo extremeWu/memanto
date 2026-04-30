@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://www.moorcheh.ai/">
+    <a href="https://www.memanto.ai/">
     <img alt="MEMANTO Logo" src="https://github.com/moorcheh-ai/memanto/raw/main/assets/memanto-dark.svg" width="500">
     </a>
 </p>
@@ -9,14 +9,11 @@
 </div>
 
 <p align="center">
-  <a href="https://moorcheh.ai/">
+  <a href="https://memanto.ai/">
     <img src="https://img.shields.io/badge/Learn-More-000000?style=for-the-badge&logo=rocket&logoColor=white" alt="Learn More">
   </a>
   <a href="https://discord.gg/CyxRFQSQ3p">
     <img src="https://img.shields.io/badge/Join-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord">
-  </a>
-  <a href="https://github.com/moorcheh-ai/memanto/raw/main/assets/Memanto-Setup.mp4">
-    <img src="https://img.shields.io/badge/Setup-Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Setup Video">
   </a>
 </p>
 
@@ -44,6 +41,10 @@ MEMANTO is built for teams that want high-quality agent memory without graph-hea
 ## 🏗️ Architecture
 
 <img alt="MEMANTO architecture" src="https://github.com/moorcheh-ai/memanto/raw/main/assets/Architecture-diagram.png" width="1000">
+
+## 📺 Setup & Demo
+
+[![Watch the video](https://img.youtube.com/vi/vEtOaoweIG4/0.jpg)](https://www.youtube.com/watch?v=vEtOaoweIG4)
 
 ## 🚀 MEMANTO CLI
 
@@ -200,7 +201,7 @@ If you use MEMANTO in your research, please cite:
 ## 📞 Support & Documentation
 
 Have questions or feedback? We're here to help:
-- **Docs**: [https://docs.moorcheh.ai](https://docs.moorcheh.ai)
+- **Docs**: [https://docs.memanto.ai](https://docs.memanto.ai)
 - **Discord**: [Join our Discord server](https://discord.gg/CyxRFQSQ3p)
 - **Email**: support@moorcheh.ai
 
