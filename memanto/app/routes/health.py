@@ -24,6 +24,7 @@ async def health_check(client: MoorchehClient = Depends(get_moorcheh_client)):
         try:
             # Dummy fetch to test connection
             client.documents.get(namespace_name="__memanto_auth_ping__", ids=["1"])
+            moorcheh_connected = True
         except NamespaceNotFound:
             moorcheh_connected = True
         except AuthenticationError:
