@@ -16,7 +16,13 @@ from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, Upload
 from memanto.app.clients.moorcheh import get_moorcheh_client
 from memanto.app.config import settings
 from memanto.app.core import MemoryRecord
-from memanto.app.models import BatchRememberRequest
+from memanto.app.models import (
+    AnswerRequest,
+    BatchRememberRequest,
+    ContradictRequest,
+    RememberRequest,
+    SupersedeRequest,
+)
 from memanto.app.models.session import Session
 from memanto.app.routes.auth_deps import get_current_session, get_session_service
 from memanto.app.services.memory_read_service import MemoryReadService
@@ -29,18 +35,7 @@ router = APIRouter()
 @router.post("/{agent_id}/remember")
 async def remember(
     agent_id: str,
-    content: str = Body(..., embed=True, description="Memory content"),
-    memory_type: str = Query("fact", description="Type of memory"),
-    title: str | None = Query(
-        None, description="Memory title (optional, defaults to truncated content)"
-    ),
-    confidence: float = Query(0.8, description="Confidence score (0-1)"),
-    tags: str | None = Query(None, description="Comma-separated tags"),
-    source: str = Query("agent", description="Source of memory"),
-    provenance: str = Query(
-        "explicit_statement",
-        description="How memory was obtained (explicit_statement, inferred, observed, etc.)",
-    ),
+    request: RememberRequest = Body(...),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -77,22 +72,22 @@ async def remember(
 
         from memanto.app.constants import MemoryType, ProvenanceType
 
-        resolved_title = title or (
-            f"{content[:50]}..." if len(content) > 50 else content
+        resolved_title = request.title or (
+            f"{request.content[:50]}..." if len(request.content) > 50 else request.content
         )
 
         # Create memory record with scope fields and provenance
         memory = MemoryRecord(
-            type=cast(MemoryType, memory_type),
+            type=cast(MemoryType, request.type),
             title=resolved_title,
-            content=content,
+            content=request.content,
             scope_type="agent",
             scope_id=agent_id,
             actor_id=agent_id,
-            confidence=confidence,
-            tags=tags.split(",") if tags else [],
-            source=source,
-            provenance=cast(ProvenanceType, provenance),
+            confidence=request.confidence,
+            tags=request.tags or [],
+            source=request.source,
+            provenance=cast(ProvenanceType, request.provenance),
         )
 
         # Store memory in agent's namespace.
@@ -117,8 +112,8 @@ async def remember(
             "session_id": session.session_id,
             "namespace": session.namespace,
             "status": "queued",
-            "provenance": provenance,
-            "confidence": confidence,
+            "provenance": request.provenance,
+            "confidence": request.confidence,
             # "computed_confidence": trust_score["computed_confidence"],
             # "trust_level": trust_score["trust_level"]
         }
@@ -161,7 +156,7 @@ async def batch_remember(
         # Convert each item to a MemoryRecord
         from typing import cast
 
-        from memanto.app.constants import MemoryType
+        from memanto.app.constants import MemoryType, ProvenanceType
 
         memory_records = []
         for item in request.memories:
@@ -177,8 +172,8 @@ async def batch_remember(
                 actor_id=agent_id,
                 confidence=item.confidence,
                 tags=item.tags or [],
-                source="user",
-                provenance="explicit_statement",
+                source=item.source,
+                provenance=cast(ProvenanceType, item.provenance),
             )
             memory_records.append(memory)
 
@@ -356,23 +351,7 @@ async def recall(
 @router.post("/{agent_id}/answer")
 async def answer(
     agent_id: str,
-    question: str = Body(..., embed=True, description="Question to ask"),
-    limit: int = Query(None, description="Number of context memories to use"),
-    threshold: float = Query(
-        None, description="Confidence threshold for memory relevance"
-    ),
-    temperature: float = Query(None, description="Temperature for the LLM response"),
-    aiModel: str = Query(
-        None,
-        description="AI model to use for generating the answer",
-    ),
-    kiosk_mode: bool = Query(False, description="Kiosk mode setting"),
-    header_prompt: str | None = Body(
-        None, embed=True, description="Header prompt for the LLM"
-    ),
-    footer_prompt: str | None = Body(
-        None, embed=True, description="Footer prompt for the LLM"
-    ),
+    request: AnswerRequest = Body(...),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -395,27 +374,29 @@ async def answer(
         )
 
     # Resolve defaults from settings
-    if limit is None:
-        limit = settings.ANSWER_LIMIT
-    if threshold is None:
-        threshold = settings.ANSWER_THRESHOLD
-    if temperature is None:
-        temperature = settings.ANSWER_TEMPERATURE
-    if aiModel is None:
-        aiModel = settings.ANSWER_MODEL
+    limit = request.limit if request.limit is not None else settings.ANSWER_LIMIT
+    threshold = (
+        request.threshold if request.threshold is not None else settings.ANSWER_THRESHOLD
+    )
+    temperature = (
+        request.temperature
+        if request.temperature is not None
+        else settings.ANSWER_TEMPERATURE
+    )
+    aiModel = request.aiModel if request.aiModel is not None else settings.ANSWER_MODEL
 
     try:
         # Use namespace from session
         namespace = session.namespace
 
         # Define default prompts for RAG
-        header_prompt = header_prompt or (
+        header_prompt = request.header_prompt or (
             "You are a helpful AI assistant with access to the agent's persistent memory. "
             "Use the provided context from the agent's memories to answer the user's question accurately. "
             "If the memories don't contain relevant information, say so clearly."
         )
 
-        footer_prompt = footer_prompt or (
+        footer_prompt = request.footer_prompt or (
             "Answer the question based on the memory context above. "
             "Be concise and cite specific memories when relevant. "
             "If no relevant memories exist, acknowledge that."
@@ -425,12 +406,12 @@ async def answer(
         response = await asyncio.to_thread(
             client.answer.generate,
             namespace=namespace,
-            query=question,
+            query=request.question,
             top_k=limit,
             threshold=threshold,
             temperature=temperature,
             ai_model=aiModel,
-            kiosk_mode=kiosk_mode,
+            kiosk_mode=request.kiosk_mode,
             header_prompt=header_prompt,
             footer_prompt=footer_prompt,
         )
@@ -442,7 +423,7 @@ async def answer(
         return {
             "agent_id": agent_id,
             "session_id": session.session_id,
-            "question": question,
+            "question": request.question,
             "answer": answer,
             "sources": sources,
             "namespace": namespace,
@@ -527,9 +508,7 @@ async def validate_memory(
 async def supersede_memory(
     agent_id: str,
     old_memory_id: str,
-    new_memory_id: str = Query(
-        ..., description="ID of new memory that supersedes the old one"
-    ),
+    request: SupersedeRequest = Body(...),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -561,7 +540,7 @@ async def supersede_memory(
         namespace = session.namespace
 
         # Update old memory to mark as superseded
-        updates = {"status": "superseded", "superseded_by": new_memory_id}
+        updates = {"status": "superseded", "superseded_by": request.new_memory_id}
 
         await asyncio.to_thread(
             write_service.update_memory, old_memory_id, namespace, updates
@@ -570,16 +549,16 @@ async def supersede_memory(
         # Update new memory to record what it supersedes
         new_updates = {"supersedes": old_memory_id}
         await asyncio.to_thread(
-            write_service.update_memory, new_memory_id, namespace, new_updates
+            write_service.update_memory, request.new_memory_id, namespace, new_updates
         )
 
         return {
             "old_memory_id": old_memory_id,
-            "new_memory_id": new_memory_id,
+            "new_memory_id": request.new_memory_id,
             "agent_id": agent_id,
             "session_id": session.session_id,
             "status": "superseded",
-            "message": f"Memory {old_memory_id} superseded by {new_memory_id}",
+            "message": f"Memory {old_memory_id} superseded by {request.new_memory_id}",
         }
 
     except Exception as e:
@@ -590,6 +569,7 @@ async def supersede_memory(
 async def mark_contradiction(
     agent_id: str,
     memory_id: str,
+    request: ContradictRequest = Body(default_factory=ContradictRequest),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -622,6 +602,10 @@ async def mark_contradiction(
 
         # Update memory to flag contradiction
         updates = {"contradiction_detected": True}
+        if request.reason:
+            updates["contradiction_reason"] = request.reason
+        if request.confidence is not None:
+            updates["confidence"] = request.confidence
 
         await asyncio.to_thread(
             write_service.update_memory, memory_id, namespace, updates
@@ -633,6 +617,8 @@ async def mark_contradiction(
             "session_id": session.session_id,
             "status": "contradicted",
             "message": f"Memory {memory_id} marked as contradicted",
+            "reason": request.reason,
+            "confidence": request.confidence,
         }
 
     except Exception as e:

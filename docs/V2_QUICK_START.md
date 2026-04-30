@@ -50,9 +50,19 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/activate" \
 ### 3. Store Memory (NO tenant_id!)
 
 ```bash
-curl -X POST "http://localhost:8000/api/v2/agents/my-agent/remember?memory_type=fact&title=First+Memory&content=This+is+my+first+memory&confidence=0.9" \
+curl -X POST "http://localhost:8000/api/v2/agents/my-agent/remember" \
   -H "Authorization: Bearer YOUR_MOORCHEH_API_KEY" \
-  -H "X-Session-Token: YOUR_SESSION_TOKEN"
+  -H "X-Session-Token: YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "This is my first memory",
+    "type": "fact",
+    "title": "First Memory",
+    "confidence": 0.9,
+    "tags": ["quick-start", "example"],
+    "source": "agent",
+    "provenance": "explicit_statement"
+  }'
 ```
 
 ### 4. Upload a File (Optional)
@@ -92,9 +102,15 @@ curl -X GET "http://localhost:8000/api/v2/agents/my-agent/recall?query=first+mem
 ### 6. Ask Questions (RAG)
 
 ```bash
-curl -X POST "http://localhost:8000/api/v2/agents/my-agent/answer?question=What+is+my+first+memory" \
+curl -X POST "http://localhost:8000/api/v2/agents/my-agent/answer" \
   -H "Authorization: Bearer YOUR_MOORCHEH_API_KEY" \
-  -H "X-Session-Token: YOUR_SESSION_TOKEN"
+  -H "X-Session-Token: YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "What is my first memory?",
+    "limit": 5,
+    "temperature": 0.7
+  }'
 ```
 
 ---
@@ -142,12 +158,14 @@ headers = {
 memory = client.post(
     f"/api/v2/agents/{AGENT_ID}/remember",
     headers=headers,
-    params={
-        "memory_type": "preference",
+    json={
+        "type": "preference",
         "title": "Customer 123 Communication",
         "content": "Customer prefers email over phone",
         "confidence": 0.9,
-        "tags": "customer-123,communication"
+        "tags": ["customer-123", "communication"],
+        "source": "agent",
+        "provenance": "explicit_statement"
     }
 )
 print("Memory stored:", memory.json())
@@ -173,7 +191,7 @@ print("Found memories:", len(memories.json()["memories"]))
 answer = client.post(
     f"/api/v2/agents/{AGENT_ID}/answer",
     headers=headers,
-    params={"question": "How does customer 123 prefer to be contacted?"}
+    json={"question": "How does customer 123 prefer to be contacted?"}
 )
 print("Answer:", answer.json()["answer"])
 ```
@@ -204,9 +222,13 @@ curl -X GET "http://localhost:8000/api/v2/session/current" \
 ### Extend Session
 
 ```bash
-curl -X POST "http://localhost:8000/api/v2/session/extend?additional_hours=4" \
+curl -X POST "http://localhost:8000/api/v2/session/extend" \
   -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "X-Session-Token: YOUR_SESSION_TOKEN"
+  -H "X-Session-Token: YOUR_SESSION_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "duration_hours": 4
+  }'
 ```
 
 ### End Session

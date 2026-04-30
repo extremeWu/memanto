@@ -357,7 +357,7 @@ class TestMEMANTOAPI:
 
         headers = {**auth_headers, "X-Session-Token": token}
         response = await client.post(
-            "/api/v2/session/extend", headers=headers, params={"additional_hours": 4}
+            "/api/v2/session/extend", headers=headers, json={"duration_hours": 4}
         )
         assert response.status_code == 200
         assert "expires_at" in response.json()

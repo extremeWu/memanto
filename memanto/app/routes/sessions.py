@@ -5,7 +5,7 @@ New session-based architecture endpoints.
 Replaces tenant_id with Moorcheh API key-based authentication.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 
 from memanto.app.config import settings
 from memanto.app.models.session import (
@@ -14,6 +14,7 @@ from memanto.app.models.session import (
     AgentList,
     Session,
     SessionCreate,
+    SessionExtendRequest,
     SessionInfo,
     SessionSummary,
 )
@@ -212,7 +213,7 @@ async def get_current_session_info(session: Session = Depends(get_current_sessio
 
 @router.post("/session/extend", response_model=Session)
 async def extend_session(
-    additional_hours: int = settings.SESSION_DEFAULT_DURATION_HOURS,
+    request: SessionExtendRequest = Body(default_factory=SessionExtendRequest),
     session: Session = Depends(get_current_session),
 ):
     """
@@ -221,6 +222,11 @@ async def extend_session(
     Adds additional hours to session expiration.
     """
     try:
+        additional_hours = (
+            request.duration_hours
+            if request.duration_hours is not None
+            else settings.SESSION_DEFAULT_DURATION_HOURS
+        )
         extended_session = get_session_service().extend_session(
             session.agent_id, additional_hours
         )
