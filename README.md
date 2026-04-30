@@ -1,6 +1,6 @@
 <p align="center">
     <a href="https://www.moorcheh.ai/">
-    <img alt="MEMANTO Logo" src="assets/memanto-dark.svg" width="500">
+    <img alt="MEMANTO Logo" src="https://github.com/moorcheh-ai/memanto/raw/main/assets/memanto-dark.svg" width="500">
     </a>
 </p>
 
@@ -38,12 +38,12 @@ MEMANTO is built for teams that want high-quality agent memory without graph-hea
 
 ## 🏗️ Architecture
 
-<img alt="MEMANTO architecture" src="assets/Architecture-diagram.png" width="1000">
+<img alt="MEMANTO architecture" src="https://github.com/moorcheh-ai/memanto/raw/main/assets/Architecture-diagram.png" width="1000">
 
 ## 📺 Setup & Demo
 
 <p align="center">
-  <video src="assets/Memanto-Setup.mp4" width="100%" controls></video>
+  <video src="https://github.com/moorcheh-ai/memanto/raw/main/assets/Memanto-Setup.mp4" width="100%" controls></video>
 </p>
 
 ## 🚀 MEMANTO CLI
