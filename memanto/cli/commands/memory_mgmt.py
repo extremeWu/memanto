@@ -127,8 +127,8 @@ def memory_sync(
 ):
     """Sync agent memories to a project directory's MEMORY.md.
 
-    Uses the locally cached export when available.
-    Falls back to a fresh export if no cached agent_memory.md exists.
+    Always performs a fresh export before syncing to ensure the latest
+    memories are captured in the project's MEMORY.md file.
 
     Examples:
         memanto memory sync

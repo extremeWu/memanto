@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from moorcheh_sdk import MoorchehClient
 
+from memanto.app.config import settings
 from memanto.app.core import create_memory_scope
 from memanto.app.utils.errors import MemoryError
 
@@ -697,7 +698,7 @@ class MemoryReadService:
 
             # Generate answer
             answer_result = self.client.answer.generate(
-                namespace=namespace, query=query
+                namespace=namespace, query=query, ai_model=settings.ANSWER_MODEL
             )
 
             return {

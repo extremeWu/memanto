@@ -5,8 +5,10 @@ Server-side settings (loaded from .env via pydantic-settings).
 CLI config models have been moved to cli/config/manager.py.
 """
 
+import os
 from pathlib import Path
 
+import yaml  # type: ignore[import-untyped]
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,6 +18,36 @@ load_dotenv()
 _memanto_env = Path.home() / ".memanto" / ".env"
 if _memanto_env.exists():
     load_dotenv(_memanto_env, override=True)
+
+# Load model override from ~/.memanto/config.yaml
+_config_file = Path.home() / ".memanto" / "config.yaml"
+if _config_file.exists():
+    try:
+        import yaml
+
+        with open(_config_file) as f:
+            _data = yaml.safe_load(f)
+            _memanto = _data.get("memanto", {})
+
+            # Answer configuration
+            _answer = _memanto.get("answer", {})
+            _ans_model = _answer.get("model")
+            if _ans_model:
+                os.environ["ANSWER_MODEL"] = _ans_model
+            _ans_temp = _answer.get("temperature")
+            if _ans_temp is not None:
+                os.environ["ANSWER_TEMPERATURE"] = str(_ans_temp)
+            _ans_limit = _answer.get("answer_limit")
+            if _ans_limit is not None:
+                os.environ["ANSWER_LIMIT"] = str(_ans_limit)
+
+            # Summary configuration
+            _summary = _memanto.get("summary", {})
+            _sum_model = _summary.get("model")
+            if _sum_model:
+                os.environ["SUMMARY_MODEL"] = _sum_model
+    except Exception:
+        pass
 
 
 # CLI & YAML Format Models (kept for backward compat with config.yaml structure)
@@ -79,6 +111,9 @@ class Settings(BaseSettings):
     ANSWER_TEMPERATURE: float = 0.7
     ANSWER_LIMIT: int = 15  # number of context memories to retrieve
     ANSWER_THRESHOLD: float = 0.01  # confidence threshold for memory relevance
+
+    # Summary & Conflict Detection Configuration
+    SUMMARY_MODEL: str = "anthropic.claude-sonnet-4-6"
 
     # Recall / Search Configuration
     RECALL_LIMIT: int = 10  # default top-N results for recall/search
