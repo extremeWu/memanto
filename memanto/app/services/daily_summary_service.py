@@ -90,7 +90,10 @@ Format the output as a Markdown report:
         try:
             # Use Moorcheh's answer.generate
             result = client.answer.generate(
-                namespace=namespace, query=summary_prompt, top_k=50
+                namespace=namespace,
+                query=summary_prompt,
+                ai_model=settings.ANSWER_MODEL,
+                top_k=50,
             )
             summary_text = result.get("answer", "Failed to generate summary.")
         except Exception as e:

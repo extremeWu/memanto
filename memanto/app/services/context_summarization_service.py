@@ -10,6 +10,7 @@ from typing import Any, cast
 
 from moorcheh_sdk import MoorchehClient
 
+from memanto.app.config import settings
 from memanto.app.constants import ScopeType
 from memanto.app.core import MemoryRecord
 from memanto.app.services.memory_read_service import MemoryReadService
@@ -99,7 +100,10 @@ Provide a clear, organized summary that an AI agent could use to understand the 
 
             # Use Moorcheh's answer.generate for summarization
             answer_result = self.client.answer.generate(
-                namespace=namespace, query=summary_prompt, top_k=max_memories
+                namespace=namespace,
+                query=summary_prompt,
+                ai_model=settings.ANSWER_MODEL,
+                top_k=max_memories,
             )
 
             summary_text = answer_result.get("answer", "")
@@ -208,7 +212,10 @@ Create a clear, organized summary preserving key information."""
 
             # Generate summary
             answer_result = self.client.answer.generate(
-                namespace=namespace, query=summary_prompt, top_k=len(memories)
+                namespace=namespace,
+                query=summary_prompt,
+                ai_model=settings.ANSWER_MODEL,
+                top_k=len(memories),
             )
 
             summary_text = answer_result.get("answer", "")

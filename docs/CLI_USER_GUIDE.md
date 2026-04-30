@@ -582,7 +582,7 @@ cli:
 
 # Answer configuration (all optional — defaults shown)
 answer:
-  model: "anthropic.claude-sonnet-4-20250514-v1:0"  # LLM used for answer
+  model: "anthropic.claude-sonnet-4-6"  # LLM used for answer
   temperature: 0.7        # LLM temperature (0.0–1.0)
   answer_limit: 5         # context memories passed to LLM for `answer`
   threshold: 0.25         # confidence threshold for memory relevance

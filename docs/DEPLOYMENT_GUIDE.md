@@ -35,7 +35,7 @@ RATE_LIMIT_READS=120             # Reads per minute per tenant
 RATE_LIMIT_ANSWERS=30            # Answer generations per minute
 
 # Answer & Recall configuration (all optional — defaults shown)
-ANSWER_MODEL=anthropic.claude-sonnet-4-20250514-v1:0  # LLM model for answer
+ANSWER_MODEL=anthropic.claude-sonnet-4-6  # LLM model for answer
 ANSWER_TEMPERATURE=0.7            # LLM temperature (0.0–1.0)
 ANSWER_LIMIT=5                    # context memories passed to LLM for answer
 ANSWER_THRESHOLD=0.25             # confidence threshold for memory relevance

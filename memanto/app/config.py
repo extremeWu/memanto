@@ -5,6 +5,8 @@ Server-side settings (loaded from .env via pydantic-settings).
 CLI config models have been moved to cli/config/manager.py.
 """
 
+import os
+import yaml
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -16,6 +18,22 @@ load_dotenv()
 _memanto_env = Path.home() / ".memanto" / ".env"
 if _memanto_env.exists():
     load_dotenv(_memanto_env, override=True)
+
+# Load model override from ~/.memanto/config.yaml
+_config_file = Path.home() / ".memanto" / "config.yaml"
+if _config_file.exists():
+    try:
+        import yaml
+
+        with open(_config_file) as f:
+            _data = yaml.safe_load(f)
+            _ans_model = _data.get("memanto", {}).get("answer", {}).get("model")
+            if _ans_model:
+                import os
+
+                os.environ["ANSWER_MODEL"] = _ans_model
+    except Exception:
+        pass
 
 
 # CLI & YAML Format Models (kept for backward compat with config.yaml structure)
