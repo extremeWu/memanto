@@ -82,7 +82,7 @@ def mock_moorcheh():
         # Setup mock instances
         mock_instance = MagicMock()
         mock_async_instance = MagicMock()
-        
+
         mock_agent_client.return_value = mock_instance
         mock_moorcheh_cls.return_value = mock_instance
         mock_async_moorcheh_cls.return_value = mock_async_instance
