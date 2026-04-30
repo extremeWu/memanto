@@ -43,7 +43,7 @@ MEMANTO is built for teams that want high-quality agent memory without graph-hea
 ## 📺 Setup & Demo
 
 <p align="center">
-  <video src="assets/Memanto-Setup.mp4" width="100%" controls></video>
+  <video src="https://github.com/moorcheh-ai/memanto/raw/feat/add-setup/assets/Memanto-Setup.mp4" width="100%" controls></video>
 </p>
 
 ## 🚀 MEMANTO CLI
