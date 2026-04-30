@@ -64,15 +64,18 @@ async def verify_moorcheh_api_key(api_key: str = Depends(get_moorcheh_api_key)) 
     Raises:
         HTTPException: If the API key is invalid or request fails
     """
-    from moorcheh_sdk.exceptions import AuthenticationError
+    from moorcheh_sdk.exceptions import AuthenticationError, NamespaceNotFound
 
     from memanto.app.clients.moorcheh import get_async_moorcheh_client
 
     client = get_async_moorcheh_client(api_key)
     try:
-        await client.namespaces.list()
+        await client.documents.get(namespace_name="__memanto_auth_ping__", ids=["1"])
     except AuthenticationError:
         raise HTTPException(status_code=401, detail="Invalid Moorcheh API key")
+    except NamespaceNotFound:
+        # Key is valid, the auth passed but the fake namespace doesn't exist
+        pass
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to verify Moorcheh API key: {str(e)}"

@@ -52,7 +52,29 @@ def _first_run_setup() -> None:
         console.print("[red]API key cannot be empty.[/red]")
         raise typer.Exit(1)
 
-    config_manager.set_api_key(api_key.strip())
+    api_key_clean = api_key.strip()
+    console.print("  [dim]Verifying API key...[/dim]")
+    try:
+        from moorcheh_sdk import MoorchehClient
+        from moorcheh_sdk.exceptions import AuthenticationError, NamespaceNotFound
+
+        client = MoorchehClient(api_key=api_key_clean)
+        try:
+            client.documents.get(namespace_name="__memanto_auth_ping__", ids=["1"])
+        except AuthenticationError:
+            console.print("[red]Invalid Moorcheh API key.[/red]")
+            raise typer.Exit(1)
+        except NamespaceNotFound:
+            pass  # Key is valid
+        except Exception as e:
+            # For other network errors, assume valid or warn, but don't strictly fail setup
+            console.print(
+                f"[yellow]Could not fully verify API key (network issue?): {str(e)}[/yellow]"
+            )
+    except ImportError:
+        pass  # SDK not installed or available, skip verify
+
+    config_manager.set_api_key(api_key_clean)
     console.print("[green]  ✓ API key saved[/green]")
     console.print()
 
