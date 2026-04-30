@@ -9,13 +9,18 @@
 </div>
 
 <p align="center">
-  <a href="https://moorcheh.ai/">Learn more</a>
-  ·
-  <a href="https://discord.gg/CyxRFQSQ3p">Join Discord</a>
+  <a href="https://moorcheh.ai/">
+    <img src="https://img.shields.io/badge/Learn-More-000000?style=for-the-badge&logo=rocket&logoColor=white" alt="Learn More">
+  </a>
+  <a href="https://discord.gg/CyxRFQSQ3p">
+    <img src="https://img.shields.io/badge/Join-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord">
+  </a>
+  <a href="https://github.com/moorcheh-ai/memanto/raw/main/assets/Memanto-Setup.mp4">
+    <img src="https://img.shields.io/badge/Setup-Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Setup Video">
+  </a>
 </p>
 
 <p align="center">
-    <a href="https://discord.gg/CyxRFQSQ3p"><img src="https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white" alt="Moorcheh Discord"></a>
     <a href="https://pypi.org/project/memanto/"><img alt="PyPI - Total Downloads" src="https://img.shields.io/pepy/dt/memanto.svg?color=blue&label=downloads"></a>
     <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg"></a>
     <a href="https://pypi.org/project/memanto/"><img alt="PyPI Version" src="https://img.shields.io/pypi/v/memanto.svg?color=%2334D058"></a>
@@ -39,12 +44,6 @@ MEMANTO is built for teams that want high-quality agent memory without graph-hea
 ## 🏗️ Architecture
 
 <img alt="MEMANTO architecture" src="https://github.com/moorcheh-ai/memanto/raw/main/assets/Architecture-diagram.png" width="1000">
-
-## 📺 Setup & Demo
-
-<p align="center">
-  <video src="https://github.com/moorcheh-ai/memanto/raw/main/assets/Memanto-Setup.mp4" width="100%" controls></video>
-</p>
 
 ## 🚀 MEMANTO CLI
 
