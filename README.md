@@ -15,6 +15,9 @@
   <a href="https://discord.gg/CyxRFQSQ3p">
     <img src="https://img.shields.io/badge/Join-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord">
   </a>
+  <a href="https://www.youtube.com/watch?v=vEtOaoweIG4">
+    <img src="https://img.shields.io/badge/Setup-Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Setup Video">
+  </a>
 </p>
 
 <p align="center">
