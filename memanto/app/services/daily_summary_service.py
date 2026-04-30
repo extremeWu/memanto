@@ -88,11 +88,10 @@ Format the output as a Markdown report:
 ...
 """
         try:
-            # Use Moorcheh's answer.generate
             result = client.answer.generate(
                 namespace=namespace,
                 query=summary_prompt,
-                ai_model=settings.ANSWER_MODEL,
+                ai_model=settings.SUMMARY_MODEL,
                 top_k=50,
             )
             summary_text = result.get("answer", "Failed to generate summary.")
@@ -190,7 +189,7 @@ Example response format:
             result = client.answer.generate(
                 namespace=namespace,
                 query=conflict_prompt,
-                ai_model=settings.ANSWER_MODEL,
+                ai_model=settings.SUMMARY_MODEL,
                 top_k=50,
             )
             conflict_text = result.get("answer", "[]")

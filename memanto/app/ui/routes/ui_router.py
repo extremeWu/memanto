@@ -44,10 +44,12 @@ async def get_ui_config():
 
     return {
         "api_key_configured": bool(api_key),
-        "api_key_preview": f"{api_key[:8]}...{api_key[-4:]}"
-        if api_key and len(api_key) > 12
+        "api_key_preview": f"........{api_key[-6:]}"
+        if api_key and len(api_key) > 6
         else ("***" if api_key else None),
-        "api_key": api_key,
+        "api_key": f"........{api_key[-6:]}"
+        if api_key and len(api_key) > 6
+        else ("***" if api_key else None),
         "server": {
             "url": server_cfg.get("url", "localhost"),
             "port": server_cfg.get("port", 8000),
@@ -132,7 +134,7 @@ async def update_api_key(body: dict):
     if not new_key:
         raise HTTPException(status_code=400, detail="API key cannot be empty")
     _config_manager.set_api_key(new_key)
-    preview = f"{new_key[:8]}...{new_key[-4:]}" if len(new_key) > 12 else "***"
+    preview = f"••••••••{new_key[-6:]}" if len(new_key) > 6 else "***"
     return {"status": "updated", "api_key_preview": preview}
 
 

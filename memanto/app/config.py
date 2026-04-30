@@ -27,11 +27,25 @@ if _config_file.exists():
 
         with open(_config_file) as f:
             _data = yaml.safe_load(f)
-            _ans_model = _data.get("memanto", {}).get("answer", {}).get("model")
-            if _ans_model:
-                import os
+            _memanto = _data.get("memanto", {})
 
+            # Answer configuration
+            _answer = _memanto.get("answer", {})
+            _ans_model = _answer.get("model")
+            if _ans_model:
                 os.environ["ANSWER_MODEL"] = _ans_model
+            _ans_temp = _answer.get("temperature")
+            if _ans_temp is not None:
+                os.environ["ANSWER_TEMPERATURE"] = str(_ans_temp)
+            _ans_limit = _answer.get("answer_limit")
+            if _ans_limit is not None:
+                os.environ["ANSWER_LIMIT"] = str(_ans_limit)
+
+            # Summary configuration
+            _summary = _memanto.get("summary", {})
+            _sum_model = _summary.get("model")
+            if _sum_model:
+                os.environ["SUMMARY_MODEL"] = _sum_model
     except Exception:
         pass
 
@@ -97,6 +111,9 @@ class Settings(BaseSettings):
     ANSWER_TEMPERATURE: float = 0.7
     ANSWER_LIMIT: int = 15  # number of context memories to retrieve
     ANSWER_THRESHOLD: float = 0.01  # confidence threshold for memory relevance
+
+    # Summary & Conflict Detection Configuration
+    SUMMARY_MODEL: str = "anthropic.claude-sonnet-4-6"
 
     # Recall / Search Configuration
     RECALL_LIMIT: int = 10  # default top-N results for recall/search
