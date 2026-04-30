@@ -40,6 +40,12 @@ MEMANTO is built for teams that want high-quality agent memory without graph-hea
 
 <img alt="MEMANTO architecture" src="assets/Architecture-diagram.png" width="1000">
 
+## 📺 Setup & Demo
+
+<p align="center">
+  <video src="assets/Memanto-Setup.mp4" width="100%" controls></video>
+</p>
+
 ## 🚀 MEMANTO CLI
 
 MEMANTO comes with a powerful, developer-friendly Command Line Interface. You can manage your agent's memories completely from your terminal—no local server required!
