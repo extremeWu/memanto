@@ -68,7 +68,9 @@ def _first_run_setup() -> None:
             pass  # Key is valid
         except Exception as e:
             # For other network errors, assume valid or warn, but don't strictly fail setup
-            console.print(f"[yellow]Could not fully verify API key (network issue?): {str(e)}[/yellow]")
+            console.print(
+                f"[yellow]Could not fully verify API key (network issue?): {str(e)}[/yellow]"
+            )
     except ImportError:
         pass  # SDK not installed or available, skip verify
 
