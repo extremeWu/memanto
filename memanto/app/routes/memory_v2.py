@@ -22,6 +22,7 @@ from memanto.app.routes.auth_deps import get_current_session, get_session_servic
 from memanto.app.services.memory_read_service import MemoryReadService
 from memanto.app.services.memory_write_service import MemoryWriteService
 from memanto.app.utils.errors import map_error_to_http_exception
+from memanto.app.utils.validation import CostGuard
 
 router = APIRouter()
 
@@ -29,12 +30,16 @@ router = APIRouter()
 @router.post("/{agent_id}/remember")
 async def remember(
     agent_id: str,
-    content: str = Body(..., embed=True, description="Memory content"),
+    content: str = Body(..., embed=True, description="Memory content", min_length=1),
     memory_type: str = Query("fact", description="Type of memory"),
     title: str | None = Query(
-        None, description="Memory title (optional, defaults to truncated content)"
+        None,
+        description="Memory title (optional, defaults to truncated content)",
+        max_length=500,
     ),
-    confidence: float = Query(0.8, description="Confidence score (0-1)"),
+    confidence: float = Query(
+        0.8, description="Confidence score (0-1)", ge=0.0, le=1.0
+    ),
     tags: str | None = Query(None, description="Comma-separated tags"),
     source: str = Query("agent", description="Source of memory"),
     provenance: str = Query(
@@ -61,6 +66,8 @@ async def remember(
     - corrected: Updated after contradiction
     - imported: From external source
     """
+    CostGuard.validate_text_length(content, "Memory content")
+
     # Enforce session scope: token must match agent_id
     if session.agent_id != agent_id:
         raise map_error_to_http_exception(
@@ -289,10 +296,10 @@ async def upload_file(
 @router.get("/{agent_id}/recall")
 async def recall(
     agent_id: str,
-    query: str = Query(..., description="Search query"),
-    limit: int = Query(None, description="Max results"),
+    query: str = Query(..., description="Search query", min_length=1),
+    limit: int | None = Query(None, description="Max results", ge=1),
     min_similarity: float | None = Query(
-        None, description="Minimum similarity score (0-1)"
+        None, description="Minimum similarity score (0-1)", ge=0.0, le=1.0
     ),
     created_after: datetime | None = Query(None, description="Filter by creation date"),
     created_before: datetime | None = Query(
@@ -311,6 +318,8 @@ async def recall(
 
     The session must be for the specified agent_id.
     """
+    CostGuard.validate_query_length(query)
+
     # Enforce session scope
     if session.agent_id != agent_id:
         raise map_error_to_http_exception(
@@ -321,6 +330,7 @@ async def recall(
 
     if limit is None:
         limit = settings.RECALL_LIMIT
+    CostGuard.validate_k_limit(limit)
 
     try:
         # Initialize memory read service
@@ -356,15 +366,26 @@ async def recall(
 @router.post("/{agent_id}/answer")
 async def answer(
     agent_id: str,
-    question: str = Body(..., embed=True, description="Question to ask"),
-    limit: int = Query(None, description="Number of context memories to use"),
-    threshold: float = Query(
-        None, description="Confidence threshold for memory relevance"
+    question: str = Body(..., embed=True, description="Question to ask", min_length=1),
+    limit: int | None = Query(
+        None, description="Number of context memories to use", ge=1
     ),
-    temperature: float = Query(None, description="Temperature for the LLM response"),
-    aiModel: str = Query(
+    threshold: float | None = Query(
+        None,
+        description="Confidence threshold for memory relevance",
+        ge=0.0,
+        le=1.0,
+    ),
+    temperature: float | None = Query(
+        None,
+        description="Temperature for the LLM response",
+        ge=0.0,
+        le=1.0,
+    ),
+    aiModel: str | None = Query(
         None,
         description="AI model to use for generating the answer",
+        min_length=1,
     ),
     kiosk_mode: bool = Query(False, description="Kiosk mode setting"),
     header_prompt: str | None = Body(
@@ -386,6 +407,8 @@ async def answer(
     Uses Moorcheh's answer.generate endpoint to produce LLM-generated answers
     based on the agent's stored memories.
     """
+    CostGuard.validate_query_length(question)
+
     # Enforce session scope
     if session.agent_id != agent_id:
         raise map_error_to_http_exception(
@@ -397,6 +420,7 @@ async def answer(
     # Resolve defaults from settings
     if limit is None:
         limit = settings.ANSWER_LIMIT
+    CostGuard.validate_k_limit(limit)
     if threshold is None:
         threshold = settings.ANSWER_THRESHOLD
     if temperature is None:
@@ -642,9 +666,9 @@ async def mark_contradiction(
 @router.get("/{agent_id}/recall/as-of")
 async def recall_as_of(
     agent_id: str,
-    query: str = Query(..., description="Search query"),
+    query: str = Query(..., description="Search query", min_length=1),
     as_of: str = Query(..., description="Point-in-time timestamp (ISO format)"),
-    limit: int = Query(None, description="Max results"),
+    limit: int | None = Query(None, description="Max results", ge=1),
     memory_types: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
@@ -663,6 +687,7 @@ async def recall_as_of(
     - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
     """
+    CostGuard.validate_query_length(query)
     if session.agent_id != agent_id:
         raise map_error_to_http_exception(
             Exception(
@@ -672,6 +697,7 @@ async def recall_as_of(
 
     if limit is None:
         limit = settings.RECALL_LIMIT
+    CostGuard.validate_k_limit(limit)
 
     try:
         read_service = MemoryReadService(client)
@@ -705,7 +731,7 @@ async def recall_as_of(
 async def recall_changed_since(
     agent_id: str,
     since: str = Query(..., description="Start date for changes (ISO format)"),
-    limit: int = Query(None, description="Max results"),
+    limit: int | None = Query(None, description="Max results", ge=1),
     memory_types: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
@@ -731,6 +757,7 @@ async def recall_changed_since(
 
     if limit is None:
         limit = settings.RECALL_LIMIT
+    CostGuard.validate_k_limit(limit)
 
     try:
         read_service = MemoryReadService(client)
@@ -761,8 +788,8 @@ async def recall_changed_since(
 @router.get("/{agent_id}/recall/current")
 async def recall_current(
     agent_id: str,
-    query: str = Query(..., description="Search query"),
-    limit: int = Query(None, description="Max results"),
+    query: str = Query(..., description="Search query", min_length=1),
+    limit: int | None = Query(None, description="Max results", ge=1),
     memory_types: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
@@ -783,6 +810,7 @@ async def recall_current(
     - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
     """
+    CostGuard.validate_query_length(query)
     if session.agent_id != agent_id:
         raise map_error_to_http_exception(
             Exception(
@@ -792,6 +820,7 @@ async def recall_current(
 
     if limit is None:
         limit = settings.RECALL_LIMIT
+    CostGuard.validate_k_limit(limit)
 
     try:
         read_service = MemoryReadService(client)
