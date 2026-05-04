@@ -514,9 +514,6 @@ def daily_summary(
     agent_id: str | None = typer.Option(
         None, "--agent", "-a", help="Agent identifier (defaults to active agent)"
     ),
-    output_path: str | None = typer.Option(
-        None, "--output", "-o", help="Custom output path for the summary MD file"
-    ),
 ):
     """Generate a daily AI summary from session memories."""
     start = time.perf_counter()
@@ -542,7 +539,9 @@ def daily_summary(
             f"[cyan]Generating daily summary for '{agent_id}' on {date}...",
             spinner="dots",
         ):
-            result = client.generate_daily_summary(agent_id=agent_id, date=date)
+            result = client.generate_daily_summary(
+                agent_id=agent_id, date=date, output_path=output_path
+            )
         elapsed = time.perf_counter() - start
 
         summary = result.get("summary", {})
