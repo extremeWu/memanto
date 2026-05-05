@@ -38,6 +38,15 @@ class SessionCreate(BaseModel):
     )
 
 
+class SessionExtendRequest(BaseModel):
+    """Request to extend an active session"""
+
+    duration_hours: int | None = Field(
+        default=None,
+        description="Hours to add to current expiration (default: from server config)",
+    )
+
+
 class SessionToken(BaseModel):
     """JWT token payload structure"""
 
