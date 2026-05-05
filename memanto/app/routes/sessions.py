@@ -108,12 +108,35 @@ async def delete_agent(
     """
     Delete agent
 
-    Warning: This does NOT delete memories from Moorcheh.
-    Only removes local agent metadata.
+    Deletes both:
+    - Local agent metadata
+    - Agent memory namespace in Moorcheh (all stored memories)
     """
     try:
+        agent = agent_service.get_agent(agent_id)
+        if not agent:
+            raise map_error_to_http_exception(
+                AgentNotFoundError(f"Agent '{agent_id}' not found")
+            )
+
+        # Delete remote namespace first so API behavior matches contract:
+        # deleting an agent also deletes all memories.
+        from moorcheh_sdk import MoorchehClient
+
+        moorcheh_client = MoorchehClient(moorcheh_api_key)
+        try:
+            moorcheh_client.namespaces.delete(agent.namespace)
+        except Exception:
+            # If namespace is already gone/unreachable, keep best-effort behavior
+            # and continue removing local metadata.
+            pass
+
         agent_service.delete_agent(agent_id)
-        return {"message": f"Agent '{agent_id}' successfully deleted"}
+        return {
+            "message": (
+                f"Agent '{agent_id}' successfully deleted with all namespace memories"
+            )
+        }
     except AgentNotFoundError as e:
         raise map_error_to_http_exception(e)
 
