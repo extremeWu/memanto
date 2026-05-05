@@ -82,7 +82,6 @@ class SessionService:
     def create_session(
         self,
         agent_id: str,
-        moorcheh_api_key: str,
         pattern: AgentPattern | None = None,
         duration_hours: int | None = None,
     ) -> Session:
@@ -91,7 +90,6 @@ class SessionService:
 
         Args:
             agent_id: Agent identifier
-            moorcheh_api_key: Moorcheh API key (for isolation)
             pattern: Agent pattern (support, project, tool)
             duration_hours: Session duration in hours
 
@@ -141,15 +139,12 @@ class SessionService:
 
         return session
 
-    def validate_session(
-        self, session_token: str, moorcheh_api_key: str
-    ) -> SessionToken:
+    def validate_session(self, session_token: str) -> SessionToken:
         """
         Validate session token
 
         Args:
             session_token: JWT session token
-            moorcheh_api_key: Moorcheh API key for validation
 
         Returns:
             Decoded SessionToken
@@ -292,7 +287,6 @@ class SessionService:
     def renew_session(
         self,
         agent_id: str,
-        moorcheh_api_key: str,
         pattern: AgentPattern | None = None,
     ) -> Session:
         """
@@ -304,7 +298,6 @@ class SessionService:
 
         Args:
             agent_id: Agent identifier
-            moorcheh_api_key: Moorcheh API key
             pattern: Agent pattern (carried over from previous session)
 
         Returns:
@@ -313,7 +306,6 @@ class SessionService:
         renew_hours = settings.SESSION_AUTO_RENEW_INTERVAL_HOURS
         return self.create_session(
             agent_id=agent_id,
-            moorcheh_api_key=moorcheh_api_key,
             pattern=pattern,
             duration_hours=renew_hours,
         )
@@ -321,7 +313,6 @@ class SessionService:
     def check_and_auto_renew(
         self,
         agent_id: str,
-        moorcheh_api_key: str,
     ) -> Session | None:
         """
         Check if the current session is near expiry and auto-renew if enabled.
@@ -332,7 +323,6 @@ class SessionService:
 
         Args:
             agent_id: Agent identifier
-            moorcheh_api_key: Moorcheh API key
 
         Returns:
             New Session if renewed, None if no renewal was needed
@@ -351,7 +341,6 @@ class SessionService:
             # Renew with a fresh session
             return self.renew_session(
                 agent_id=agent_id,
-                moorcheh_api_key=moorcheh_api_key,
                 pattern=session.pattern,
             )
 
