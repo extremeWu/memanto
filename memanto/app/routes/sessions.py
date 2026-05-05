@@ -13,7 +13,6 @@ from memanto.app.models.session import (
     AgentInfo,
     AgentList,
     Session,
-    SessionCreate,
     SessionExtendRequest,
     SessionInfo,
     SessionSummary,
@@ -149,7 +148,6 @@ async def delete_agent(
 @router.post("/agents/{agent_id}/activate", response_model=Session)
 async def activate_agent(
     agent_id: str,
-    session_create: SessionCreate | None = None,
     moorcheh_api_key: str = Depends(verify_moorcheh_api_key),
 ):
     """
@@ -169,12 +167,8 @@ async def activate_agent(
             AgentNotFoundError(f"Agent '{agent_id}' not found")
         )
 
-    # Get duration from request or use default
-    duration_hours = (
-        session_create.duration_hours
-        if session_create
-        else settings.SESSION_DEFAULT_DURATION_HOURS
-    )
+    # Session duration is controlled by server defaults.
+    duration_hours = settings.SESSION_DEFAULT_DURATION_HOURS
 
     try:
         session = get_session_service().create_session(

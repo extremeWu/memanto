@@ -60,9 +60,9 @@ MEMANTO v2 introduces a **session-based authentication model** that eliminates t
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ Agent operations use session token                          │
+│ Agent operations use API key + session token               │
 │ POST /api/v2/agents/{agent_id}/remember                    │
-│ Auth: Bearer {session_token}                                │
+│ Auth: Bearer {moorcheh_api_key} + X-Session-Token          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -110,6 +110,11 @@ User B (API Key: key_xyz789)
 ### 4. Session Storage
 
 **File-based storage** (v1): `~/.memanto/sessions/`
+
+> Important: CLI local session state and API server session are related but distinct.
+> - CLI stores local "active session" pointers for convenience.
+> - API enforces actual server-side session lifecycle and token validity.
+> - Clearing local CLI state does not, by itself, guarantee server session termination.
 
 ```
 ~/.memanto/
@@ -196,12 +201,23 @@ All memory operations now require the `X-Session-Token` header and use the `/api
 
 ```bash
 # Store memory in agent's session
-curl -X POST "http://localhost:8000/api/v2/agents/my-agent/remember?content=..." \
-  -H "X-Session-Token: eyJhbGciOiJIUzI1..."
+curl -X POST "http://localhost:8000/api/v2/agents/my-agent/remember" \
+  -H "Authorization: Bearer YOUR_MOORCHEH_API_KEY" \
+  -H "X-Session-Token: eyJhbGciOiJIUzI1..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Customer prefers concise responses",
+    "type": "preference"
+  }'
 
 # Ask a question
-curl -X POST "http://localhost:8000/api/v2/agents/my-agent/answer?question=..." \
-  -H "X-Session-Token: eyJhbGciOiJIUzI1..."
+curl -X POST "http://localhost:8000/api/v2/agents/my-agent/answer" \
+  -H "Authorization: Bearer YOUR_MOORCHEH_API_KEY" \
+  -H "X-Session-Token: eyJhbGciOiJIUzI1..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "question": "How should I respond to this customer?"
+  }'
 ```
 
 #### Activate Agent (Start Session)
@@ -223,7 +239,7 @@ Response:
 #### Deactivate Agent (End Session)
 ```http
 POST /api/v2/agents/{agent_id}/deactivate
-Authorization: Bearer {session_token}
+Authorization: Bearer {moorcheh_api_key}
 
 Response:
 {
@@ -241,7 +257,8 @@ Response:
 #### Remember
 ```http
 POST /api/v2/agents/{agent_id}/remember
-Authorization: Bearer {session_token}
+Authorization: Bearer {moorcheh_api_key}
+X-Session-Token: {session_token}
 
 Parameters:
   memory_type: str
@@ -264,7 +281,8 @@ Response:
 #### Recall
 ```http
 GET /api/v2/agents/{agent_id}/recall
-Authorization: Bearer {session_token}
+Authorization: Bearer {moorcheh_api_key}
+X-Session-Token: {session_token}
 
 Parameters:
   query: str
@@ -285,7 +303,8 @@ Response:
 #### Answer (RAG)
 ```http
 POST /api/v2/agents/{agent_id}/answer
-Authorization: Bearer {session_token}
+Authorization: Bearer {moorcheh_api_key}
+X-Session-Token: {session_token}
 
 Parameters:
   question: str
@@ -441,10 +460,11 @@ memanto:
 |----------|-----------------|-------------|
 | `POST /api/v2/agents` | `Authorization` | Create a new agent namespace |
 | `POST /api/v2/agents/{id}/activate` | `Authorization` | Start session, get token |
-| `POST /api/v2/agents/{id}/remember` | `X-Session-Token` | Store memory in session |
-| `GET /api/v2/agents/{id}/recall` | `X-Session-Token` | Search session memories |
-| `POST /api/v2/agents/{id}/answer` | `X-Session-Token` | Ask question over session memories |
-| `POST /api/v2/session/extend` | `X-Session-Token` | Extend expiration time |
+| `POST /api/v2/agents/{id}/deactivate` | `Authorization` | End the current agent session |
+| `POST /api/v2/agents/{id}/remember` | `Authorization` + `X-Session-Token` | Store memory in session |
+| `GET /api/v2/agents/{id}/recall` | `Authorization` + `X-Session-Token` | Search session memories |
+| `POST /api/v2/agents/{id}/answer` | `Authorization` + `X-Session-Token` | Ask question over session memories |
+| `POST /api/v2/session/extend` | `Authorization` + `X-Session-Token` | Extend expiration time |
 
 ---
 
