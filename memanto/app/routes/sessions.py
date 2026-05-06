@@ -207,6 +207,40 @@ async def deactivate_agent(
         raise map_error_to_http_exception(e)
 
 
+@router.post("/agents/{agent_id}/extend", response_model=Session)
+async def extend_agent_activation(
+    agent_id: str,
+    request: SessionExtendRequest = Body(default_factory=SessionExtendRequest),
+    session: Session = Depends(get_current_session),
+):
+    """
+    Extend the active agent session window.
+
+    This is the agent-centric alias for session extension.
+    """
+    if session.agent_id != agent_id:
+        raise map_error_to_http_exception(
+            Exception(
+                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
+            )
+        )
+
+    try:
+        additional_hours = (
+            request.duration_hours
+            if request.duration_hours is not None
+            else settings.SESSION_DEFAULT_DURATION_HOURS
+        )
+        if additional_hours <= 0:
+            raise map_error_to_http_exception(
+                ValueError("Duration hours must be greater than 0.")
+            )
+        extended_session = get_session_service().extend_session(agent_id, additional_hours)
+        return extended_session
+    except SessionNotFoundError as e:
+        raise map_error_to_http_exception(e)
+
+
 @router.get("/session/current", response_model=SessionInfo)
 async def get_current_session_info(session: Session = Depends(get_current_session)):
     """
@@ -234,9 +268,10 @@ async def extend_session(
     session: Session = Depends(get_current_session),
 ):
     """
-    Extend current session expiration
+    Extend current session expiration (legacy path).
 
     Adds additional hours to session expiration.
+    Prefer /agents/{agent_id}/extend for agent-centric API usage.
     """
     try:
         additional_hours = (

@@ -228,6 +228,15 @@ class TestMEMANTOCLI:
         assert result.exit_code == 0
         assert "deactivated" in result.stdout.lower()
 
+    def test_agent_extend(self, mock_all_clients):
+        """Test 'memanto agent extend'"""
+        mock_all_clients.extend_session.return_value = {
+            "expires_at": "2026-03-19T22:00:00Z"
+        }
+        result = runner.invoke(app, ["agent", "extend", "--hours", "2"])
+        assert result.exit_code == 0
+        assert "extended" in result.stdout.lower()
+
     def test_agent_delete_keep_cloud(self, mock_all_clients):
         """Test 'memanto agent delete --force' keeping cloud memories (default)"""
         mock_all_clients.delete_agent.return_value = {

@@ -363,6 +363,28 @@ class TestMEMANTOAPI:
         assert "expires_at" in response.json()
 
     @pytest.mark.asyncio
+    async def test_extend_agent_api(self, client, auth_headers):
+        """Test extending active agent via agent-centric endpoint"""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+
+        headers = {**auth_headers, "X-Session-Token": token}
+        response = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/extend",
+            headers=headers,
+            json={"duration_hours": 4},
+        )
+        assert response.status_code == 200
+        assert "expires_at" in response.json()
+
+    @pytest.mark.asyncio
     async def test_list_sessions_api(self, client, auth_headers):
         """Test listing all sessions"""
         response = await client.get("/api/v2/sessions", headers=auth_headers)

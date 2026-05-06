@@ -104,10 +104,10 @@ def agent_list():
 def agent_activate(
     agent_id: str = typer.Argument(..., help="Agent ID to activate"),
     duration_hours: int = typer.Option(
-        6, help="Session duration in hours (default: 6)"
+        6, "--hours", "-h", help="Activation duration in hours (default: 6)"
     ),
 ):
-    """Activate an agent and start a session."""
+    """Activate an agent and start its active session."""
     client = get_client()
 
     try:
@@ -117,9 +117,9 @@ def agent_activate(
         config_manager.set_active_session(agent_id, result["session_token"])
 
         console.print(f"[green]OK Agent '{agent_id}' activated![/green]")
-        console.print(f"[dim]Session duration: {duration_hours} hours[/dim]")
+        console.print(f"[dim]Activation duration: {duration_hours} hours[/dim]")
         console.print(
-            f"[dim]Session expires: {result.get('expires_at', 'unknown')}[/dim]"
+            f"[dim]Activation expires: {result.get('expires_at', 'unknown')}[/dim]"
         )
 
     except Exception as e:
@@ -132,16 +132,44 @@ def agent_activate(
 
 @agent_app.command("deactivate")
 def agent_deactivate():
-    """Deactivate the current agent session."""
+    """Deactivate the currently active agent."""
     active_agent_id, _ = config_manager.get_active_session()
 
     if not active_agent_id:
-        console.print("[yellow]No active agent session[/yellow]")
+        console.print("[yellow]No active agent[/yellow]")
         return
 
     config_manager.clear_active_session()
 
     console.print(f"[green]OK Agent '{active_agent_id}' deactivated[/green]")
+
+
+@agent_app.command("extend")
+def agent_extend(
+    hours: int = typer.Option(6, "--hours", "-h", help="Number of hours to extend"),
+):
+    """Extend the active agent session."""
+    if hours <= 0:
+        _error("Hours must be greater than 0.")
+
+    active_agent_id, _ = config_manager.get_active_session()
+    if not active_agent_id:
+        _error(
+            "No active agent to extend.",
+            hint="Run 'memanto agent activate <agent-id>' first.",
+        )
+
+    client = get_client()
+    try:
+        result = client.extend_session(active_agent_id, hours)
+        console.print(
+            f"[green]OK Agent '{active_agent_id}' extended by {hours} hours[/green]"
+        )
+        console.print(
+            f"[dim]New activation expiration: {result.get('expires_at', 'unknown')}[/dim]"
+        )
+    except Exception as e:
+        _error(f"Failed to extend agent '{active_agent_id}': {e}")
 
 
 @agent_app.command("delete")

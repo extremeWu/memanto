@@ -70,7 +70,7 @@ def session_info():
 def session_extend(
     hours: int = typer.Option(6, "--hours", "-h", help="Number of hours to extend"),
 ):
-    """Extend the current session."""
+    """Extend the current session (legacy alias for 'agent extend')."""
     if hours <= 0:
         _error("Hours must be greater than 0.")
 
@@ -86,9 +86,12 @@ def session_extend(
 
     try:
         result = client.extend_session(active_agent_id, hours)
-        console.print(f"[green]OK Session extended by {hours} hours[/green]")
         console.print(
-            f"[dim]New expiration: {result.get('expires_at', 'unknown')}[/dim]"
+            f"[green]OK Agent '{active_agent_id}' extended by {hours} hours[/green]"
         )
+        console.print(
+            f"[dim]New activation expiration: {result.get('expires_at', 'unknown')}[/dim]"
+        )
+        console.print("[dim]Tip: you can also run 'memanto agent extend'.[/dim]")
     except Exception as e:
         _error(f"Failed to extend session: {e}")
