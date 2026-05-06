@@ -48,7 +48,6 @@ class TestSessionService:
         """Test session creation"""
         session = session_service.create_session(
             agent_id="test-agent",
-            moorcheh_api_key=settings.MOORCHEH_API_KEY,
             pattern=AgentPattern.SUPPORT,
             duration_hours=4,
         )
@@ -70,15 +69,14 @@ class TestSessionService:
 
     def test_validate_session(self, session_service):
         """Test session validation"""
-        api_key = settings.MOORCHEH_API_KEY
 
         # Create session
         session = session_service.create_session(
-            agent_id="test-agent", moorcheh_api_key=api_key, duration_hours=1
+            agent_id="test-agent", duration_hours=1
         )
 
         # Validate session
-        token_payload = session_service.validate_session(session.session_token, api_key)
+        token_payload = session_service.validate_session(session.session_token)
 
         assert token_payload.agent_id == "test-agent"
         assert token_payload.namespace == "memanto_agent_test-agent"
@@ -90,7 +88,6 @@ class TestSessionService:
         # Create session with very short duration
         session_service.create_session(
             agent_id="test-agent",
-            moorcheh_api_key=settings.MOORCHEH_API_KEY,
             duration_hours=0,  # Expires immediately
         )
 
@@ -110,7 +107,6 @@ class TestSessionService:
         # Create session
         session = session_service.create_session(
             agent_id="test-agent",
-            moorcheh_api_key=settings.MOORCHEH_API_KEY,
             duration_hours=1,
         )
 
@@ -133,7 +129,6 @@ class TestSessionService:
         # Create session
         session = session_service.create_session(
             agent_id="test-agent",
-            moorcheh_api_key=settings.MOORCHEH_API_KEY,
             duration_hours=1,
         )
 
@@ -296,9 +291,7 @@ class TestMEMANTOArchitecture:
         from memanto.app.services.session_service import SessionService
 
         service = SessionService(secret_key="test-secret-min-32-bytes-abcdefg")
-        session = service.create_session(
-            agent_id="test-agent", moorcheh_api_key="test-key", duration_hours=4
-        )
+        session = service.create_session(agent_id="test-agent", duration_hours=4)
 
         # Decode token (without verification, just to check structure)
         payload = jwt.decode(session.session_token, options={"verify_signature": False})

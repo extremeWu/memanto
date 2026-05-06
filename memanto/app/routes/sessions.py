@@ -33,8 +33,8 @@ router = APIRouter()
 from memanto.app.routes import memory_v2  # noqa: E402
 from memanto.app.routes.auth_deps import (  # noqa: E402
     get_current_session,
+    get_moorcheh_api_key,
     get_session_service,
-    verify_moorcheh_api_key,
 )
 
 router.include_router(
@@ -57,7 +57,7 @@ def get_agent_service():
 
 @router.post("/agents", response_model=AgentInfo, status_code=201)
 async def create_agent(
-    agent_create: AgentCreate, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
+    agent_create: AgentCreate, moorcheh_api_key: str = Depends(get_moorcheh_api_key)
 ):
     """
     Create a new MEMANTO agent
@@ -76,7 +76,7 @@ async def create_agent(
 
 
 @router.get("/agents", response_model=AgentList)
-async def list_agents(moorcheh_api_key: str = Depends(verify_moorcheh_api_key)):
+async def list_agents():
     """
     List all agents for this Moorcheh account
 
@@ -86,9 +86,7 @@ async def list_agents(moorcheh_api_key: str = Depends(verify_moorcheh_api_key)):
 
 
 @router.get("/agents/{agent_id}", response_model=AgentInfo)
-async def get_agent(
-    agent_id: str, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
-):
+async def get_agent(agent_id: str):
     """
     Get agent information
     """
@@ -101,9 +99,7 @@ async def get_agent(
 
 
 @router.delete("/agents/{agent_id}", status_code=200)
-async def delete_agent(
-    agent_id: str, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
-):
+async def delete_agent(agent_id: str):
     """
     Delete agent
 
@@ -126,7 +122,6 @@ async def delete_agent(
 async def activate_agent(
     agent_id: str,
     session_create: SessionCreate | None = None,
-    moorcheh_api_key: str = Depends(verify_moorcheh_api_key),
 ):
     """
     Activate agent and start session
@@ -155,7 +150,6 @@ async def activate_agent(
     try:
         session = get_session_service().create_session(
             agent_id=agent_id,
-            moorcheh_api_key=moorcheh_api_key,
             pattern=agent.pattern,
             duration_hours=duration_hours,
         )
@@ -174,9 +168,7 @@ async def activate_agent(
 
 
 @router.post("/agents/{agent_id}/deactivate", response_model=SessionSummary)
-async def deactivate_agent(
-    agent_id: str, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
-):
+async def deactivate_agent(agent_id: str):
     """
     Deactivate agent and end session
 
@@ -235,7 +227,7 @@ async def extend_session(
 
 
 @router.get("/sessions", response_model=list[Session])
-async def list_sessions(moorcheh_api_key: str = Depends(verify_moorcheh_api_key)):
+async def list_sessions():
     """
     List all sessions
 
