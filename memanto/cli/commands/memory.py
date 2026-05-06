@@ -682,8 +682,8 @@ def conflicts(
     # Interactive mode
     if not active_session_token:
         _error(
-            "No active session.",
-            hint="Resolving conflicts requires a session.\n"
+            "No active agent activation.",
+            hint="Resolving conflicts requires an active agent.\n"
             "Run 'memanto agent activate <agent-id>' first.",
         )
 

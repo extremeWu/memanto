@@ -1,5 +1,5 @@
 """
-MEMANTO CLI - Session commands (info, extend).
+MEMANTO CLI - Legacy session aliases for agent activation commands.
 """
 
 from datetime import datetime
@@ -20,14 +20,14 @@ from memanto.cli.commands._shared import (
 
 @session_app.command("info")
 def session_info():
-    """Show current session information."""
+    """Show current active agent activation information."""
     active_agent_id, active_session_token = config_manager.get_active_session()
 
     if not active_agent_id or not active_session_token:
-        console.print("[yellow]No active session[/yellow]")
+        console.print("[yellow]No active agent[/yellow]")
         return
 
-    table = Table(title="Active Session", show_header=False)
+    table = Table(title="Active Agent", show_header=False)
     table.add_column("Property", style="cyan")
     table.add_column("Value", style="white")
 
@@ -70,7 +70,7 @@ def session_info():
 def session_extend(
     hours: int = typer.Option(6, "--hours", "-h", help="Number of hours to extend"),
 ):
-    """Extend the current session (legacy alias for 'agent extend')."""
+    """Extend the active agent (legacy alias for 'agent extend')."""
     if hours <= 0:
         _error("Hours must be greater than 0.")
 
@@ -78,7 +78,7 @@ def session_extend(
 
     if not active_agent_id:
         _error(
-            "No active session to extend.",
+            "No active agent to extend.",
             hint="Run 'memanto agent activate <agent-id>' first.",
         )
 
@@ -94,4 +94,4 @@ def session_extend(
         )
         console.print("[dim]Tip: you can also run 'memanto agent extend'.[/dim]")
     except Exception as e:
-        _error(f"Failed to extend session: {e}")
+        _error(f"Failed to extend active agent: {e}")

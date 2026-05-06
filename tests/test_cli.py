@@ -128,7 +128,7 @@ class TestMEMANTOCLI:
         assert result.exit_code == 0
         assert "test-agent" in result.stdout
         assert "created successfully" in result.stdout.lower()
-        assert "session started automatically" in result.stdout.lower()
+        assert "agent activated automatically" in result.stdout.lower()
         mock_all_clients.activate_agent.assert_called_once_with("test-agent", 6)
 
     def test_agent_list(self, mock_all_clients):

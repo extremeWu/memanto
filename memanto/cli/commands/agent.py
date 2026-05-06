@@ -38,7 +38,7 @@ def agent_create(
     ),
     description: str | None = typer.Option(None, help="Agent description"),
 ):
-    """Create a new agent and start a session immediately."""
+    """Create a new agent and activate it immediately."""
     client = get_client()
 
     try:
@@ -50,9 +50,9 @@ def agent_create(
         console.print(f"[dim]Pattern: {pattern}[/dim]")
         if description:
             console.print(f"[dim]Description: {description}[/dim]")
-        console.print("[green]Session started automatically for this agent.[/green]")
+        console.print("[green]Agent activated automatically.[/green]")
         console.print(
-            f"[dim]Session expires: {activation.get('expires_at', 'unknown')}[/dim]"
+            f"[dim]Activation expires: {activation.get('expires_at', 'unknown')}[/dim]"
         )
         console.print(
             '[dim]You can now run: memanto remember "..." and memanto recall "..."[/dim]'

@@ -241,13 +241,23 @@ async def extend_agent_activation(
         raise map_error_to_http_exception(e)
 
 
-@router.get("/session/current", response_model=SessionInfo)
-async def get_current_session_info(session: Session = Depends(get_current_session)):
+@router.get("/agents/{agent_id}/status", response_model=SessionInfo)
+async def get_agent_status(
+    agent_id: str,
+    session: Session = Depends(get_current_session),
+):
     """
-    Get current session information
+    Get current activation status for an agent.
 
-    Requires X-Session-Token header.
+    Requires X-Session-Token header and matching agent_id.
     """
+    if session.agent_id != agent_id:
+        raise map_error_to_http_exception(
+            Exception(
+                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
+            )
+        )
+
     time_remaining = session.time_remaining()
 
     return SessionInfo(
@@ -260,42 +270,3 @@ async def get_current_session_info(session: Session = Depends(get_current_sessio
         time_remaining_seconds=max(0, int(time_remaining.total_seconds())),
         pattern=session.pattern,
     )
-
-
-@router.post("/session/extend", response_model=Session)
-async def extend_session(
-    request: SessionExtendRequest = Body(default_factory=SessionExtendRequest),
-    session: Session = Depends(get_current_session),
-):
-    """
-    Extend current session expiration (legacy path).
-
-    Adds additional hours to session expiration.
-    Prefer /agents/{agent_id}/extend for agent-centric API usage.
-    """
-    try:
-        additional_hours = (
-            request.duration_hours
-            if request.duration_hours is not None
-            else settings.SESSION_DEFAULT_DURATION_HOURS
-        )
-        if additional_hours <= 0:
-            raise map_error_to_http_exception(
-                ValueError("Duration hours must be greater than 0.")
-            )
-        extended_session = get_session_service().extend_session(
-            session.agent_id, additional_hours
-        )
-        return extended_session
-    except SessionNotFoundError as e:
-        raise map_error_to_http_exception(e)
-
-
-@router.get("/sessions", response_model=list[Session])
-async def list_sessions(moorcheh_api_key: str = Depends(verify_moorcheh_api_key)):
-    """
-    List all sessions
-
-    Returns sessions sorted by start time (newest first).
-    """
-    return get_session_service().list_sessions()

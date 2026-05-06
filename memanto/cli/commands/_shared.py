@@ -59,7 +59,7 @@ config_manager = ConfigManager()
 
 # Create subcommands
 agent_app = typer.Typer(help="Agent management commands")
-session_app = typer.Typer(help="Session management commands")
+session_app = typer.Typer(help="Legacy aliases for agent activation commands")
 config_app = typer.Typer(help="Configuration commands")
 schedule_app = typer.Typer(help="Daily summary scheduling commands")
 memory_app = typer.Typer(help="Memory management commands")

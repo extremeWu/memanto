@@ -325,8 +325,8 @@ class TestMEMANTOAPI:
         assert "ended_at" in data
 
     @pytest.mark.asyncio
-    async def test_current_session_info(self, client, auth_headers):
-        """Test getting current session info"""
+    async def test_agent_status_info(self, client, auth_headers):
+        """Test getting active agent status info"""
         await client.post(
             "/api/v2/agents",
             headers=auth_headers,
@@ -338,29 +338,11 @@ class TestMEMANTOAPI:
         token = activate_resp.json()["session_token"]
 
         headers = {**auth_headers, "X-Session-Token": token}
-        response = await client.get("/api/v2/session/current", headers=headers)
+        response = await client.get(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/status", headers=headers
+        )
         assert response.status_code == 200
         assert response.json()["agent_id"] == self.TEST_AGENT_ID
-
-    @pytest.mark.asyncio
-    async def test_extend_session_api(self, client, auth_headers):
-        """Test extending session"""
-        await client.post(
-            "/api/v2/agents",
-            headers=auth_headers,
-            json={"agent_id": self.TEST_AGENT_ID},
-        )
-        activate_resp = await client.post(
-            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
-        )
-        token = activate_resp.json()["session_token"]
-
-        headers = {**auth_headers, "X-Session-Token": token}
-        response = await client.post(
-            "/api/v2/session/extend", headers=headers, json={"duration_hours": 4}
-        )
-        assert response.status_code == 200
-        assert "expires_at" in response.json()
 
     @pytest.mark.asyncio
     async def test_extend_agent_api(self, client, auth_headers):
@@ -383,13 +365,6 @@ class TestMEMANTOAPI:
         )
         assert response.status_code == 200
         assert "expires_at" in response.json()
-
-    @pytest.mark.asyncio
-    async def test_list_sessions_api(self, client, auth_headers):
-        """Test listing all sessions"""
-        response = await client.get("/api/v2/sessions", headers=auth_headers)
-        assert response.status_code == 200
-        assert isinstance(response.json(), list)
 
     @pytest.mark.asyncio
     async def test_batch_remember_api(self, client, auth_headers, mock_moorcheh):
