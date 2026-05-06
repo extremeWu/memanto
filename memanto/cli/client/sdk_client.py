@@ -180,11 +180,8 @@ class SdkClient:
         session_service = self._get_session_service()
 
         try:
-            # Validate JWT token and API key
-            token_payload = session_service.validate_session(
-                self.session_token,
-                self.api_key,
-            )
+            # Validate JWT token
+            token_payload = session_service.validate_session(self.session_token)
         except (SessionExpiredError, InvalidSessionTokenError):
             # Surface the same specific session errors as the service
             raise
@@ -197,10 +194,7 @@ class SdkClient:
             )
 
         # Check and auto-renew if near expiry
-        renewed = session_service.check_and_auto_renew(
-            agent_id=token_payload.agent_id,
-            moorcheh_api_key=self.api_key,
-        )
+        renewed = session_service.check_and_auto_renew(agent_id=token_payload.agent_id)
         if renewed:
             session = renewed
             self.session_token = session.session_token
@@ -326,7 +320,6 @@ class SdkClient:
         logger.debug("Activating agent '%s' for %s hours", agent_id, duration_hours)
         session = self._get_session_service().create_session(
             agent_id=agent_id,
-            moorcheh_api_key=self.api_key,
             pattern=agent.pattern,
             duration_hours=duration_hours,
         )
