@@ -64,18 +64,42 @@ python run_writer.py
 python run_contradiction.py
 ```
 
+## Architecture: Why Tool-Based Integration?
+
+CrewAI offers two ways to plug in external memory:
+
+1. **Native `StorageBackend` override** — Implement CrewAI's `StorageBackend` protocol and pass it via `Memory(storage=my_backend)`. CrewAI's memory pipeline (LLM analysis, consolidation, composite scoring) runs on top of your backend.
+
+2. **Tool-based integration** — Provide Memanto operations as CrewAI tools that agents call directly.
+
+**This example uses the tool-based approach.** Here's why:
+
+- **API mismatch**: CrewAI's `StorageBackend.search()` receives a pre-computed **vector embedding**. By the time it reaches the storage layer, the original query text is lost. Memanto's API performs semantic search from **natural language text**, not raw vectors. There's no clean way to bridge this gap without redundant embedding work or losing Memanto's search quality.
+
+- **Rich metadata**: The tool-based approach lets the LLM choose the right memory type (out of 13 semantic types), set confidence scores, and add tags at write time. A native backend override only receives what CrewAI's encoding pipeline extracts, which doesn't map to Memanto's type system.
+
+- **No dual memory risk**: We explicitly set `memory=False` on all Crews to prevent CrewAI from injecting its own LanceDB-backed memory tools alongside the Memanto tools. When `memory=True`, CrewAI auto-injects "Search memory" and "Save to memory" tools into every agent — running both systems would cause duplicate storage and retrieval confusion.
+
+> **Note**: Native `StorageBackend` integrations (like [Hindsight](https://hindsight.vectorize.io/) or [Mengram](https://community.crewai.com/t/mengram-human-like-memory-backend-for-crewai-pr-4595/7363)) work well when the external system accepts vector embeddings directly. Memanto's information-theoretic search operates on text, making the tool-based pattern the better fit.
+
+### Namespace Design
+
+All CrewAI agents in this example share a **single Memanto agent ID** (`crewai-research-team`), which maps to one Memanto namespace. This is intentional: the Research Agent stores findings and the Writer Agent retrieves them from the same namespace. Memanto's scope system (`memanto_agent_{agent_id}`) provides the isolation boundary — different crews or projects should use different agent IDs.
+
 ## How to Swap CrewAI Memory for Memanto
 
-### Before: CrewAI's Built-in Memory (Ephemeral)
+### Before: CrewAI's Built-in Memory
 
 ```python
 from crewai import Crew
 
-# CrewAI's built-in memory is session-scoped and ephemeral
+# CrewAI's built-in memory uses LanceDB locally
+# When memory=True, CrewAI auto-injects "Search memory" and
+# "Save to memory" tools into every agent
 crew = Crew(
     agents=[researcher, writer],
     tasks=[research_task, writing_task],
-    memory=True,  # Lost when the process ends
+    memory=True,  # Uses LanceDB, lost when storage is cleared
 )
 ```
 
@@ -92,7 +116,7 @@ client = setup.setup(agent_id="my-crew")
 # 2. Create memory tools bound to your agent
 tools = create_memanto_tools(client, agent_id="my-crew")
 
-# 3. Give agents memory tools instead of using memory=True
+# 3. Give agents Memanto tools instead of using memory=True
 researcher = Agent(
     role="Researcher",
     goal="Research and store findings",
@@ -107,8 +131,12 @@ writer = Agent(
     tools=[tools["recall"], tools["answer"]],  # Reads persistent memory!
 )
 
-# 4. Run the crew -- memories survive after the process ends
-crew = Crew(agents=[researcher, writer], tasks=[...])
+# 4. Run the crew with memory=False to prevent dual memory systems
+crew = Crew(
+    agents=[researcher, writer],
+    tasks=[...],
+    memory=False,  # Memanto handles memory via tools
+)
 crew.kickoff()
 ```
 

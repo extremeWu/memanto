@@ -30,6 +30,7 @@ def build_research_crew(
         agents=[researcher],
         tasks=[research_task],
         process=Process.sequential,
+        memory=False,  # Memanto replaces CrewAI's built-in LanceDB memory via tools
         verbose=True,
     )
 
@@ -49,6 +50,7 @@ def build_writer_crew(
         agents=[writer],
         tasks=[writing_task],
         process=Process.sequential,
+        memory=False,  # Memanto replaces CrewAI's built-in LanceDB memory via tools
         verbose=True,
     )
 
@@ -72,5 +74,6 @@ def build_full_crew(
         agents=[researcher, writer],
         tasks=[research_task, writing_task],
         process=Process.sequential,
+        memory=False,  # Memanto replaces CrewAI's built-in LanceDB memory via tools
         verbose=True,
     )
