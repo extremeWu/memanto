@@ -5,8 +5,9 @@ New session-based architecture endpoints.
 Replaces tenant_id with Moorcheh API key-based authentication.
 """
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
+from memanto.app.clients import moorcheh as moorcheh_clients
 from memanto.app.config import settings
 from memanto.app.models.session import (
     AgentCreate,
@@ -101,14 +102,17 @@ async def get_agent(
 
 @router.delete("/agents/{agent_id}", status_code=200)
 async def delete_agent(
-    agent_id: str, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
+    agent_id: str,
+    delete_backup_too: bool = Query(
+        False, alias="delete-backup-too", description="Delete Moorcheh namespace backup"
+    ),
+    moorcheh_api_key: str = Depends(verify_moorcheh_api_key),
 ):
     """
     Delete agent
 
-    Deletes both:
-    - Local agent metadata
-    - Agent memory namespace in Moorcheh (all stored memories)
+    Always deletes local agent metadata.
+    If `delete-backup-too=true`, also deletes the agent memory namespace in Moorcheh.
     """
     try:
         agent = agent_service.get_agent(agent_id)
@@ -117,22 +121,25 @@ async def delete_agent(
                 AgentNotFoundError(f"Agent '{agent_id}' not found")
             )
 
-        # Delete remote namespace first so API behavior matches contract:
-        # deleting an agent also deletes all memories.
-        from moorcheh_sdk import MoorchehClient
-
-        moorcheh_client = MoorchehClient(moorcheh_api_key)
-        try:
-            moorcheh_client.namespaces.delete(agent.namespace)
-        except Exception:
-            # If namespace is already gone/unreachable, keep best-effort behavior
-            # and continue removing local metadata.
-            pass
+        if delete_backup_too:
+            # Delete remote namespace only when explicitly requested.
+            moorcheh_client = moorcheh_clients.MoorchehClient(moorcheh_api_key)
+            try:
+                moorcheh_client.namespaces.delete(namespace_name=agent.namespace)
+            except Exception:
+                # If namespace is already gone/unreachable, keep best-effort behavior
+                # and continue removing local metadata.
+                pass
 
         agent_service.delete_agent(agent_id)
         return {
             "message": (
-                f"Agent '{agent_id}' successfully deleted with all namespace memories"
+                f"Agent '{agent_id}' successfully deleted"
+                + (
+                    " with all namespace memories"
+                    if delete_backup_too
+                    else " (backup retained in Moorcheh)"
+                )
             )
         }
     except AgentNotFoundError as e:

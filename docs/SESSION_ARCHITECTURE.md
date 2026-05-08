@@ -450,6 +450,7 @@ memanto:
 | Endpoint | Header Required | Description |
 |----------|-----------------|-------------|
 | `POST /api/v2/agents` | Server `MOORCHEH_API_KEY` | Create a new agent namespace |
+| `DELETE /api/v2/agents/{id}?delete-backup-too={true|false}` | Server `MOORCHEH_API_KEY` | Delete local agent; `true` also deletes Moorcheh namespace backup |
 | `POST /api/v2/agents/{id}/activate` | Server `MOORCHEH_API_KEY` | Start session, get token |
 | `POST /api/v2/agents/{id}/deactivate` | Server `MOORCHEH_API_KEY` | End the current agent session |
 | `GET /api/v2/agents/{id}/status` | `X-Session-Token` | Get active agent status |

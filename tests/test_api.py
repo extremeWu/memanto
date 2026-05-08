@@ -399,13 +399,31 @@ class TestMEMANTOAPI:
         assert response.json()["agent_id"] == self.TEST_AGENT_ID
 
     @pytest.mark.asyncio
-    async def test_delete_agent(self, client, auth_headers):
+    async def test_delete_agent(self, client, auth_headers, mock_moorcheh):
         """Test deleting agent"""
         await client.post(
             "/api/v2/agents", headers=auth_headers, json={"agent_id": "to-delete"}
         )
         response = await client.delete("/api/v2/agents/to-delete", headers=auth_headers)
         assert response.status_code == 200
+        mock_moorcheh.namespaces.delete.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_delete_agent_with_backup_delete(
+        self, client, auth_headers, mock_moorcheh
+    ):
+        """Test deleting agent including Moorcheh backup deletion."""
+        await client.post(
+            "/api/v2/agents", headers=auth_headers, json={"agent_id": "to-delete-remote"}
+        )
+        response = await client.delete(
+            "/api/v2/agents/to-delete-remote?delete-backup-too=true",
+            headers=auth_headers,
+        )
+        assert response.status_code == 200
+        mock_moorcheh.namespaces.delete.assert_called_once_with(
+            namespace_name="memanto_agent_to-delete-remote"
+        )
 
     @pytest.mark.asyncio
     async def test_deactivate_agent(self, client, auth_headers):

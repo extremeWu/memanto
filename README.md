@@ -155,7 +155,7 @@ By default, call the endpoints on your local server (for example: `"http://127.0
 - `POST /api/v2/agents` - Create a new agent namespace
 - `GET /api/v2/agents` - List all available agents
 - `GET /api/v2/agents/{agent_id}` - Get metadata for a specific agent
-- `DELETE /api/v2/agents/{agent_id}` - Delete an agent and purge all memories in its Moorcheh namespace
+- `DELETE /api/v2/agents/{agent_id}` - Delete local agent metadata (`?delete-backup-too=true` also deletes Moorcheh namespace backup)
 
 ### Session Management
 - `POST /api/v2/agents/{agent_id}/activate` - Start a session (returns a 6-hour JWT `session_token`)
