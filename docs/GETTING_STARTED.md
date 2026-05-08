@@ -260,7 +260,8 @@ You'll see all 17 API endpoints with interactive testing!
    -H "Content-Type: application/json" \
    -d '{
      "query": "MEMANTO",
-     "limit": 5
+     "limit": 5,
+     "type": ["fact"]
    }'
  ```
 

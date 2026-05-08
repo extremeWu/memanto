@@ -271,6 +271,61 @@ class TestMEMANTOAPI:
 
         assert response.status_code == 200
         assert "mocked answer" in response.json()["answer"]
+        call_kwargs = mock_moorcheh.answer.generate.call_args.kwargs
+        assert "threshold" not in call_kwargs
+
+    @pytest.mark.asyncio
+    async def test_answer_with_kiosk_mode_uses_default_threshold(
+        self, client, auth_headers, mock_moorcheh
+    ):
+        """Test kiosk mode applies default threshold when omitted."""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+
+        headers = {**auth_headers, "X-Session-Token": token}
+        payload = {"question": "What is being tested?", "kiosk_mode": True}
+        response = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/answer", headers=headers, json=payload
+        )
+
+        assert response.status_code == 200
+        call_kwargs = mock_moorcheh.answer.generate.call_args.kwargs
+        assert call_kwargs["threshold"] == 0.10
+
+    @pytest.mark.asyncio
+    async def test_answer_accepts_ai_model_field(
+        self, client, auth_headers, mock_moorcheh
+    ):
+        """Test ai_model request field maps to answer.generate ai_model."""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+
+        headers = {**auth_headers, "X-Session-Token": token}
+        payload = {
+            "question": "What is being tested?",
+            "ai_model": "anthropic.claude-sonnet-4-6",
+        }
+        response = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/answer", headers=headers, json=payload
+        )
+
+        assert response.status_code == 200
+        call_kwargs = mock_moorcheh.answer.generate.call_args.kwargs
+        assert call_kwargs["ai_model"] == "anthropic.claude-sonnet-4-6"
 
     @pytest.mark.asyncio
     async def test_recall_with_session(self, client, auth_headers, mock_moorcheh):
@@ -303,6 +358,31 @@ class TestMEMANTOAPI:
 
         assert response.status_code == 200
         assert len(response.json()["memories"]) == 1
+
+    @pytest.mark.asyncio
+    async def test_recall_accepts_type_filter(self, client, auth_headers, mock_moorcheh):
+        """Test recall request uses 'type' field for memory filters."""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+
+        headers = {**auth_headers, "X-Session-Token": token}
+        payload = {"query": "test query", "type": ["fact"]}
+        response = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/recall",
+            headers=headers,
+            json=payload,
+        )
+
+        assert response.status_code == 200
+        call_kwargs = mock_moorcheh.similarity_search.query.call_args.kwargs
+        assert "memory_type:fact" in call_kwargs["query"]
 
     @pytest.mark.asyncio
     async def test_get_agent(self, client, auth_headers):

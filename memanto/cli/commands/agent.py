@@ -280,7 +280,7 @@ def agent_bootstrap(
 
     # Helper: fetch memories safely
     def _fetch(
-        query: str, memory_types: list[str] | None = None, limit: int = 10
+        query: str, type: list[str] | None = None, limit: int = 10
     ) -> list[dict[str, Any]]:
         """Fetch memories via recall, return list or empty on error."""
         try:
@@ -288,7 +288,7 @@ def agent_bootstrap(
                 agent_id=agent_id,
                 query=query,
                 limit=limit,
-                memory_types=memory_types,
+                type=type,
             )
             return cast(list[dict[str, Any]], result.get("memories", []))
         except Exception:
@@ -307,7 +307,7 @@ def agent_bootstrap(
     }
     type_samples: dict[str, list] = {}
     for mem_type, query in type_queries.items():
-        type_samples[mem_type] = _fetch(query, memory_types=[mem_type], limit=5)
+        type_samples[mem_type] = _fetch(query, type=[mem_type], limit=5)
 
     # Deduplicate all memories
     all_memories_map: dict[str, dict] = {}

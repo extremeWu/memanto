@@ -60,7 +60,7 @@ class MemoryReadService:
         query: str,
         scope_type: str | None = None,
         scope_id: str | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         min_confidence: float | None = None,
         status_filter: list[str] | None = None,
@@ -89,7 +89,7 @@ class MemoryReadService:
             # Build enhanced query with Moorcheh metadata filters
             enhanced_query = self._build_filtered_query(
                 query=query,
-                memory_types=memory_types,
+                type=type,
                 tags=tags,
                 min_confidence=min_confidence,
                 status_filter=status_filter,
@@ -151,7 +151,7 @@ class MemoryReadService:
         self,
         query: str,
         scopes: list[dict[str, str]],
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         min_confidence: float | None = None,
         status_filter: list[str] | None = None,
@@ -185,7 +185,7 @@ class MemoryReadService:
             # Build enhanced query with filters
             enhanced_query = self._build_filtered_query(
                 query=query,
-                memory_types=memory_types,
+                type=type,
                 tags=tags,
                 min_confidence=min_confidence,
                 status_filter=status_filter,
@@ -228,7 +228,7 @@ class MemoryReadService:
         as_of_date: str,
         scope_type: str | None = None,
         scope_id: str | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
     ) -> dict[str, Any]:
@@ -247,7 +247,7 @@ class MemoryReadService:
             as_of_date: ISO timestamp for point-in-time (e.g., "2025-11-01T00:00:00Z")
             scope_type: Optional scope filter
             scope_id: Optional scope ID filter
-            memory_types: Optional memory type filters
+            type: Optional memory type filters
             tags: Optional tag filters
             limit: Max results
 
@@ -265,7 +265,7 @@ class MemoryReadService:
                 query=query,
                 scope_type=scope_type,
                 scope_id=scope_id,
-                memory_types=memory_types,
+                type=type,
                 tags=tags,
                 created_before=as_of_date,
                 limit=1000,  # Increased limit to ensure we get more historical context
@@ -317,7 +317,7 @@ class MemoryReadService:
         since_date: str,
         scope_type: str | None = None,
         scope_id: str | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
     ) -> dict[str, Any]:
@@ -335,7 +335,7 @@ class MemoryReadService:
             since_date: ISO timestamp for change boundary (e.g., "2025-12-01T00:00:00Z")
             scope_type: Optional scope filter
             scope_id: Optional scope ID filter
-            memory_types: Optional memory type filters
+            type: Optional memory type filters
             tags: Optional tag filters
             limit: Max results
 
@@ -355,7 +355,7 @@ class MemoryReadService:
                 return {"results": [], "total_found": 0, "since_date": since_date}
 
             # Gather memory types to iterate over for recursive fetching
-            types_to_fetch = memory_types
+            types_to_fetch = type
             if not types_to_fetch:
                 import typing
 
@@ -368,7 +368,7 @@ class MemoryReadService:
             for mem_type in types_to_fetch:
                 enhanced_query = self._build_filtered_query(
                     query="*",  # Match all
-                    memory_types=[mem_type],
+                    type=[mem_type],
                     tags=tags,
                 )
                 try:
@@ -439,7 +439,7 @@ class MemoryReadService:
         query: str,
         scope_type: str | None = None,
         scope_id: str | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
     ) -> dict[str, Any]:
@@ -457,7 +457,7 @@ class MemoryReadService:
             query: Search query
             scope_type: Optional scope filter
             scope_id: Optional scope ID filter
-            memory_types: Optional memory type filters
+            type: Optional memory type filters
             tags: Optional tag filters
             limit: Max results
 
@@ -472,7 +472,7 @@ class MemoryReadService:
                 query=query,
                 scope_type=scope_type,
                 scope_id=scope_id,
-                memory_types=memory_types,
+                type=type,
                 tags=tags,
                 status_filter=["active"],  # Only active memories
                 limit=1000,  # Increased limit for thorough retrieval
@@ -527,7 +527,7 @@ class MemoryReadService:
     def _build_filtered_query(
         self,
         query: str,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         min_confidence: float | None = None,
         status_filter: list[str] | None = None,
@@ -546,8 +546,8 @@ class MemoryReadService:
         filter_parts = []
 
         # Add memory type filters
-        if memory_types:
-            for mem_type in memory_types:
+        if type:
+            for mem_type in type:
                 filter_parts.append(f"#memory_type:{mem_type}")
 
         # Add tag filters (keyword syntax)
@@ -734,7 +734,7 @@ class MemoryReadService:
     def _filter_search_results(
         self,
         results: list[dict[str, Any]],
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
     ) -> list[dict[str, Any]]:
@@ -747,8 +747,8 @@ class MemoryReadService:
         filtered = results
 
         # Filter by memory types (flat field: memory_type)
-        if memory_types:
-            filtered = [r for r in filtered if r.get("memory_type") in memory_types]
+        if type:
+            filtered = [r for r in filtered if r.get("memory_type") in type]
 
         # Filter by tags (flat field: tags as comma-separated string)
         if tags:

@@ -731,7 +731,7 @@ class DirectClient:
         agent_id: str,
         query: str,
         limit: int | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
         tags: list[str] | None = None,
         min_confidence: float | None = None,
         created_after: datetime | None = None,
@@ -744,7 +744,7 @@ class DirectClient:
             agent_id: Target agent.
             query: Natural-language search query.
             limit: Max results (1–100, defaults to config).
-            memory_types: Filter by types (e.g. ``["fact", "decision"]``).
+            type: Filter by types (e.g. ``["fact", "decision"]``).
             tags: Filter by tags.
             min_confidence: Minimum confidence threshold.
             created_after: Only memories created after this datetime.
@@ -769,7 +769,7 @@ class DirectClient:
             query=query,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types,
+            type=type,
             tags=tags,
             min_confidence=min_confidence,
             created_after=created_after.isoformat() if created_after else None,
@@ -790,7 +790,7 @@ class DirectClient:
         query: str,
         as_of: str,
         limit: int | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Point-in-time recall: what was true at a given moment?
@@ -800,7 +800,7 @@ class DirectClient:
             query: Search query.
             as_of: ISO-8601 date/datetime string.
             limit: Max results (defaults to config).
-            memory_types: Optional type filter.
+            type: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
@@ -816,7 +816,7 @@ class DirectClient:
             as_of_date=as_of,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types,
+            type=type,
             limit=limit,
         )
 
@@ -833,7 +833,7 @@ class DirectClient:
         agent_id: str,
         since: str,
         limit: int | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Differential retrieval: what changed since a given date?
@@ -842,7 +842,7 @@ class DirectClient:
             agent_id: Target agent.
             since: ISO-8601 date/datetime string.
             limit: Max results (defaults to config).
-            memory_types: Optional type filter.
+            type: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
@@ -857,7 +857,7 @@ class DirectClient:
             since_date=since,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types,
+            type=type,
             limit=limit,
         )
 
@@ -873,7 +873,7 @@ class DirectClient:
         agent_id: str,
         query: str,
         limit: int | None = None,
-        memory_types: list[str] | None = None,
+        type: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Current-state recall (supersession-aware).
@@ -885,7 +885,7 @@ class DirectClient:
             agent_id: Target agent.
             query: Search query.
             limit: Max results (defaults to config).
-            memory_types: Optional type filter.
+            type: Optional type filter.
 
         Returns:
             Dict with ``memories`` and ``count``.
@@ -900,7 +900,7 @@ class DirectClient:
             query=query,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types,
+            type=type,
             limit=limit,
         )
 
@@ -1261,7 +1261,7 @@ class DirectClient:
                     agent_id=agent_id,
                     query="*",
                     limit=limit_per_type,
-                    memory_types=[mem_type],
+                    type=[mem_type],
                 )
                 memories_by_type[mem_type] = result.get("memories", [])
             except Exception:

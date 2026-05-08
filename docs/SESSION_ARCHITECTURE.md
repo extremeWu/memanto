@@ -281,9 +281,7 @@ Body:
 {
   "query": "customer preferences",
   "limit": 10,
-  "created_after": null,
-  "created_before": null,
-  "memory_types": ["preference"]
+  "type": ["preference"]
 }
 
 Response:
@@ -302,6 +300,9 @@ X-Session-Token: {session_token}
 
 Parameters:
   question: str
+  ai_model: str (optional)
+  kiosk_mode: bool (optional)
+  threshold: float (optional, only used when kiosk_mode=true; defaults to 0.10 in kiosk mode)
 
 Response:
 {

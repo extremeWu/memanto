@@ -96,7 +96,8 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/recall" \
   -H "Content-Type: application/json" \
   -d '{
     "query": "first memory",
-    "limit": 5
+    "limit": 5,
+    "type": ["fact"]
   }'
 ```
 
@@ -109,9 +110,13 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/answer" \
   -d '{
     "question": "What is my first memory?",
     "limit": 5,
-    "temperature": 0.7
+    "temperature": 0.7,
+    "ai_model": "anthropic.claude-sonnet-4-6",
+    "kiosk_mode": true
   }'
 ```
+
+`threshold` is only used when `kiosk_mode` is `true`. If omitted in kiosk mode, MEMANTO uses `0.10`.
 
 ---
 

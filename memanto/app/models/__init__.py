@@ -115,12 +115,12 @@ class AnswerRequest(BaseModel):
         None, ge=1, le=100, description="Number of context memories to use"
     )
     threshold: float | None = Field(
-        None, ge=0.0, le=1.0, description="Confidence threshold for memory relevance"
+        None, ge=0.0, le=1.0, description="Confidence threshold (used only in kiosk mode)"
     )
     temperature: float | None = Field(
         None, ge=0.0, le=2.0, description="Temperature for the LLM response"
     )
-    aiModel: str | None = Field(
+    ai_model: str | None = Field(
         None, description="AI model to use for generating the answer"
     )
     kiosk_mode: bool = Field(False, description="Kiosk mode setting")

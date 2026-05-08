@@ -324,7 +324,7 @@ def recall(
         changed_since = _validate_and_parse_timestamp(changed_since, "--changed-since")
 
     # Parse filters
-    memory_types = [memory_type] if memory_type else None
+    type = [memory_type] if memory_type else None
     tag_list = [t.strip() for t in tags.split(",")] if tags else None
 
     try:
@@ -337,7 +337,7 @@ def recall(
                     query=query,
                     as_of=as_of,
                     limit=limit,
-                    memory_types=memory_types,
+                    type=type,
                 )
                 temporal_mode = "as_of"
             elif changed_since:
@@ -345,7 +345,7 @@ def recall(
                     agent_id=agent_id,
                     since=changed_since,
                     limit=limit,
-                    memory_types=memory_types,
+                    type=type,
                 )
                 temporal_mode = "changed_since"
             elif current_only:
@@ -353,7 +353,7 @@ def recall(
                     agent_id=agent_id,
                     query=query,
                     limit=limit,
-                    memory_types=memory_types,
+                    type=type,
                 )
                 temporal_mode = "current_only"
             else:
@@ -362,7 +362,7 @@ def recall(
                     agent_id=agent_id,
                     query=query,
                     limit=limit,
-                    memory_types=memory_types,
+                    type=type,
                     tags=tag_list,
                     min_confidence=min_confidence,
                 )

@@ -40,15 +40,7 @@ class RecallRequest(BaseModel):
     min_similarity: float | None = Field(
         default=None, ge=0.0, le=1.0, description="Minimum similarity score (0-1)"
     )
-    created_after: datetime | None = Field(
-        default=None, description="Filter by creation date (ISO datetime)"
-    )
-    created_before: datetime | None = Field(
-        default=None, description="Filter by creation date (ISO datetime)"
-    )
-    memory_types: list[str] | None = Field(
-        default=None, description="Memory type filters"
-    )
+    type: list[str] | None = Field(default=None, description="Memory type filters")
 
 
 @router.post("/{agent_id}/remember")
@@ -337,14 +329,8 @@ async def recall(
             query=request.query,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=request.memory_types,
+            type=request.type,
             min_similarity_score=request.min_similarity,
-            created_after=request.created_after.isoformat()
-            if request.created_after
-            else None,
-            created_before=request.created_before.isoformat()
-            if request.created_before
-            else None,
             limit=limit,
         )
 
@@ -391,15 +377,15 @@ async def answer(
     # Resolve defaults from settings
     limit = request.limit if request.limit is not None else settings.ANSWER_LIMIT
     CostGuard.validate_k_limit(limit)
-    threshold = (
-        request.threshold if request.threshold is not None else settings.ANSWER_THRESHOLD
-    )
+    threshold = None
+    if request.kiosk_mode:
+        threshold = request.threshold if request.threshold is not None else 0.10
     temperature = (
         request.temperature
         if request.temperature is not None
         else settings.ANSWER_TEMPERATURE
     )
-    aiModel = request.aiModel if request.aiModel is not None else settings.ANSWER_MODEL
+    ai_model = request.ai_model if request.ai_model is not None else settings.ANSWER_MODEL
 
     try:
         # Use namespace from session
@@ -419,18 +405,20 @@ async def answer(
         )
 
         # Use Moorcheh's answer.generate endpoint.
-        response = await asyncio.to_thread(
-            client.answer.generate,
-            namespace=namespace,
-            query=request.question,
-            top_k=limit,
-            threshold=threshold,
-            temperature=temperature,
-            ai_model=aiModel,
-            kiosk_mode=request.kiosk_mode,
-            header_prompt=header_prompt,
-            footer_prompt=footer_prompt,
-        )
+        generate_kwargs = {
+            "namespace": namespace,
+            "query": request.question,
+            "top_k": limit,
+            "temperature": temperature,
+            "ai_model": ai_model,
+            "kiosk_mode": request.kiosk_mode,
+            "header_prompt": header_prompt,
+            "footer_prompt": footer_prompt,
+        }
+        if request.kiosk_mode:
+            generate_kwargs["threshold"] = threshold
+
+        response = await asyncio.to_thread(client.answer.generate, **generate_kwargs)
 
         # Extract the generated answer and sources
         answer = response.get("answer", "No answer generated.")
@@ -644,7 +632,7 @@ async def recall_as_of(
     query: str = Query(..., description="Search query", min_length=1),
     as_of: str = Query(..., description="Point-in-time timestamp (ISO format)"),
     limit: int | None = Query(None, description="Max results", ge=1),
-    memory_types: str | None = Query(None, description="Comma-separated memory types"),
+    type: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -682,7 +670,7 @@ async def recall_as_of(
             as_of_date=as_of,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types.split(",") if memory_types else None,
+            type=type.split(",") if type else None,
             limit=limit,
         )
 
@@ -706,7 +694,7 @@ async def recall_changed_since(
     agent_id: str,
     since: str = Query(..., description="Start date for changes (ISO format)"),
     limit: int | None = Query(None, description="Max results", ge=1),
-    memory_types: str | None = Query(None, description="Comma-separated memory types"),
+    type: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -740,7 +728,7 @@ async def recall_changed_since(
             since_date=since,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types.split(",") if memory_types else None,
+            type=type.split(",") if type else None,
             limit=limit,
         )
 
@@ -763,7 +751,7 @@ async def recall_current(
     agent_id: str,
     query: str = Query(..., description="Search query", min_length=1),
     limit: int | None = Query(None, description="Max results", ge=1),
-    memory_types: str | None = Query(None, description="Comma-separated memory types"),
+    type: str | None = Query(None, description="Comma-separated memory types"),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -802,7 +790,7 @@ async def recall_current(
             query=query,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types.split(",") if memory_types else None,
+            type=type.split(",") if type else None,
             limit=limit,
         )
 
