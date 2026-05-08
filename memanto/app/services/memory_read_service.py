@@ -226,8 +226,7 @@ class MemoryReadService:
         self,
         query: str,
         as_of_date: str,
-        scope_type: str | None = None,
-        scope_id: str | None = None,
+        agent_id: str,
         type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
@@ -240,31 +239,23 @@ class MemoryReadService:
         2. NOT superseded before as_of_date
         3. NOT expired at as_of_date
 
-        This answers: "What did the system know on date X?"
-
         Args:
             query: Search query
             as_of_date: ISO timestamp for point-in-time (e.g., "2025-11-01T00:00:00Z")
-            scope_type: Optional scope filter
-            scope_id: Optional scope ID filter
+            agent_id: Agent whose memories to search
             type: Optional memory type filters
             tags: Optional tag filters
             limit: Max results
-
-        Returns:
-            Search results valid at the specified point in time
         """
         try:
             from memanto.app.utils.temporal_helpers import parse_iso_timestamp
 
-            # Parse as_of timestamp safely
             as_of_dt = parse_iso_timestamp(as_of_date)
 
-            # Search all memories created before as_of_date
             results = self.search_memories(
                 query=query,
-                scope_type=scope_type,
-                scope_id=scope_id,
+                scope_type="agent",
+                scope_id=agent_id,
                 type=type,
                 tags=tags,
                 created_before=as_of_date,
@@ -315,8 +306,7 @@ class MemoryReadService:
     def search_changed_since(
         self,
         since_date: str,
-        scope_type: str | None = None,
-        scope_id: str | None = None,
+        agent_id: str,
         type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
@@ -325,23 +315,15 @@ class MemoryReadService:
         """
         Differential retrieval: "What changed recently?"
 
-        Returns memories that were:
-        1. Created after since_date (new memories)
-        2. Updated after since_date (modified memories)
-        3. Superseded after since_date (replaced memories)
-
-        This answers: "What's new/changed since date X?"
+        Returns memories created or updated after since_date.
 
         Args:
             since_date: ISO timestamp for change boundary (e.g., "2025-12-01T00:00:00Z")
-            scope_type: Optional scope filter
-            scope_id: Optional scope ID filter
+            agent_id: Agent whose memories to search
             type: Optional memory type filters
             tags: Optional tag filters
             limit: Max results
-
-        Returns:
-            Memories that changed after the specified date
+            query: Optional semantic filter — omit to match all
         """
         try:
             from memanto.app.constants import MemoryType
@@ -351,7 +333,7 @@ class MemoryReadService:
             since_dt = parse_iso_timestamp(since_date)
 
             # Get all memories (we'll filter by timestamps)
-            namespaces = self._get_search_namespaces(scope_type, scope_id)
+            namespaces = self._get_search_namespaces("agent", agent_id)
             if not namespaces:
                 return {"results": [], "total_found": 0, "since_date": since_date}
 
@@ -435,6 +417,76 @@ class MemoryReadService:
 
         except Exception as e:
             raise MemoryError(f"Failed to search changed memories: {e}")
+
+    def search_recent(
+        self,
+        agent_id: str,
+        type: list[str] | None = None,
+        limit: int = 10,
+    ) -> dict[str, Any]:
+        """
+        Retrieve the most recently stored memories, sorted by created_at descending.
+
+        Args:
+            agent_id: Agent whose memories to search
+            type: Optional memory type filters
+            limit: Max results to return
+        """
+        try:
+            from memanto.app.constants import MemoryType
+            from memanto.app.utils.temporal_helpers import parse_iso_timestamp
+
+            namespaces = self._get_search_namespaces("agent", agent_id)
+            if not namespaces:
+                return {"results": [], "total_found": 0}
+
+            types_to_fetch = type
+            if not types_to_fetch:
+                import typing
+                types_to_fetch = list(typing.get_args(MemoryType))
+
+            search_items = []
+            for mem_type in types_to_fetch:
+                enhanced_query = self._build_filtered_query(
+                    query="*",
+                    type=[mem_type],
+                )
+                try:
+                    search_result = self.client.similarity_search.query(
+                        query=enhanced_query, namespaces=namespaces, top_k=100
+                    )
+                    search_items.extend(search_result.get("results", []))
+                except Exception:
+                    pass
+
+            all_memories = [self._format_memory_item(item) for item in search_items]
+
+            # Deduplicate by id
+            seen_ids: set[str] = set()
+            unique_memories = []
+            for m in all_memories:
+                mid = m.get("id")
+                if mid not in seen_ids:
+                    seen_ids.add(mid)
+                    unique_memories.append(m)
+
+            # Sort by created_at descending (most recent first)
+            def _created_sort_key(m: dict[str, Any]) -> str:
+                raw = m.get("created_at")
+                if not raw:
+                    return ""
+                try:
+                    return parse_iso_timestamp(str(raw)).isoformat()
+                except Exception:
+                    return ""
+
+            unique_memories.sort(key=_created_sort_key, reverse=True)
+
+            results = unique_memories[:limit]
+            return {"results": results, "total_found": len(results)}
+
+        except Exception as e:
+            raise MemoryError(f"Failed to retrieve recent memories: {e}")
 
     def _build_filtered_query(
         self,

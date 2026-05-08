@@ -101,6 +101,11 @@ class RecallChangedSinceRequest(BaseModel):
         raise ValueError(f"Cannot parse since from {type(v)}")
 
 
+class RecallRecentRequest(BaseModel):
+    limit: int | None = Field(default=None, ge=1, description="Max results")
+    type: list[str] | None = Field(default=None, description="Memory type filters")
+
+
 @router.post("/{agent_id}/remember")
 async def remember(
     agent_id: str,
@@ -614,8 +619,7 @@ async def recall_as_of(
             read_service.search_as_of,
             query=query,
             as_of_date=request.as_of.isoformat(),
-            scope_type="agent",
-            scope_id=agent_id,
+            agent_id=agent_id,
             type=request.type,
             limit=limit,
         )
@@ -671,8 +675,7 @@ async def recall_changed_since(
         result = await asyncio.to_thread(
             read_service.search_changed_since,
             since_date=request.since.isoformat(),
-            scope_type="agent",
-            scope_id=agent_id,
+            agent_id=agent_id,
             type=request.type,
             limit=limit,
             query=request.query,
@@ -686,6 +689,56 @@ async def recall_changed_since(
             "memories": result["results"],
             "count": result["total_found"],
             "temporal_mode": "changed_since",
+        }
+
+    except Exception as e:
+        raise map_error_to_http_exception(e)
+
+
+@router.post("/{agent_id}/recall/recent")
+async def recall_recent(
+    agent_id: str,
+    request: RecallRecentRequest = Body(...),
+    session: Session = Depends(get_current_session),
+    client=Depends(get_moorcheh_client),
+):
+    """
+    Recall the most recently stored memories.
+
+    Returns memories sorted by created_at descending (newest first).
+    Optionally filter by memory type.
+
+    Requires:
+    - X-Session-Token: {session_token}
+
+    The session must be for the specified agent_id.
+    """
+    if session.agent_id != agent_id:
+        raise map_error_to_http_exception(
+            Exception(
+                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
+            )
+        )
+
+    limit = request.limit if request.limit is not None else settings.RECALL_LIMIT
+    CostGuard.validate_k_limit(limit)
+
+    try:
+        read_service = MemoryReadService(client)
+
+        result = await asyncio.to_thread(
+            read_service.search_recent,
+            agent_id=agent_id,
+            type=request.type,
+            limit=limit,
+        )
+
+        return {
+            "agent_id": agent_id,
+            "session_id": session.session_id,
+            "memories": result["results"],
+            "count": result["total_found"],
+            "temporal_mode": "recent",
         }
 
     except Exception as e:

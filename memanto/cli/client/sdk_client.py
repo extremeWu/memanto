@@ -696,8 +696,7 @@ class SdkClient:
         result = self._get_read_service().search_as_of(
             query=query,
             as_of_date=as_of,
-            scope_type="agent",
-            scope_id=agent_id,
+            agent_id=agent_id,
             type=type,
             limit=limit,
         )
@@ -737,8 +736,7 @@ class SdkClient:
 
         result = self._get_read_service().search_changed_since(
             since_date=since,
-            scope_type="agent",
-            scope_id=agent_id,
+            agent_id=agent_id,
             type=type,
             limit=limit,
         )
