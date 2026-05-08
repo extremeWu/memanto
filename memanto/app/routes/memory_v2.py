@@ -8,11 +8,11 @@ Replaces legacy agent memory endpoints with session-based auth.
 import asyncio
 import os
 import tempfile
-from datetime import datetime
+from datetime import date, datetime, time, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from memanto.app.clients.moorcheh import get_moorcheh_client
 from memanto.app.config import settings
@@ -23,7 +23,6 @@ from memanto.app.models import (
     BatchRememberRequest,
     ConflictResolveRequest,
     RememberRequest,
-    SupersedeRequest,
 )
 from memanto.app.models.session import Session
 from memanto.app.routes.auth_deps import get_current_session, get_session_service
@@ -42,6 +41,64 @@ class RecallRequest(BaseModel):
         default=None, ge=0.0, le=1.0, description="Minimum similarity score (0-1)"
     )
     type: list[str] | None = Field(default=None, description="Memory type filters")
+
+
+class RecallAsOfRequest(BaseModel):
+    as_of: datetime = Field(
+        ...,
+        description="Point-in-time — YYYY-MM-DD (defaults to end of day) or full ISO datetime e.g. 2025-11-01T14:30:00Z",
+    )
+    query: str | None = Field(default=None, min_length=1, description="Search query — omit to return all memories valid at that point")
+    limit: int | None = Field(default=None, ge=1, description="Max results")
+    type: list[str] | None = Field(default=None, description="Memory type filters")
+
+    @field_validator("as_of", mode="before")
+    @classmethod
+    def parse_as_of(cls, v: object) -> datetime:
+        if isinstance(v, datetime):
+            return v if v.tzinfo else v.replace(tzinfo=timezone.utc)
+        if isinstance(v, date):
+            return datetime.combine(v, time(23, 59, 59), tzinfo=timezone.utc)
+        if isinstance(v, str):
+            try:
+                dt = datetime.fromisoformat(v.replace("Z", "+00:00"))
+                return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+            except ValueError:
+                pass
+            try:
+                return datetime.combine(date.fromisoformat(v), time(23, 59, 59), tzinfo=timezone.utc)
+            except ValueError:
+                raise ValueError(f"Invalid value '{v}'. Use YYYY-MM-DD or ISO 8601 datetime.")
+        raise ValueError(f"Cannot parse as_of from {type(v)}")
+
+
+class RecallChangedSinceRequest(BaseModel):
+    since: datetime = Field(
+        ...,
+        description="Start of change window — YYYY-MM-DD (defaults to start of day) or full ISO datetime e.g. 2025-11-01T00:00:00Z",
+    )
+    query: str | None = Field(default=None, min_length=1, description="Search query — omit to return all changed memories")
+    limit: int | None = Field(default=None, ge=1, description="Max results")
+    type: list[str] | None = Field(default=None, description="Memory type filters")
+
+    @field_validator("since", mode="before")
+    @classmethod
+    def parse_since(cls, v: object) -> datetime:
+        if isinstance(v, datetime):
+            return v if v.tzinfo else v.replace(tzinfo=timezone.utc)
+        if isinstance(v, date):
+            return datetime.combine(v, time(0, 0, 0), tzinfo=timezone.utc)
+        if isinstance(v, str):
+            try:
+                dt = datetime.fromisoformat(v.replace("Z", "+00:00"))
+                return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+            except ValueError:
+                pass
+            try:
+                return datetime.combine(date.fromisoformat(v), time(0, 0, 0), tzinfo=timezone.utc)
+            except ValueError:
+                raise ValueError(f"Invalid value '{v}'. Use YYYY-MM-DD or ISO 8601 datetime.")
+        raise ValueError(f"Cannot parse since from {type(v)}")
 
 
 @router.post("/{agent_id}/remember")
@@ -438,136 +495,6 @@ async def answer(
         raise map_error_to_http_exception(e)
 
 
-@router.post("/{agent_id}/validate/{memory_id}")
-async def validate_memory(
-    agent_id: str,
-    memory_id: str,
-    session: Session = Depends(get_current_session),
-    client=Depends(get_moorcheh_client),
-):
-    """
-    Mark a memory as validated (Session-based)
-
-    Increases validation_count and updates validated_at timestamp.
-    This increases the computed confidence of the memory.
-
-    Requires:
-    - X-Session-Token: {session_token}
-
-    The session must be for the specified agent_id.
-    """
-    # Enforce session scope
-    if session.agent_id != agent_id:
-        raise map_error_to_http_exception(
-            Exception(
-                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
-            )
-        )
-
-    try:
-        # Initialize services
-        read_service = MemoryReadService(client)
-        write_service = MemoryWriteService(client)
-
-        # Use namespace from session
-        namespace = session.namespace
-
-        # Retrieve existing memory (blocking SDK call → thread pool)
-        existing = await asyncio.to_thread(
-            read_service.get_memory, memory_id, namespace
-        )
-        if not existing:
-            raise map_error_to_http_exception(
-                Exception(f"Memory {memory_id} not found")
-            )
-
-        # Update with validation
-        updates = {
-            "validation_count": existing.get("validation_count", 0) + 1,
-            "validated_at": datetime.utcnow().isoformat(),
-        }
-
-        # If provenance was inferred, upgrade to validated
-        if existing.get("provenance") == "inferred":
-            updates["provenance"] = "validated"
-
-        await asyncio.to_thread(
-            write_service.update_memory, memory_id, namespace, updates
-        )
-
-        return {
-            "memory_id": memory_id,
-            "agent_id": agent_id,
-            "session_id": session.session_id,
-            "status": "validated",
-            "validation_count": updates["validation_count"],
-            "validated_at": updates["validated_at"],
-        }
-
-    except Exception as e:
-        raise map_error_to_http_exception(e)
-
-
-@router.post("/{agent_id}/supersede/{old_memory_id}")
-async def supersede_memory(
-    agent_id: str,
-    old_memory_id: str,
-    request: SupersedeRequest = Body(...),
-    session: Session = Depends(get_current_session),
-    client=Depends(get_moorcheh_client),
-):
-    """
-    Mark a memory as superseded by a newer one (Session-based)
-
-    This creates a chain: old_memory -> superseded_by -> new_memory
-    The old memory's status becomes 'superseded' and computed_confidence becomes 0.
-
-    Requires:
-    - X-Session-Token: {session_token}
-
-    The session must be for the specified agent_id.
-    """
-    # Enforce session scope
-    if session.agent_id != agent_id:
-        raise map_error_to_http_exception(
-            Exception(
-                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
-            )
-        )
-
-    try:
-        # Initialize services
-        write_service = MemoryWriteService(client)
-
-        # Use namespace from session
-        namespace = session.namespace
-
-        # Update old memory to mark as superseded
-        updates = {"status": "superseded", "superseded_by": request.new_memory_id}
-
-        await asyncio.to_thread(
-            write_service.update_memory, old_memory_id, namespace, updates
-        )
-
-        # Update new memory to record what it supersedes
-        new_updates = {"supersedes": old_memory_id}
-        await asyncio.to_thread(
-            write_service.update_memory, request.new_memory_id, namespace, new_updates
-        )
-
-        return {
-            "old_memory_id": old_memory_id,
-            "new_memory_id": request.new_memory_id,
-            "agent_id": agent_id,
-            "session_id": session.session_id,
-            "status": "superseded",
-            "message": f"Memory {old_memory_id} superseded by {request.new_memory_id}",
-        }
-
-    except Exception as e:
-        raise map_error_to_http_exception(e)
-
-
 @router.get("/{agent_id}/conflicts")
 async def list_conflicts(
     agent_id: str,
@@ -647,30 +574,25 @@ async def resolve_conflict(
         raise map_error_to_http_exception(e)
 
 
-@router.get("/{agent_id}/recall/as-of")
+@router.post("/{agent_id}/recall/as-of")
 async def recall_as_of(
     agent_id: str,
-    query: str = Query(..., description="Search query", min_length=1),
-    as_of: str = Query(..., description="Point-in-time timestamp (ISO format)"),
-    limit: int | None = Query(None, description="Max results", ge=1),
-    type: str | None = Query(None, description="Comma-separated memory types"),
+    request: RecallAsOfRequest = Body(...),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
     """
     Point-in-time recall: "What was true at this point in time?"
 
-    Returns memories that were valid at the specified date, excluding:
-    - Memories created after as_of date
-    - Memories superseded before as_of date
-    - Memories expired before as_of date
+    Returns memories stored before the specified datetime, excluding memories
+    created after or expired before as_of.
+    If no query is provided, returns all memories stored before the specified datetime.
 
     Example: "What database did we use on 2025-11-01?"
 
     Requires:
     - X-Session-Token: {session_token}
     """
-    CostGuard.validate_query_length(query)
     if session.agent_id != agent_id:
         raise map_error_to_http_exception(
             Exception(
@@ -678,8 +600,11 @@ async def recall_as_of(
             )
         )
 
-    if limit is None:
-        limit = settings.RECALL_LIMIT
+    query = request.query or "*"
+    if request.query:
+        CostGuard.validate_query_length(request.query)
+
+    limit = request.limit if request.limit is not None else settings.RECALL_LIMIT
     CostGuard.validate_k_limit(limit)
 
     try:
@@ -688,42 +613,39 @@ async def recall_as_of(
         result = await asyncio.to_thread(
             read_service.search_as_of,
             query=query,
-            as_of_date=as_of,
+            as_of_date=request.as_of.isoformat(),
             scope_type="agent",
             scope_id=agent_id,
-            type=type.split(",") if type else None,
+            type=request.type,
             limit=limit,
         )
 
         return {
             "agent_id": agent_id,
             "session_id": session.session_id,
-            "query": query,
-            "as_of_date": as_of,
+            "query": request.query,
+            "as_of_date": request.as_of.isoformat(),
             "memories": result["results"],
             "count": result["total_found"],
             "temporal_mode": "as_of",
-            "note": "Showing memories valid at the specified point in time",
         }
 
     except Exception as e:
         raise map_error_to_http_exception(e)
 
 
-@router.get("/{agent_id}/recall/changed-since")
+@router.post("/{agent_id}/recall/changed-since")
 async def recall_changed_since(
     agent_id: str,
-    since: str = Query(..., description="Start date for changes (ISO format)"),
-    limit: int | None = Query(None, description="Max results", ge=1),
-    type: str | None = Query(None, description="Comma-separated memory types"),
+    request: RecallChangedSinceRequest = Body(...),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
     """
     Differential retrieval: "What changed recently?"
 
-    Returns memories that were created or updated after the specified date.
-    Each result includes a change_type field: "created" or "updated".
+    Returns memories created or updated after the specified datetime.
+    If no query is provided, returns all memories created or updated after the specified datetime.
 
     Example: "What changed since last week?"
 
@@ -737,8 +659,10 @@ async def recall_changed_since(
             )
         )
 
-    if limit is None:
-        limit = settings.RECALL_LIMIT
+    if request.query:
+        CostGuard.validate_query_length(request.query)
+
+    limit = request.limit if request.limit is not None else settings.RECALL_LIMIT
     CostGuard.validate_k_limit(limit)
 
     try:
@@ -746,21 +670,22 @@ async def recall_changed_since(
 
         result = await asyncio.to_thread(
             read_service.search_changed_since,
-            since_date=since,
+            since_date=request.since.isoformat(),
             scope_type="agent",
             scope_id=agent_id,
-            type=type.split(",") if type else None,
+            type=request.type,
             limit=limit,
+            query=request.query,
         )
 
         return {
             "agent_id": agent_id,
             "session_id": session.session_id,
-            "since_date": since,
+            "query": request.query,
+            "since_date": request.since.isoformat(),
             "memories": result["results"],
             "count": result["total_found"],
             "temporal_mode": "changed_since",
-            "note": "Showing memories created or updated since the specified date",
         }
 
     except Exception as e:

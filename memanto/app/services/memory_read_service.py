@@ -320,6 +320,7 @@ class MemoryReadService:
         type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
+        query: str | None = None,
     ) -> dict[str, Any]:
         """
         Differential retrieval: "What changed recently?"
@@ -365,9 +366,10 @@ class MemoryReadService:
 
             # Fetch iteratively by specific memory_type precise metadata filtering
             # Each query gives up to 100 results, yielding a total far beyond the base 100-limit.
+            base_query = query or "*"
             for mem_type in types_to_fetch:
                 enhanced_query = self._build_filtered_query(
-                    query="*",  # Match all
+                    query=base_query,
                     type=[mem_type],
                     tags=tags,
                 )
