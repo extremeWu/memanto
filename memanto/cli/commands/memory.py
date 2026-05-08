@@ -262,11 +262,6 @@ def recall(
         "--changed-since",
         help="Differential query: What changed since this date? (ISO format)",
     ),
-    current_only: bool = typer.Option(
-        False,
-        "--current-only",
-        help="Current state query: What's currently true? (supersession-aware)",
-    ),
 ):
     """Search and retrieve memories for the active agent with temporal query support."""
     start = time.perf_counter()
@@ -278,17 +273,17 @@ def recall(
         )
 
     # Check for mutually exclusive temporal flags
-    temporal_flags = [as_of, changed_since, current_only]
+    temporal_flags = [as_of, changed_since]
     temporal_count = sum(1 for flag in temporal_flags if flag)
     if temporal_count > 1:
         _error(
             "Cannot use multiple temporal query modes together.",
-            hint="Use only one of: --as-of, --changed-since, --current-only",
+            hint="Use only one of: --as-of, --changed-since",
         )
 
     # Validate query requirement (Temporal queries can default to matching all)
     if not query:
-        if changed_since or as_of or current_only:
+        if changed_since or as_of:
             query = "*"  # Default to match all for temporal queries
         else:
             _error(
@@ -348,14 +343,6 @@ def recall(
                     type=type,
                 )
                 temporal_mode = "changed_since"
-            elif current_only:
-                results = client.recall_current(
-                    agent_id=agent_id,
-                    query=query,
-                    limit=limit,
-                    type=type,
-                )
-                temporal_mode = "current_only"
             else:
                 # Standard recall
                 results = client.recall(
@@ -379,7 +366,6 @@ def recall(
         mode_labels = {
             "as_of": f"Point-in-time (as of {as_of})",
             "changed_since": f"Differential (since {changed_since})",
-            "current_only": "Current state (supersession-aware)",
             "standard": "Standard search",
         }
         mode_label = mode_labels.get(temporal_mode, "Standard search")

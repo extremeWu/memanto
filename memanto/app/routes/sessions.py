@@ -198,13 +198,23 @@ async def activate_agent(
 
 @router.post("/agents/{agent_id}/deactivate", response_model=SessionSummary)
 async def deactivate_agent(
-    agent_id: str, _server_api_key: str = Depends(verify_moorcheh_api_key)
+    agent_id: str,
+    session: Session = Depends(get_current_session),
+    _server_api_key: str = Depends(verify_moorcheh_api_key),
 ):
     """
     Deactivate agent and end session
 
     Terminates the current session and returns statistics.
+    Requires X-Session-Token header and matching agent_id.
     """
+    if session.agent_id != agent_id:
+        raise map_error_to_http_exception(
+            Exception(
+                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
+            )
+        )
+
     try:
         summary = get_session_service().end_session(agent_id)
         return summary

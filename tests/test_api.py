@@ -433,12 +433,14 @@ class TestMEMANTOAPI:
             headers=auth_headers,
             json={"agent_id": self.TEST_AGENT_ID},
         )
-        await client.post(
+        activate_resp = await client.post(
             f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
         )
+        token = activate_resp.json()["session_token"]
+        headers = {**auth_headers, "X-Session-Token": token}
 
         response = await client.post(
-            f"/api/v2/agents/{self.TEST_AGENT_ID}/deactivate", headers=auth_headers
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/deactivate", headers=headers
         )
         assert response.status_code == 200
         data = response.json()
@@ -535,19 +537,6 @@ class TestMEMANTOAPI:
         )
         assert response.status_code == 200
         assert response.json()["temporal_mode"] == "changed_since"
-
-        # 3. Current-only recall
-        mock_moorcheh.similarity_search.query.return_value = {
-            "results": [],
-            "total_found": 0,
-        }
-        response = await client.get(
-            f"/api/v2/agents/{self.TEST_AGENT_ID}/recall/current",
-            headers=headers,
-            params={"query": "test"},
-        )
-        assert response.status_code == 200
-        assert response.json()["temporal_mode"] == "current_only"
 
     @pytest.mark.asyncio
     async def test_upload_file_with_session(self, client, auth_headers, mock_moorcheh):

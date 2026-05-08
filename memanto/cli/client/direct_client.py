@@ -868,49 +868,6 @@ class DirectClient:
             "count": result.get("total_found", 0),
         }
 
-    def recall_current(
-        self,
-        agent_id: str,
-        query: str,
-        limit: int | None = None,
-        type: list[str] | None = None,
-    ) -> dict[str, Any]:
-        """
-        Current-state recall (supersession-aware).
-
-        Returns only memories that haven't been superseded,
-        reflecting the agent's latest knowledge.
-
-        Args:
-            agent_id: Target agent.
-            query: Search query.
-            limit: Max results (defaults to config).
-            type: Optional type filter.
-
-        Returns:
-            Dict with ``memories`` and ``count``.
-        """
-        if limit is None:
-            limit = ConfigManager().get_recall_config()["limit"]
-
-        # Ensure there is a valid, non-expired session for this agent
-        self._get_validated_session_for_agent(agent_id)
-
-        result = self._get_read_service().search_current_only(
-            query=query,
-            scope_type="agent",
-            scope_id=agent_id,
-            type=type,
-            limit=limit,
-        )
-
-        return {
-            "agent_id": agent_id,
-            "query": query,
-            "memories": result.get("results", []),
-            "count": result.get("total_found", 0),
-        }
-
     def answer(
         self,
         agent_id: str,
