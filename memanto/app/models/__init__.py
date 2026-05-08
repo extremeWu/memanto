@@ -124,8 +124,6 @@ class AnswerRequest(BaseModel):
         None, description="AI model to use for generating the answer"
     )
     kiosk_mode: bool = Field(False, description="Kiosk mode setting")
-    header_prompt: str | None = Field(None, description="Header prompt for the LLM")
-    footer_prompt: str | None = Field(None, description="Footer prompt for the LLM")
 
 
 class MemoryUpdateRequest(BaseModel):

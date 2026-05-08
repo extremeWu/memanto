@@ -62,7 +62,6 @@ async def remember(
     Store a memory (Session-based)
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
 
     The session must be for the specified agent_id.
@@ -157,7 +156,6 @@ async def batch_remember(
     upload capability for efficient storage.
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
 
     The session must be for the specified agent_id.
@@ -247,7 +245,6 @@ async def upload_file(
     making its content searchable via recall.
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
     - Content-Type: multipart/form-data
     """
@@ -313,7 +310,6 @@ async def recall(
     Recall memories (Session-based)
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
 
     The session must be for the specified agent_id.
@@ -377,7 +373,6 @@ async def answer(
     Answer a question using RAG (Session-based)
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
 
     Uses Moorcheh's answer.generate endpoint to produce LLM-generated answers
@@ -410,14 +405,14 @@ async def answer(
         # Use namespace from session
         namespace = session.namespace
 
-        # Define default prompts for RAG
-        header_prompt = request.header_prompt or (
+        # Internal fixed prompts (not user-configurable via API contract)
+        header_prompt = (
             "You are a helpful AI assistant with access to the agent's persistent memory. "
             "Use the provided context from the agent's memories to answer the user's question accurately. "
             "If the memories don't contain relevant information, say so clearly."
         )
 
-        footer_prompt = request.footer_prompt or (
+        footer_prompt = (
             "Answer the question based on the memory context above. "
             "Be concise and cite specific memories when relevant. "
             "If no relevant memories exist, acknowledge that."
@@ -468,7 +463,6 @@ async def validate_memory(
     This increases the computed confidence of the memory.
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
 
     The session must be for the specified agent_id.
@@ -540,7 +534,6 @@ async def supersede_memory(
     The old memory's status becomes 'superseded' and computed_confidence becomes 0.
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
 
     The session must be for the specified agent_id.
@@ -601,7 +594,6 @@ async def mark_contradiction(
     Use this when you discover a memory conflicts with newer information.
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
 
     The session must be for the specified agent_id.
@@ -667,7 +659,6 @@ async def recall_as_of(
     Example: "What database did we use on 2025-11-01?"
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
     """
     CostGuard.validate_query_length(query)
@@ -728,7 +719,6 @@ async def recall_changed_since(
     Example: "What changed since last week?"
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
     """
     if session.agent_id != agent_id:
@@ -790,7 +780,6 @@ async def recall_current(
     Example: "What is the current database preference?"
 
     Requires:
-    - Authorization: Bearer {moorcheh_api_key}
     - X-Session-Token: {session_token}
     """
     CostGuard.validate_query_length(query)
