@@ -95,15 +95,22 @@ class SupersedeRequest(BaseModel):
     )
 
 
-class ContradictRequest(BaseModel):
-    """Request body for contradict endpoint"""
+class ConflictResolveRequest(BaseModel):
+    """Request body for resolving a conflict"""
 
-    reason: str | None = Field(None, description="Reason this memory is contradictory")
-    confidence: float | None = Field(
-        None,
-        ge=0.0,
-        le=1.0,
-        description="Optional updated confidence after contradiction",
+    conflict_index: int = Field(..., ge=0, description="Conflict index to resolve")
+    action: str = Field(
+        ...,
+        description="Resolution action: keep_old, keep_new, keep_both, remove_both, manual",
+    )
+    date: str | None = Field(
+        None, description="Conflict report date (YYYY-MM-DD). Defaults to today."
+    )
+    manual_content: str | None = Field(
+        None, description="Required when action is 'manual'"
+    )
+    manual_type: str | None = Field(
+        None, description="Optional memory type for manual action"
     )
 
 

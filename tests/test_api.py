@@ -544,6 +544,67 @@ class TestMEMANTOAPI:
         assert response.json()["temporal_mode"] == "changed_since"
 
     @pytest.mark.asyncio
+    async def test_conflicts_list_api(self, client, auth_headers):
+        """Test listing conflicts via API."""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+        headers = {**auth_headers, "X-Session-Token": token}
+
+        with patch("memanto.app.routes.memory_v2.DirectClient") as mock_client_cls:
+            mock_client = mock_client_cls.return_value
+            mock_client.list_conflicts.return_value = [{"type": "conflict", "id": "c-1"}]
+
+            response = await client.get(
+                f"/api/v2/agents/{self.TEST_AGENT_ID}/conflicts",
+                headers=headers,
+                params={"date": "2026-05-08"},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["count"] == 1
+        assert data["conflicts"][0]["id"] == "c-1"
+
+    @pytest.mark.asyncio
+    async def test_conflicts_resolve_api(self, client, auth_headers):
+        """Test resolving conflicts via API."""
+        await client.post(
+            "/api/v2/agents",
+            headers=auth_headers,
+            json={"agent_id": self.TEST_AGENT_ID},
+        )
+        activate_resp = await client.post(
+            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
+        )
+        token = activate_resp.json()["session_token"]
+        headers = {**auth_headers, "X-Session-Token": token}
+
+        with patch("memanto.app.routes.memory_v2.DirectClient") as mock_client_cls:
+            mock_client = mock_client_cls.return_value
+            mock_client.resolve_conflict.return_value = {
+                "status": "resolved",
+                "action": "keep_new",
+            }
+
+            response = await client.post(
+                f"/api/v2/agents/{self.TEST_AGENT_ID}/conflicts/resolve",
+                headers=headers,
+                json={"date": "2026-05-08", "conflict_index": 0, "action": "keep_new"},
+            )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "resolved"
+        assert data["action"] == "keep_new"
+
+    @pytest.mark.asyncio
     async def test_upload_file_with_session(self, client, auth_headers, mock_moorcheh):
         """Test file upload to agent's memory namespace"""
         # Setup agent and session

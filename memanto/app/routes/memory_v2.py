@@ -17,10 +17,11 @@ from pydantic import BaseModel, Field
 from memanto.app.clients.moorcheh import get_moorcheh_client
 from memanto.app.config import settings
 from memanto.app.core import MemoryRecord
+from memanto.cli.client.direct_client import DirectClient
 from memanto.app.models import (
     AnswerRequest,
     BatchRememberRequest,
-    ContradictRequest,
+    ConflictResolveRequest,
     RememberRequest,
     SupersedeRequest,
 )
@@ -567,19 +568,14 @@ async def supersede_memory(
         raise map_error_to_http_exception(e)
 
 
-@router.post("/{agent_id}/contradict/{memory_id}")
-async def mark_contradiction(
+@router.get("/{agent_id}/conflicts")
+async def list_conflicts(
     agent_id: str,
-    memory_id: str,
-    request: ContradictRequest = Body(default_factory=ContradictRequest),
+    date: str | None = Query(None, description="Conflict report date (YYYY-MM-DD)"),
     session: Session = Depends(get_current_session),
-    client=Depends(get_moorcheh_client),
 ):
     """
-    Flag a memory as contradicted (Session-based)
-
-    Marks contradiction_detected=true, which significantly lowers computed confidence.
-    Use this when you discover a memory conflicts with newer information.
+    List unresolved conflicts for an agent.
 
     Requires:
     - X-Session-Token: {session_token}
@@ -595,31 +591,56 @@ async def mark_contradiction(
         )
 
     try:
-        # Initialize services
-        write_service = MemoryWriteService(client)
-
-        # Use namespace from session
-        namespace = session.namespace
-
-        # Update memory to flag contradiction
-        updates = {"contradiction_detected": True}
-        if request.reason:
-            updates["contradiction_reason"] = request.reason
-        if request.confidence is not None:
-            updates["confidence"] = request.confidence
-
-        await asyncio.to_thread(
-            write_service.update_memory, memory_id, namespace, updates
+        conflicts = await asyncio.to_thread(
+            DirectClient(settings.MOORCHEH_API_KEY).list_conflicts,
+            agent_id,
+            date,
         )
-
         return {
-            "memory_id": memory_id,
             "agent_id": agent_id,
             "session_id": session.session_id,
-            "status": "contradicted",
-            "message": f"Memory {memory_id} marked as contradicted",
-            "reason": request.reason,
-            "confidence": request.confidence,
+            "date": date or datetime.now().strftime("%Y-%m-%d"),
+            "conflicts": conflicts,
+            "count": len(conflicts),
+        }
+    except Exception as e:
+        raise map_error_to_http_exception(e)
+
+
+@router.post("/{agent_id}/conflicts/resolve")
+async def resolve_conflict(
+    agent_id: str,
+    request: ConflictResolveRequest = Body(...),
+    session: Session = Depends(get_current_session),
+):
+    """
+    Resolve a conflict for an agent.
+
+    Uses the same underlying conflict resolution service used by CLI.
+    """
+    if session.agent_id != agent_id:
+        raise map_error_to_http_exception(
+            Exception(
+                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
+            )
+        )
+
+    resolved_date = request.date or datetime.now().strftime("%Y-%m-%d")
+    try:
+        result = await asyncio.to_thread(
+            DirectClient(settings.MOORCHEH_API_KEY).resolve_conflict,
+            agent_id,
+            resolved_date,
+            request.conflict_index,
+            request.action,
+            request.manual_content,
+            request.manual_type,
+        )
+        return {
+            "agent_id": agent_id,
+            "session_id": session.session_id,
+            "date": resolved_date,
+            **result,
         }
 
     except Exception as e:
