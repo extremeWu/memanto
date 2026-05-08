@@ -344,11 +344,8 @@ class DirectClient:
         session_service = self._get_session_service()
 
         try:
-            # Validate JWT token and API key
-            token_payload = session_service.validate_session(
-                self.session_token,
-                self.api_key,
-            )
+            # Validate JWT token
+            token_payload = session_service.validate_session(self.session_token)
         except (SessionExpiredError, InvalidSessionTokenError):
             # Surface the same specific session errors as the service
             raise
@@ -363,7 +360,6 @@ class DirectClient:
         # Check and auto-renew if near expiry
         renewed = session_service.check_and_auto_renew(
             agent_id=token_payload.agent_id,
-            moorcheh_api_key=self.api_key,
         )
         if renewed:
             session = renewed
@@ -493,7 +489,6 @@ class DirectClient:
         logger.debug("Activating agent '%s' for %d hours", agent_id, duration_hours)
         session = self._get_session_service().create_session(
             agent_id=agent_id,
-            moorcheh_api_key=self.api_key,
             pattern=agent.pattern,
             duration_hours=duration_hours,
         )
@@ -559,29 +554,6 @@ class DirectClient:
             "started_at": session.started_at.isoformat(),
             "expires_at": session.expires_at.isoformat(),
             "time_remaining_seconds": max(0, int(remaining.total_seconds())),
-        }
-
-    def extend_session(self, agent_id: str, hours: int | None = None) -> dict[str, Any]:
-        """
-        Extend session expiration.
-
-        Args:
-            agent_id: Agent whose session to extend.
-            hours: Number of hours to add (default: from config).
-
-        Returns:
-            Dict with updated ``expires_at``.
-        """
-        # Check if we have a valid, non-expired session for this agent
-        self._get_validated_session_for_agent(agent_id)
-
-        logger.debug("Extending session for '%s' by %d hours", agent_id, hours)
-        session = self._get_session_service().extend_session(agent_id, hours)
-        return {
-            "session_id": session.session_id,
-            "agent_id": session.agent_id,
-            "expires_at": session.expires_at.isoformat(),
-            "status": session.status.value,
         }
 
     # Memory Operations

@@ -144,34 +144,6 @@ def agent_deactivate():
     console.print(f"[green]OK Agent '{active_agent_id}' deactivated[/green]")
 
 
-@agent_app.command("extend")
-def agent_extend(
-    hours: int = typer.Option(6, "--hours", "-h", help="Number of hours to extend"),
-):
-    """Extend the active agent session."""
-    if hours <= 0:
-        _error("Hours must be greater than 0.")
-
-    active_agent_id, _ = config_manager.get_active_session()
-    if not active_agent_id:
-        _error(
-            "No active agent to extend.",
-            hint="Run 'memanto agent activate <agent-id>' first.",
-        )
-
-    client = get_client()
-    try:
-        result = client.extend_session(active_agent_id, hours)
-        console.print(
-            f"[green]OK Agent '{active_agent_id}' extended by {hours} hours[/green]"
-        )
-        console.print(
-            f"[dim]New activation expiration: {result.get('expires_at', 'unknown')}[/dim]"
-        )
-    except Exception as e:
-        _error(f"Failed to extend agent '{active_agent_id}': {e}")
-
-
 @agent_app.command("delete")
 def agent_delete(
     agent_id: str = typer.Argument(..., help="Agent ID to delete"),

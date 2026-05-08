@@ -220,22 +220,14 @@ class TestMEMANTOCLI:
 
         result = runner.invoke(app, ["session", "info"])
         assert result.exit_code == 0
-        assert "test-agent" in result.stdout
+        assert "Active Agent" in result.stdout
+        assert "Session Token" in result.stdout
 
     def test_agent_deactivate(self, mock_all_clients):
         """Test 'memanto agent deactivate'"""
         result = runner.invoke(app, ["agent", "deactivate"])
         assert result.exit_code == 0
         assert "deactivated" in result.stdout.lower()
-
-    def test_agent_extend(self, mock_all_clients):
-        """Test 'memanto agent extend'"""
-        mock_all_clients.extend_session.return_value = {
-            "expires_at": "2026-03-19T22:00:00Z"
-        }
-        result = runner.invoke(app, ["agent", "extend", "--hours", "2"])
-        assert result.exit_code == 0
-        assert "extended" in result.stdout.lower()
 
     def test_agent_delete_keep_cloud(self, mock_all_clients):
         """Test 'memanto agent delete --force' keeping cloud memories (default)"""
@@ -294,15 +286,6 @@ class TestMEMANTOCLI:
         result = runner.invoke(app, ["agent", "bootstrap"])
         assert result.exit_code == 0
         assert "Intelligence Snapshot" in result.stdout
-
-    def test_session_extend(self, mock_all_clients):
-        """Test 'memanto session extend'"""
-        mock_all_clients.extend_session.return_value = {
-            "expires_at": "2026-03-19T22:00:00Z"
-        }
-        result = runner.invoke(app, ["session", "extend", "--hours", "2"])
-        assert result.exit_code == 0
-        assert "extended" in result.stdout.lower()
 
     def test_memory_batch_remember(self, mock_all_clients, tmp_path):
         """Test 'memanto remember --batch'"""

@@ -5,7 +5,7 @@ New session-based architecture endpoints.
 Replaces tenant_id with Moorcheh API key-based authentication.
 """
 
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Depends
 
 from memanto.app.config import settings
 from memanto.app.models.session import (
@@ -13,7 +13,6 @@ from memanto.app.models.session import (
     AgentInfo,
     AgentList,
     Session,
-    SessionExtendRequest,
     SessionInfo,
     SessionSummary,
 )
@@ -76,7 +75,7 @@ async def create_agent(
 
 
 @router.get("/agents", response_model=AgentList)
-async def list_agents(moorcheh_api_key: str = Depends(verify_moorcheh_api_key)):
+async def list_agents(_server_api_key: str = Depends(verify_moorcheh_api_key)):
     """
     List all agents for this Moorcheh account
 
@@ -87,7 +86,7 @@ async def list_agents(moorcheh_api_key: str = Depends(verify_moorcheh_api_key)):
 
 @router.get("/agents/{agent_id}", response_model=AgentInfo)
 async def get_agent(
-    agent_id: str, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
+    agent_id: str, _server_api_key: str = Depends(verify_moorcheh_api_key)
 ):
     """
     Get agent information
@@ -173,7 +172,6 @@ async def activate_agent(
     try:
         session = get_session_service().create_session(
             agent_id=agent_id,
-            moorcheh_api_key=moorcheh_api_key,
             pattern=agent.pattern,
             duration_hours=duration_hours,
         )
@@ -193,7 +191,7 @@ async def activate_agent(
 
 @router.post("/agents/{agent_id}/deactivate", response_model=SessionSummary)
 async def deactivate_agent(
-    agent_id: str, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
+    agent_id: str, _server_api_key: str = Depends(verify_moorcheh_api_key)
 ):
     """
     Deactivate agent and end session
@@ -203,40 +201,6 @@ async def deactivate_agent(
     try:
         summary = get_session_service().end_session(agent_id)
         return summary
-    except SessionNotFoundError as e:
-        raise map_error_to_http_exception(e)
-
-
-@router.post("/agents/{agent_id}/extend", response_model=Session)
-async def extend_agent_activation(
-    agent_id: str,
-    request: SessionExtendRequest = Body(default_factory=SessionExtendRequest),
-    session: Session = Depends(get_current_session),
-):
-    """
-    Extend the active agent session window.
-
-    This is the agent-centric alias for session extension.
-    """
-    if session.agent_id != agent_id:
-        raise map_error_to_http_exception(
-            Exception(
-                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
-            )
-        )
-
-    try:
-        additional_hours = (
-            request.duration_hours
-            if request.duration_hours is not None
-            else settings.SESSION_DEFAULT_DURATION_HOURS
-        )
-        if additional_hours <= 0:
-            raise map_error_to_http_exception(
-                ValueError("Duration hours must be greater than 0.")
-            )
-        extended_session = get_session_service().extend_session(agent_id, additional_hours)
-        return extended_session
     except SessionNotFoundError as e:
         raise map_error_to_http_exception(e)
 

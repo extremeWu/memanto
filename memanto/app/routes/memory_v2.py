@@ -2,7 +2,7 @@
 Memory Operations - Session-Based
 
 Memory operations using session tokens (no tenant_id).
-Replaces /api/v1/agents/{agent_id}/remember with session-based auth.
+Replaces legacy agent memory endpoints with session-based auth.
 """
 
 import asyncio
@@ -12,6 +12,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
+from pydantic import BaseModel, Field
 
 from memanto.app.clients.moorcheh import get_moorcheh_client
 from memanto.app.config import settings
@@ -31,6 +32,23 @@ from memanto.app.utils.errors import map_error_to_http_exception
 from memanto.app.utils.validation import CostGuard
 
 router = APIRouter()
+
+
+class RecallRequest(BaseModel):
+    query: str = Field(..., min_length=1, description="Search query")
+    limit: int | None = Field(default=None, ge=1, description="Max results")
+    min_similarity: float | None = Field(
+        default=None, ge=0.0, le=1.0, description="Minimum similarity score (0-1)"
+    )
+    created_after: datetime | None = Field(
+        default=None, description="Filter by creation date (ISO datetime)"
+    )
+    created_before: datetime | None = Field(
+        default=None, description="Filter by creation date (ISO datetime)"
+    )
+    memory_types: list[str] | None = Field(
+        default=None, description="Memory type filters"
+    )
 
 
 @router.post("/{agent_id}/remember")
@@ -284,19 +302,10 @@ async def upload_file(
         raise map_error_to_http_exception(e)
 
 
-@router.get("/{agent_id}/recall")
+@router.post("/{agent_id}/recall")
 async def recall(
     agent_id: str,
-    query: str = Query(..., description="Search query", min_length=1),
-    limit: int | None = Query(None, description="Max results", ge=1),
-    min_similarity: float | None = Query(
-        None, description="Minimum similarity score (0-1)", ge=0.0, le=1.0
-    ),
-    created_after: datetime | None = Query(None, description="Filter by creation date"),
-    created_before: datetime | None = Query(
-        None, description="Filter by creation date"
-    ),
-    memory_types: str | None = Query(None, description="Comma-separated memory types"),
+    request: RecallRequest = Body(...),
     session: Session = Depends(get_current_session),
     client=Depends(get_moorcheh_client),
 ):
@@ -309,7 +318,7 @@ async def recall(
 
     The session must be for the specified agent_id.
     """
-    CostGuard.validate_query_length(query)
+    CostGuard.validate_query_length(request.query)
 
     # Enforce session scope
     if session.agent_id != agent_id:
@@ -319,8 +328,7 @@ async def recall(
             )
         )
 
-    if limit is None:
-        limit = settings.RECALL_LIMIT
+    limit = request.limit if request.limit is not None else settings.RECALL_LIMIT
     CostGuard.validate_k_limit(limit)
 
     try:
@@ -330,13 +338,17 @@ async def recall(
         # Search in agent's namespace using scope.
         result = await asyncio.to_thread(
             read_service.search_memories,
-            query=query,
+            query=request.query,
             scope_type="agent",
             scope_id=agent_id,
-            memory_types=memory_types.split(",") if memory_types else None,
-            min_similarity_score=min_similarity,
-            created_after=created_after.isoformat() if created_after else None,
-            created_before=created_before.isoformat() if created_before else None,
+            memory_types=request.memory_types,
+            min_similarity_score=request.min_similarity,
+            created_after=request.created_after.isoformat()
+            if request.created_after
+            else None,
+            created_before=request.created_before.isoformat()
+            if request.created_before
+            else None,
             limit=limit,
         )
 
@@ -345,7 +357,7 @@ async def recall(
         return {
             "agent_id": agent_id,
             "session_id": session.session_id,
-            "query": query,
+            "query": request.query,
             "memories": memories,
             "count": len(memories),
         }

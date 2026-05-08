@@ -274,7 +274,6 @@ memanto answer "question"                    # RAG question answering
 
 # Session Management
 memanto session info                      # Show session details
-memanto session extend --hours 2          # Extend session
 
 # Configuration
 memanto config show                       # Display config
@@ -474,11 +473,8 @@ memanto
 
 **Solution:**
 ```bash
-# Option 1: Reactivate
+# Reactivate
 memanto agent activate AGENT_ID
-
-# Option 2: Extend (if still valid)
-memanto session extend --hours 6
 ```
 
 ### Windows Unicode Errors

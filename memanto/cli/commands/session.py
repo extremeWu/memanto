@@ -5,15 +5,12 @@ MEMANTO CLI - Legacy session aliases for agent activation commands.
 from datetime import datetime
 
 import jwt
-import typer
 from rich.table import Table
 
 from memanto.cli.commands._shared import (
-    _error,
     config_manager,
     console,
     format_local_time,
-    get_client,
     session_app,
 )
 
@@ -66,32 +63,3 @@ def session_info():
     console.print(table)
 
 
-@session_app.command("extend")
-def session_extend(
-    hours: int = typer.Option(6, "--hours", "-h", help="Number of hours to extend"),
-):
-    """Extend the active agent (legacy alias for 'agent extend')."""
-    if hours <= 0:
-        _error("Hours must be greater than 0.")
-
-    active_agent_id, _ = config_manager.get_active_session()
-
-    if not active_agent_id:
-        _error(
-            "No active agent to extend.",
-            hint="Run 'memanto agent activate <agent-id>' first.",
-        )
-
-    client = get_client()
-
-    try:
-        result = client.extend_session(active_agent_id, hours)
-        console.print(
-            f"[green]OK Agent '{active_agent_id}' extended by {hours} hours[/green]"
-        )
-        console.print(
-            f"[dim]New activation expiration: {result.get('expires_at', 'unknown')}[/dim]"
-        )
-        console.print("[dim]Tip: you can also run 'memanto agent extend'.[/dim]")
-    except Exception as e:
-        _error(f"Failed to extend active agent: {e}")

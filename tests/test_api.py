@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
+from memanto.app.config import settings
 from memanto.app.main import app
 
 # Set test environment
@@ -156,6 +157,28 @@ class TestMEMANTOAPI:
         assert "namespace" in data
 
     @pytest.mark.asyncio
+    async def test_create_agent_without_authorization_header(self, client):
+        """Test creating a new agent using server-configured API key"""
+        payload = {
+            "agent_id": "server-key-agent",
+            "pattern": "support",
+        }
+        response = await client.post("/api/v2/agents", json=payload)
+        assert response.status_code == 201
+        assert response.json()["agent_id"] == "server-key-agent"
+
+    @pytest.mark.asyncio
+    async def test_create_agent_fails_when_server_key_missing(self, client):
+        """Test failure when server API key is not configured"""
+        payload = {
+            "agent_id": "missing-key-agent",
+            "pattern": "support",
+        }
+        with patch.object(settings, "MOORCHEH_API_KEY", ""):
+            response = await client.post("/api/v2/agents", json=payload)
+        assert response.status_code == 500
+
+    @pytest.mark.asyncio
     async def test_list_agents(self, client, auth_headers):
         """Test listing agents"""
         response = await client.get("/api/v2/agents", headers=auth_headers)
@@ -271,11 +294,11 @@ class TestMEMANTOAPI:
 
         # Query
         headers = {**auth_headers, "X-Session-Token": token}
-        params = {"query": "test query", "limit": 1}
-        response = await client.get(
+        payload = {"query": "test query", "limit": 1}
+        response = await client.post(
             f"/api/v2/agents/{self.TEST_AGENT_ID}/recall",
             headers=headers,
-            params=params,
+            json=payload,
         )
 
         assert response.status_code == 200
@@ -343,28 +366,6 @@ class TestMEMANTOAPI:
         )
         assert response.status_code == 200
         assert response.json()["agent_id"] == self.TEST_AGENT_ID
-
-    @pytest.mark.asyncio
-    async def test_extend_agent_api(self, client, auth_headers):
-        """Test extending active agent via agent-centric endpoint"""
-        await client.post(
-            "/api/v2/agents",
-            headers=auth_headers,
-            json={"agent_id": self.TEST_AGENT_ID},
-        )
-        activate_resp = await client.post(
-            f"/api/v2/agents/{self.TEST_AGENT_ID}/activate", headers=auth_headers
-        )
-        token = activate_resp.json()["session_token"]
-
-        headers = {**auth_headers, "X-Session-Token": token}
-        response = await client.post(
-            f"/api/v2/agents/{self.TEST_AGENT_ID}/extend",
-            headers=headers,
-            json={"duration_hours": 4},
-        )
-        assert response.status_code == 200
-        assert "expires_at" in response.json()
 
     @pytest.mark.asyncio
     async def test_batch_remember_api(self, client, auth_headers, mock_moorcheh):

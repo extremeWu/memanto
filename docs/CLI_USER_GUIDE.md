@@ -446,22 +446,6 @@ memanto session info
 └────────────────┴────────────────────────────────┘
 ```
 
-#### `session extend` - Extend Session
-
-```bash
-memanto session extend [OPTIONS]
-```
-
-**Options:**
-- `--hours, -h INT` - Hours to extend (default: 6)
-
-**Example:**
-```bash
-python -m cli.main session extend --hours 6
-```
-
----
-
 ### Configuration Commands
 
 #### `config show` - Display Configuration
@@ -665,9 +649,6 @@ memanto
 ```bash
 # Reactivate the agent
 memanto agent activate <agent-id>
-
-# Or extend existing session (if still valid)
-memanto session extend --hours 6
 ```
 
 ---
