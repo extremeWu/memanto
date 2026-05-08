@@ -5,7 +5,7 @@ New session-based architecture endpoints.
 Replaces tenant_id with Moorcheh API key-based authentication.
 """
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from memanto.app.clients import moorcheh as moorcheh_clients
 from memanto.app.config import settings
@@ -222,22 +222,16 @@ async def deactivate_agent(
         raise map_error_to_http_exception(e)
 
 
-@router.get("/agents/{agent_id}/status", response_model=SessionInfo)
-async def get_agent_status(
-    agent_id: str,
-    session: Session = Depends(get_current_session),
-):
+@router.get("/status", response_model=SessionInfo)
+async def get_status():
     """
-    Get current activation status for an agent.
+    Get current active session status.
 
-    Requires X-Session-Token header and matching agent_id.
+    No parameters required — reads the active session from local state.
     """
-    if session.agent_id != agent_id:
-        raise map_error_to_http_exception(
-            Exception(
-                f"Session is for agent '{session.agent_id}', cannot access '{agent_id}'"
-            )
-        )
+    session = get_session_service().get_active_session()
+    if session is None:
+        raise HTTPException(status_code=404, detail="No active session")
 
     time_remaining = session.time_remaining()
 
