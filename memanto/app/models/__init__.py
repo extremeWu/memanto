@@ -122,7 +122,10 @@ class AnswerRequest(BaseModel):
         None, ge=1, le=100, description="Number of context memories to use"
     )
     threshold: float | None = Field(
-        None, ge=0.0, le=1.0, description="Confidence threshold (used only in kiosk mode)"
+        None,
+        ge=0.0,
+        le=1.0,
+        description="Confidence threshold (used only in kiosk mode)",
     )
     temperature: float | None = Field(
         None, ge=0.0, le=2.0, description="Temperature for the LLM response"

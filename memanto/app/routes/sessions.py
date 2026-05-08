@@ -30,16 +30,14 @@ router = APIRouter()
 # Import auth dependencies (avoid circular import)
 # Include memory operations sub-router
 # Commented to avoid triggering ruff linter
-from memanto.app.routes import memory_v2  # noqa: E402
+from memanto.app.routes import memory  # noqa: E402
 from memanto.app.routes.auth_deps import (  # noqa: E402
     get_current_session,
     get_session_service,
     verify_moorcheh_api_key,
 )
 
-router.include_router(
-    memory_v2.router, prefix="/agents", tags=["Memory Operations (V2)"]
-)
+router.include_router(memory.router, prefix="/agents", tags=["Memory Operations"])
 
 # Service instances
 agent_service = AgentService()

@@ -46,9 +46,7 @@ def verify_moorcheh_api_key() -> str:
     return get_moorcheh_api_key()
 
 
-def get_current_session(
-    x_session_token: str | None = Header(None)
-) -> Session:
+def get_current_session(x_session_token: str | None = Header(None)) -> Session:
     """
     Get and validate current session
 

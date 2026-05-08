@@ -443,6 +443,7 @@ class MemoryReadService:
             types_to_fetch = type
             if not types_to_fetch:
                 import typing
+
                 types_to_fetch = list(typing.get_args(MemoryType))
 
             search_items = []

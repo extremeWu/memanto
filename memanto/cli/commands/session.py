@@ -61,5 +61,3 @@ def session_info():
         table.add_row("Status", "[yellow]Unknown (Token unreadable)[/yellow]")
 
     console.print(table)
-
-

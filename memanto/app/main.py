@@ -11,7 +11,7 @@ from moorcheh_sdk.exceptions import AuthenticationError, NamespaceNotFound
 
 from memanto.app import __version__
 from memanto.app.config import settings
-from memanto.app.routes import context, health, sessions
+from memanto.app.routes import health, sessions
 from memanto.app.ui.routes.ui_router import mount_ui_static
 from memanto.app.ui.routes.ui_router import router as ui_router
 
@@ -44,6 +44,7 @@ async def lifespan(_: FastAPI):
     _validate_startup_dependencies()
     yield
 
+
 # Create FastAPI app
 app = FastAPI(
     title="Memanto - Memory that AI Agents Love!",
@@ -69,9 +70,6 @@ app.include_router(health.router, tags=["Health"])
 # Session-Based API (Primary)
 app.include_router(sessions.router, prefix="/api/v2", tags=["Sessions & Agents"])
 
-
-# Internal/Advanced APIs
-app.include_router(context.router, prefix="/api/v2/context", tags=["Context"])
 
 # Web UI Dashboard
 app.include_router(ui_router, tags=["Web UI"])

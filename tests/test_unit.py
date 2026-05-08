@@ -268,9 +268,7 @@ class TestMEMANTOArchitecture:
         from memanto.app.services.session_service import SessionService
 
         service = SessionService(secret_key="test-secret-min-32-bytes-abcdefg")
-        session = service.create_session(
-            agent_id="test-agent", duration_hours=4
-        )
+        session = service.create_session(agent_id="test-agent", duration_hours=4)
 
         # Decode token (without verification, just to check structure)
         payload = jwt.decode(session.session_token, options={"verify_signature": False})

@@ -275,9 +275,7 @@ def status():
             minutes = remainder // 60
             sess_table.add_row("Remaining", f"{int(hours)}h {int(minutes)}m")
 
-            console.print(
-                Panel(sess_table, title="Active Agent", border_style=SUCCESS)
-            )
+            console.print(Panel(sess_table, title="Active Agent", border_style=SUCCESS))
             console.print()
         except Exception:
             sess_table = Table(show_header=False, box=None, padding=(0, 2))
@@ -291,9 +289,7 @@ def status():
             )
             sess_table.add_row("Status", "[yellow]● activation may be expired[/yellow]")
 
-            console.print(
-                Panel(sess_table, title="Active Agent", border_style=WARNING)
-            )
+            console.print(Panel(sess_table, title="Active Agent", border_style=WARNING))
             console.print()
     elif has_session and not server_online:
         try:
@@ -322,9 +318,7 @@ def status():
             minutes = remainder // 60
             sess_table.add_row("Remaining", f"{int(hours)}h {int(minutes)}m")
 
-            console.print(
-                Panel(sess_table, title="Active Agent", border_style=SUCCESS)
-            )
+            console.print(Panel(sess_table, title="Active Agent", border_style=SUCCESS))
             console.print()
         except Exception:
             sess_table = Table(show_header=False, box=None, padding=(0, 2))
@@ -338,9 +332,7 @@ def status():
             )
             sess_table.add_row("Status", "[yellow]● activation may be expired[/yellow]")
 
-            console.print(
-                Panel(sess_table, title="Active Agent", border_style=WARNING)
-            )
+            console.print(Panel(sess_table, title="Active Agent", border_style=WARNING))
             console.print()
     else:
         console.print(
