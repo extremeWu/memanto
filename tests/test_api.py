@@ -155,6 +155,7 @@ class TestMEMANTOAPI:
         data = response.json()
         assert data["agent_id"] == self.TEST_AGENT_ID
         assert "namespace" in data
+        assert "metadata" not in data
 
     @pytest.mark.asyncio
     async def test_create_agent_without_authorization_header(self, client):
@@ -185,6 +186,8 @@ class TestMEMANTOAPI:
         assert response.status_code == 200
         data = response.json()
         assert "agents" in data
+        if data["agents"]:
+            assert "metadata" not in data["agents"][0]
 
     @pytest.mark.asyncio
     async def test_activate_session(self, client, auth_headers):
@@ -396,7 +399,9 @@ class TestMEMANTOAPI:
             f"/api/v2/agents/{self.TEST_AGENT_ID}", headers=auth_headers
         )
         assert response.status_code == 200
-        assert response.json()["agent_id"] == self.TEST_AGENT_ID
+        data = response.json()
+        assert data["agent_id"] == self.TEST_AGENT_ID
+        assert "metadata" not in data
 
     @pytest.mark.asyncio
     async def test_delete_agent(self, client, auth_headers, mock_moorcheh):

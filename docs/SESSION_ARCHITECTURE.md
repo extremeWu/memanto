@@ -155,11 +155,7 @@ Content-Type: application/json
 {
   "agent_id": "customer-support",
   "pattern": "support",
-  "description": "Customer support AI agent",
-  "metadata": {
-    "real_agent_type": "claude-3.5-sonnet",
-    "owner": "user@company.com"
-  }
+  "description": "Customer support AI agent"
 }
 
 Response:
