@@ -79,7 +79,7 @@ def main() -> None:
             agent_id=AGENT_ID,
             query="AI agent market size 2025",
             limit=10,
-            memory_types=["fact"],
+            type=["fact"],
         )
         memories = recall_result.get("memories", [])
         print(f"  Found {len(memories)} memories:\n")
@@ -127,12 +127,13 @@ def main() -> None:
             print("  No conflicts detected in the report.")
             print("  (Conflict detection runs during daily summary generation.)")
 
-        # Step 7: Verify with current-only recall
-        print("\nStep 7: Recalling current (non-superseded) memories...")
-        current = client.recall_current(
+        # Step 7: Verify with semantic recall (recall_current API removed)
+        print("\nStep 7: Recalling memories for verification...")
+        current = client.recall(
             agent_id=AGENT_ID,
             query="AI agent market size",
             limit=5,
+            type=["fact"],
         )
         current_memories = current.get("memories", [])
         print(f"  Current memories: {len(current_memories)}")
