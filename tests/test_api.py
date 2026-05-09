@@ -26,29 +26,28 @@ def test_env_setup():
         patch("memanto.app.services.agent_service.Path.home", return_value=temp_path),
         patch("memanto.app.services.session_service.Path.home", return_value=temp_path),
     ):
-        # Manually update singletons/global instances
         from memanto.app.routes.sessions import agent_service
-        from memanto.app.services.session_service import get_session_service
+        from memanto.app.services import session_service as session_service_mod
 
-        session_service = get_session_service()
+        # Force a fresh SessionService bound to the patched Path.home so the
+        # singleton's sessions_dir always points inside this test's temp dir.
+        session_service_mod._session_service = None
+        session_service = session_service_mod.get_session_service()
 
-        # Save original dirs
         orig_agent_dir = agent_service.agents_dir
-        orig_session_dir = session_service.sessions_dir
-
-        # Set to temp
         agent_service.agents_dir = temp_path / ".memanto" / "agents"
-        session_service.sessions_dir = temp_path / ".memanto" / "sessions"
 
         agent_service.agents_dir.mkdir(parents=True, exist_ok=True)
         session_service.sessions_dir.mkdir(parents=True, exist_ok=True)
 
-        yield temp_path
-
-        # Cleanup
-        agent_service.agents_dir = orig_agent_dir
-        session_service.sessions_dir = orig_session_dir
-        shutil.rmtree(temp_dir)
+        try:
+            yield temp_path
+        finally:
+            agent_service.agents_dir = orig_agent_dir
+            # Drop the temp-bound singleton so later tests rebuild it against
+            # the real Path.home() instead of inheriting a deleted temp dir.
+            session_service_mod._session_service = None
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 @pytest.fixture

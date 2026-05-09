@@ -35,6 +35,7 @@ from memanto.app.routes.auth_deps import (  # noqa: E402
     get_current_session,
     get_moorcheh_api_key,
     get_session_service,
+    verify_moorcheh_api_key,
 )
 
 router.include_router(memory.router, prefix="/agents", tags=["Memory Operations"])
