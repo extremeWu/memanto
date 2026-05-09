@@ -221,7 +221,7 @@ class MemantoRecallTool(BaseTool):
             agent_id=self._agent_id,
             query=query,
             limit=min(limit, 20),
-            memory_types=type_list,
+            type=type_list,
         )
 
         memories = result.get("memories", [])
