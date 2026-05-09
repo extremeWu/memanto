@@ -357,20 +357,15 @@ class DirectClient:
                 f"Session for agent {token_payload.agent_id} not found"
             )
 
-        # Check and auto-renew if near expiry
+        # Check and auto-renew if near expiry. SessionService.renew_session
+        # writes the new token to ~/.memanto/sessions/{agent}.json and
+        # refreshes the active marker, so no extra persistence is needed here.
         renewed = session_service.check_and_auto_renew(
             agent_id=token_payload.agent_id,
         )
         if renewed:
             session = renewed
             self.session_token = session.session_token
-
-            # Persist the new active session token
-            try:
-                config_manager = ConfigManager()
-                config_manager.set_active_session(self.agent_id, self.session_token)
-            except Exception as e:
-                logger.warning("Failed to persist auto-renewed session token: %s", e)
 
         self._cached_session = session
         return session

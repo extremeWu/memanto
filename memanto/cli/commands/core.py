@@ -557,6 +557,7 @@ def ui(
 
     # Start server
     try:
+        os.environ["MEMANTO_UI_MODE"] = "true"
         uvicorn.run("memanto.app.main:app", host=host, port=port, log_level="info")
     except KeyboardInterrupt:
         console.print("\n\n[yellow]Dashboard stopped.[/yellow]")

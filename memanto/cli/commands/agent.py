@@ -44,7 +44,6 @@ def agent_create(
     try:
         client.create_agent(agent_id, pattern, description)
         activation = client.activate_agent(agent_id, 6)
-        config_manager.set_active_session(agent_id, activation["session_token"])
 
         console.print(f"[green]Agent '{agent_id}' created successfully![/green]")
         console.print(f"[dim]Pattern: {pattern}[/dim]")
@@ -112,9 +111,6 @@ def agent_activate(
 
     try:
         result = client.activate_agent(agent_id, duration_hours)
-
-        # Save session to config
-        config_manager.set_active_session(agent_id, result["session_token"])
 
         console.print(f"[green]OK Agent '{agent_id}' activated![/green]")
         console.print(f"[dim]Activation duration: {duration_hours} hours[/dim]")

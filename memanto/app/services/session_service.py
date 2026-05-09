@@ -390,6 +390,10 @@ class SessionService:
         if active_link.exists():
             active_link.unlink()
 
+    def clear_active_session(self) -> None:
+        """Public alias: clear the active-session marker without ending the session."""
+        self._clear_active_session()
+
     def list_sessions(self) -> list[Session]:
         """
         List all sessions
