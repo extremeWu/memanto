@@ -20,6 +20,27 @@ from httpx import ASGITransport, AsyncClient
 from memanto.app.config import settings
 from memanto.app.main import app
 
+
+def _live_moorcheh_api_key_configured() -> bool:
+    """E2E hits production Moorcheh; skip when key is missing or the unit-test placeholder."""
+    key = (settings.MOORCHEH_API_KEY or "").strip()
+    if not key:
+        return False
+    if key == "test-api-key":
+        return False
+    return True
+
+
+# Skip entire module unless a real Moorcheh key is configured (CI uses placeholder).
+pytestmark = pytest.mark.skipif(
+    not _live_moorcheh_api_key_configured(),
+    reason=(
+        "Live Moorcheh E2E skipped: MOORCHEH_API_KEY missing or placeholder 'test-api-key'. "
+        "Use a real key locally (~/.memanto/.env). In GitHub Actions, set the MOORCHEH_API_KEY "
+        "repository secret and pass it to the test job env to run E2E in CI."
+    ),
+)
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
