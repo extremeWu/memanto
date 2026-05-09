@@ -33,8 +33,8 @@ router = APIRouter()
 from memanto.app.routes import memory  # noqa: E402
 from memanto.app.routes.auth_deps import (  # noqa: E402
     get_current_session,
+    get_moorcheh_api_key,
     get_session_service,
-    verify_moorcheh_api_key,
 )
 
 router.include_router(memory.router, prefix="/agents", tags=["Memory Operations"])
@@ -55,7 +55,7 @@ def get_agent_service():
 
 @router.post("/agents", response_model=AgentInfo, status_code=201)
 async def create_agent(
-    agent_create: AgentCreate, moorcheh_api_key: str = Depends(verify_moorcheh_api_key)
+    agent_create: AgentCreate, moorcheh_api_key: str = Depends(get_moorcheh_api_key)
 ):
     """
     Create a new MEMANTO agent
