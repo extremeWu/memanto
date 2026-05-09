@@ -242,7 +242,6 @@ class SdkClient:
             agent_id=agent_id,
             pattern=AgentPattern(pattern),
             description=description,
-            metadata=None,
         )
 
         logger.debug("Creating agent '%s' with pattern '%s'", agent_id, pattern)

@@ -4,7 +4,7 @@ Memory Read Service
 
 import re
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
     from moorcheh_sdk import MoorchehClient
@@ -467,8 +467,8 @@ class MemoryReadService:
             unique_memories = []
             for m in all_memories:
                 mid = m.get("id")
-                if mid not in seen_ids:
-                    seen_ids.add(mid)
+                if mid and mid not in seen_ids:
+                    seen_ids.add(cast(str, mid))
                     unique_memories.append(m)
 
             # Sort by created_at descending (most recent first)

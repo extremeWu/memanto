@@ -211,7 +211,7 @@ async def search_memories(
             query=query,
             scope_type=scope_type,
             scope_id=scope_id,
-            memory_types=memory_types,
+            type=memory_types,
             tags=tags,
             min_confidence=min_confidence,
             status_filter=status_filter,
@@ -254,7 +254,7 @@ async def search_multi_scope(
         result = service.search_multi_scope(
             query=request.query,
             scopes=scopes,
-            memory_types=list(request.memory_types) if request.memory_types else None,
+            type=list(request.memory_types) if request.memory_types else None,
             tags=request.tags,
             min_confidence=request.min_confidence,
             status_filter=request.status_filter,
