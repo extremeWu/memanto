@@ -69,7 +69,6 @@ class TestSessionService:
 
     def test_validate_session(self, session_service):
         """Test session validation"""
-
         # Create session
         session = session_service.create_session(
             agent_id="test-agent", duration_hours=1
@@ -101,28 +100,6 @@ class TestSessionService:
         # Note: We can't easily test this without manipulating time
         # Just verify the logic exists
         print("✅ Session expiration logic exists")
-
-    def test_extend_session(self, session_service):
-        """Test session extension"""
-        # Create session
-        session = session_service.create_session(
-            agent_id="test-agent",
-            duration_hours=1,
-        )
-
-        original_expires = session.expires_at
-
-        # Extend session
-        extended_session = session_service.extend_session(
-            agent_id="test-agent", additional_hours=2
-        )
-
-        # Expiration should be 2 hours later
-        time_diff = (extended_session.expires_at - original_expires).total_seconds()
-        assert 1.9 * 3600 < time_diff < 2.1 * 3600
-
-        print("✅ Session extended successfully")
-        print(f"   Added: {time_diff / 3600:.2f} hours")
 
     def test_end_session(self, session_service):
         """Test ending session"""

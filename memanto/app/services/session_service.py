@@ -145,7 +145,6 @@ class SessionService:
 
         Args:
             session_token: JWT session token
-
         Returns:
             Decoded SessionToken
 
@@ -253,37 +252,6 @@ class SessionService:
             memories_created=memories_created,
         )
 
-    def extend_session(
-        self, agent_id: str, additional_hours: int | None = None
-    ) -> Session:
-        """
-        Extend session expiration
-
-        Args:
-            agent_id: Agent identifier
-            additional_hours: Hours to add to expiration (default: from config)
-
-        Returns:
-            Updated Session object
-
-        Raises:
-            SessionNotFoundError: If session doesn't exist
-        """
-        if additional_hours is None:
-            additional_hours = settings.SESSION_DEFAULT_DURATION_HOURS
-
-        session = self.get_session(agent_id)
-        if not session:
-            raise SessionNotFoundError(f"No session found for agent {agent_id}")
-
-        # Extend expiration
-        session.expires_at = session.expires_at + timedelta(hours=additional_hours)
-
-        # Save updated session
-        self._save_session(session)
-
-        return session
-
     def renew_session(
         self,
         agent_id: str,
@@ -323,7 +291,6 @@ class SessionService:
 
         Args:
             agent_id: Agent identifier
-
         Returns:
             New Session if renewed, None if no renewal was needed
         """
@@ -422,6 +389,10 @@ class SessionService:
         active_link = self.sessions_dir / "active"
         if active_link.exists():
             active_link.unlink()
+
+    def clear_active_session(self) -> None:
+        """Public alias: clear the active-session marker without ending the session."""
+        self._clear_active_session()
 
     def list_sessions(self) -> list[Session]:
         """

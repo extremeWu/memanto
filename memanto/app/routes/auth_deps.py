@@ -16,39 +16,34 @@ from memanto.app.utils.errors import (
 )
 
 
-def get_moorcheh_api_key(authorization: str | None = Header(None)) -> str:
+def get_moorcheh_api_key() -> str:
     """
-    Extract Moorcheh API key from Authorization header or use configured default
-
-    Args:
-        authorization: Authorization header (Bearer {api_key})
+    Get Moorcheh API key from server configuration.
 
     Returns:
         API key
 
     Raises:
-        HTTPException: If authorization header is invalid or no key is found
+        HTTPException: If no configured key is found
     """
-    if authorization:
-        if not authorization.startswith("Bearer "):
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid authorization header. Use: Bearer {api_key}",
-            )
-
-        api_key = authorization.replace("Bearer ", "").strip()
-        if api_key:
-            return api_key
-
     from memanto.app.config import settings
 
     if settings.MOORCHEH_API_KEY:
         return settings.MOORCHEH_API_KEY
 
     raise HTTPException(
-        status_code=401,
-        detail="Missing API key in authorization header and no configured default",
+        status_code=500,
+        detail="Server misconfigured: MOORCHEH_API_KEY is not set",
     )
+
+
+def verify_moorcheh_api_key() -> str:
+    """
+    Return configured Moorcheh API key.
+
+    Runtime connectivity is validated at startup and via /health.
+    """
+    return get_moorcheh_api_key()
 
 
 def get_current_session(x_session_token: str | None = Header(None)) -> Session:

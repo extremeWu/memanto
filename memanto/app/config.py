@@ -126,6 +126,9 @@ class Settings(BaseSettings):
     # Schedule Configuration
     MEMANTO_SCHEDULE_TIME: str = "23:55"
 
+    # UI Mode
+    MEMANTO_UI_MODE: bool = False
+
     model_config = SettingsConfigDict(
         env_file=".env", case_sensitive=True, extra="ignore"
     )
