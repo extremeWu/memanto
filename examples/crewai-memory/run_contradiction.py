@@ -17,7 +17,7 @@ import sys
 from datetime import datetime
 
 from dotenv import load_dotenv
-from memanto_tools import MemantoSetup
+from memanto_crewai import MemantoSetup
 
 AGENT_ID = "crewai-contradiction-demo"
 
