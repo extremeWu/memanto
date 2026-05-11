@@ -281,15 +281,12 @@ def recall(
             hint="Use only one of: --as-of, --changed-since",
         )
 
-    # Validate query requirement (Temporal queries can default to matching all)
-    if not query:
-        if changed_since or as_of:
-            query = "*"  # Default to match all for temporal queries
-        else:
-            _error(
-                "Missing argument 'QUERY'.",
-                hint="Try 'memanto recall --help' for help.",
-            )
+    # Temporal queries list memories directly and don't take a query argument.
+    if not query and not (changed_since or as_of):
+        _error(
+            "Missing argument 'QUERY'.",
+            hint="Try 'memanto recall --help' for help.",
+        )
 
     client = get_client()
     agent_id = active_agent_id
@@ -329,7 +326,6 @@ def recall(
             if as_of:
                 results = client.recall_as_of(
                     agent_id=agent_id,
-                    query=query,
                     as_of=as_of,
                     limit=limit,
                     type=type,

@@ -339,7 +339,7 @@ class TestE2E:
         resp = await http.post(
             f"/api/v2/agents/{TEST_AGENT_ID}/recall/as-of",
             headers=headers,
-            json={"as_of": "2026-12-31", "query": "Python FastAPI"},
+            json={"as_of": "2026-12-31"},
         )
         assert resp.status_code == 200, resp.text
         data = resp.json()
@@ -375,13 +375,13 @@ class TestE2E:
         assert "memories" in data
 
     @pytest.mark.asyncio
-    async def test_14b_recall_changed_since_with_query(self, http):
-        """POST /{id}/recall/changed-since — optional query field is accepted."""
+    async def test_14b_recall_changed_since_full_datetime(self, http):
+        """POST /{id}/recall/changed-since — full ISO datetime is accepted."""
         headers = {**AUTH, "X-Session-Token": state["session_token"]}
         resp = await http.post(
             f"/api/v2/agents/{TEST_AGENT_ID}/recall/changed-since",
             headers=headers,
-            json={"since": "2026-01-01T00:00:00Z", "query": "deployment"},
+            json={"since": "2026-01-01T00:00:00Z"},
         )
         assert resp.status_code == 200, resp.text
         assert resp.json()["temporal_mode"] == "changed_since"

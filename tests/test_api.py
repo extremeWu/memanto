@@ -529,12 +529,16 @@ class TestMEMANTOAPI:
             "results": [],
             "total_found": 0,
         }
+        mock_moorcheh.documents.fetch_text_data.return_value = {
+            "status": "ok",
+            "items": [],
+        }
 
         # 1. As-of recall — date-only input defaults to end of day
         response = await client.post(
             f"/api/v2/agents/{self.TEST_AGENT_ID}/recall/as-of",
             headers=headers,
-            json={"as_of": "2025-01-01", "query": "test"},
+            json={"as_of": "2025-01-01"},
         )
         assert response.status_code == 200
         data = response.json()

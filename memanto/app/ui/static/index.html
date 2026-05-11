@@ -1551,16 +1551,20 @@
                 document.getElementById('explorerTable').innerHTML = '<p style="color:var(--text-dim);padding:20px">Activate an agent via CLI to explore memories</p>';
                 return;
             }
-            const q = document.getElementById('expSearch').value.trim() || '*';
+            const q = document.getElementById('expSearch').value.trim();
             const type = document.getElementById('expType').value;
             const box = document.getElementById('explorerTable');
             box.innerHTML = '<div class="loading-overlay"><span class="spinner"></span> Loading memories...</div>';
             try {
                 let url, body;
                 if (asOfDate) {
-                    body = { as_of: asOfDate, query: q, limit: 50 };
+                    body = { as_of: asOfDate, limit: 50 };
                     if (type) body.type = [type];
                     url = `/api/v2/agents/${S.agentId}/recall/as-of`;
+                } else if (!q) {
+                    body = { limit: 50 };
+                    if (type) body.type = [type];
+                    url = `/api/v2/agents/${S.agentId}/recall/recent`;
                 } else {
                     body = { query: q, limit: 50 };
                     if (type) body.type = [type];
@@ -1916,7 +1920,7 @@
             cards.innerHTML = '<div class="loading-overlay"><span class="spinner"></span> Loading analytics...</div>';
 
             try {
-                const res = await api('POST', `/api/v2/agents/${S.agentId}/recall`, { query: '*', limit: 100 });
+                const res = await api('POST', `/api/v2/agents/${S.agentId}/recall/recent`, { limit: 100 });
                 const mems = res.memories || [];
 
                 const typeCounts = {};
