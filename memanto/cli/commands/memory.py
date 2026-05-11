@@ -282,10 +282,10 @@ def recall(
         )
 
     # Temporal queries list memories directly and don't take a query argument.
-    if not query and not (changed_since or as_of):
+    if query and (as_of or changed_since):
         _error(
-            "Missing argument 'QUERY'.",
-            hint="Try 'memanto recall --help' for help.",
+            "Cannot provide a search query with temporal flags.",
+            hint="Temporal queries (--as-of, --changed-since) list all memories for that time. Remove the search query to continue.",
         )
 
     client = get_client()
@@ -339,7 +339,7 @@ def recall(
                     type=type,
                 )
                 temporal_mode = "changed_since"
-            else:
+            elif query:
                 # Standard recall
                 results = client.recall(
                     agent_id=agent_id,
@@ -348,6 +348,11 @@ def recall(
                     type=type,
                     tags=tag_list,
                     min_confidence=min_confidence,
+                )
+            else:
+                _error(
+                    "Missing argument 'QUERY'.",
+                    hint="Try 'memanto recall --help' for help.",
                 )
         elapsed = time.perf_counter() - start
 
