@@ -288,7 +288,6 @@ def recall(
             hint="Temporal queries (--as-of, --changed-since) list all memories for that time. Remove the search query to continue.",
         )
 
-
     client = get_client()
     agent_id = active_agent_id
 
