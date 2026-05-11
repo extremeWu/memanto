@@ -224,7 +224,6 @@ class MemoryReadService:
 
     def search_as_of(
         self,
-        query: str,
         as_of_date: str,
         agent_id: str,
         type: list[str] | None = None,
@@ -240,7 +239,6 @@ class MemoryReadService:
         3. NOT expired at as_of_date
 
         Args:
-            query: Search query
             as_of_date: ISO timestamp for point-in-time (e.g., "2025-11-01T00:00:00Z")
             agent_id: Agent whose memories to search
             type: Optional memory type filters
@@ -252,19 +250,23 @@ class MemoryReadService:
 
             as_of_dt = parse_iso_timestamp(as_of_date)
 
-            results = self.search_memories(
-                query=query,
-                scope_type="agent",
-                scope_id=agent_id,
-                type=type,
-                tags=tags,
-                created_before=as_of_date,
-                limit=1000,  # Increased limit to ensure we get more historical context
+            namespaces = self._get_search_namespaces("agent", agent_id)
+            if not namespaces:
+                return {
+                    "results": [],
+                    "total_found": 0,
+                    "as_of_date": as_of_date,
+                    "temporal_mode": "as_of",
+                }
+
+            all_memories = self._fetch_all_memories(namespaces, type=type, tags=tags)
+            all_memories = self._apply_temporal_filter(
+                all_memories, created_before=as_of_date
             )
 
             # Filter to only include memories valid at as_of_date
             valid_memories = []
-            for memory in results.get("results", []):
+            for memory in all_memories:
                 # Skip if expired before as_of_date
                 expires_at = memory.get("expires_at")
                 if expires_at:
@@ -295,7 +297,6 @@ class MemoryReadService:
             return {
                 "results": valid_memories,
                 "total_found": len(valid_memories),
-                "query": query,
                 "as_of_date": as_of_date,
                 "temporal_mode": "as_of",
             }
@@ -310,7 +311,6 @@ class MemoryReadService:
         type: list[str] | None = None,
         tags: list[str] | None = None,
         limit: int = 10,
-        query: str | None = None,
     ) -> dict[str, Any]:
         """
         Differential retrieval: "What changed recently?"
@@ -323,48 +323,17 @@ class MemoryReadService:
             type: Optional memory type filters
             tags: Optional tag filters
             limit: Max results
-            query: Optional semantic filter — omit to match all
         """
         try:
-            from memanto.app.constants import MemoryType
             from memanto.app.utils.temporal_helpers import parse_iso_timestamp
 
-            # Parse since timestamp safely
             since_dt = parse_iso_timestamp(since_date)
 
-            # Get all memories (we'll filter by timestamps)
             namespaces = self._get_search_namespaces("agent", agent_id)
             if not namespaces:
                 return {"results": [], "total_found": 0, "since_date": since_date}
 
-            # Gather memory types to iterate over for recursive fetching
-            types_to_fetch = type
-            if not types_to_fetch:
-                import typing
-
-                types_to_fetch = list(typing.get_args(MemoryType))
-
-            search_items = []
-
-            # Fetch iteratively by specific memory_type precise metadata filtering
-            # Each query gives up to 100 results, yielding a total far beyond the base 100-limit.
-            base_query = query or "*"
-            for mem_type in types_to_fetch:
-                enhanced_query = self._build_filtered_query(
-                    query=base_query,
-                    type=[mem_type],
-                    tags=tags,
-                )
-                try:
-                    search_result = self.client.similarity_search.query(
-                        query=enhanced_query, namespaces=namespaces, top_k=100
-                    )
-                    search_items.extend(search_result.get("results", []))
-                except Exception:
-                    pass  # Ignore if a specific memory type causes an issue
-
-            # Format results
-            all_memories = [self._format_memory_item(item) for item in search_items]
+            all_memories = self._fetch_all_memories(namespaces, type=type, tags=tags)
 
             # Filter to only changed memories
             changed_memories = []
@@ -433,43 +402,13 @@ class MemoryReadService:
             limit: Max results to return
         """
         try:
-            from memanto.app.constants import MemoryType
             from memanto.app.utils.temporal_helpers import parse_iso_timestamp
 
             namespaces = self._get_search_namespaces("agent", agent_id)
             if not namespaces:
                 return {"results": [], "total_found": 0}
 
-            types_to_fetch = type
-            if not types_to_fetch:
-                import typing
-
-                types_to_fetch = list(typing.get_args(MemoryType))
-
-            search_items = []
-            for mem_type in types_to_fetch:
-                enhanced_query = self._build_filtered_query(
-                    query="*",
-                    type=[mem_type],
-                )
-                try:
-                    search_result = self.client.similarity_search.query(
-                        query=enhanced_query, namespaces=namespaces, top_k=100
-                    )
-                    search_items.extend(search_result.get("results", []))
-                except Exception:
-                    pass
-
-            all_memories = [self._format_memory_item(item) for item in search_items]
-
-            # Deduplicate by id
-            seen_ids: set[str] = set()
-            unique_memories = []
-            for m in all_memories:
-                mid = m.get("id")
-                if mid and mid not in seen_ids:
-                    seen_ids.add(cast(str, mid))
-                    unique_memories.append(m)
+            unique_memories = self._fetch_all_memories(namespaces, type=type)
 
             # Sort by created_at descending (most recent first)
             def _created_sort_key(m: dict[str, Any]) -> str:
@@ -488,6 +427,52 @@ class MemoryReadService:
 
         except Exception as e:
             raise MemoryError(f"Failed to retrieve recent memories: {e}")
+
+    def _fetch_all_memories(
+        self,
+        namespaces: list[str],
+        type: list[str] | None = None,
+        tags: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        List all stored memories across the given namespaces via Moorcheh's
+        documents.fetch_text_data endpoint, applying optional type/tag filters
+        and de-duplicating by id.
+
+        Note: Moorcheh's fetch_text_data currently returns up to 100 items per
+        namespace and does not paginate.
+        """
+        items: list[Any] = []
+        for ns in namespaces:
+            try:
+                result = self.client.documents.fetch_text_data(namespace_name=ns)
+            except Exception:
+                continue
+            if isinstance(result, dict):
+                items.extend(result.get("items", []) or [])
+
+        seen_ids: set[str] = set()
+        memories: list[dict[str, Any]] = []
+        for item in items:
+            # Skip summary chunks — only return real memory documents
+            if isinstance(item, dict) and item.get("is_summary"):
+                continue
+            formatted = self._format_memory_item(item)
+            mid = formatted.get("id")
+            if not mid or mid in seen_ids:
+                continue
+            seen_ids.add(cast(str, mid))
+
+            if type and formatted.get("type") not in type:
+                continue
+            if tags:
+                mem_tags = formatted.get("tags") or []
+                if not any(t in mem_tags for t in tags):
+                    continue
+
+            memories.append(formatted)
+
+        return self._filter_expired_memories(memories)
 
     def _build_filtered_query(
         self,

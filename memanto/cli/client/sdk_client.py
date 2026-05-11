@@ -663,17 +663,15 @@ class SdkClient:
     def recall_as_of(
         self,
         agent_id: str,
-        query: str,
         as_of: str,
         limit: int | None = None,
         type: list[str] | None = None,
     ) -> dict[str, Any]:
         """
-        Point-in-time recall: what was true at a given moment?
+        Point-in-time recall: what memories existed at a given moment?
 
         Args:
             agent_id: Target agent.
-            query: Search query.
             as_of: ISO-8601 date/datetime string.
             limit: Max results (defaults to config).
             type: Optional type filter.
@@ -688,7 +686,6 @@ class SdkClient:
         self._get_validated_session_for_agent(agent_id)
 
         result = self._get_read_service().search_as_of(
-            query=query,
             as_of_date=as_of,
             agent_id=agent_id,
             type=type,
@@ -697,7 +694,6 @@ class SdkClient:
 
         return {
             "agent_id": agent_id,
-            "query": query,
             "as_of_date": as_of,
             "memories": result.get("results", []),
             "count": result.get("total_found", 0),

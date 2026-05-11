@@ -48,11 +48,6 @@ class RecallAsOfRequest(BaseModel):
         ...,
         description="Point-in-time — YYYY-MM-DD (defaults to end of day) or full ISO datetime e.g. 2025-11-01T14:30:00Z",
     )
-    query: str | None = Field(
-        default=None,
-        min_length=1,
-        description="Search query — omit to return all memories valid at that point",
-    )
     limit: int | None = Field(default=None, ge=1, description="Max results")
     type: list[str] | None = Field(default=None, description="Memory type filters")
 
@@ -86,11 +81,6 @@ class RecallChangedSinceRequest(BaseModel):
     since: datetime = Field(
         ...,
         description="Start of change window — YYYY-MM-DD (defaults to start of day) or full ISO datetime e.g. 2025-11-01T00:00:00Z",
-    )
-    query: str | None = Field(
-        default=None,
-        min_length=1,
-        description="Search query — omit to return all changed memories",
     )
     limit: int | None = Field(default=None, ge=1, description="Max results")
     type: list[str] | None = Field(default=None, description="Memory type filters")
@@ -615,9 +605,8 @@ async def recall_as_of(
 
     Returns memories stored before the specified datetime, excluding memories
     created after or expired before as_of.
-    If no query is provided, returns all memories stored before the specified datetime.
 
-    Example: "What database did we use on 2025-11-01?"
+    Example: "What memories did we have on 2025-11-01?"
 
     Requires:
     - X-Session-Token: {session_token}
@@ -629,10 +618,6 @@ async def recall_as_of(
             )
         )
 
-    query = request.query or "*"
-    if request.query:
-        CostGuard.validate_query_length(request.query)
-
     limit = request.limit if request.limit is not None else settings.RECALL_LIMIT
     CostGuard.validate_k_limit(limit)
 
@@ -641,7 +626,6 @@ async def recall_as_of(
 
         result = await asyncio.to_thread(
             read_service.search_as_of,
-            query=query,
             as_of_date=request.as_of.isoformat(),
             agent_id=agent_id,
             type=request.type,
@@ -651,7 +635,6 @@ async def recall_as_of(
         return {
             "agent_id": agent_id,
             "session_id": session.session_id,
-            "query": request.query,
             "as_of_date": request.as_of.isoformat(),
             "memories": result["results"],
             "count": result["total_found"],
@@ -673,7 +656,6 @@ async def recall_changed_since(
     Differential retrieval: "What changed recently?"
 
     Returns memories created or updated after the specified datetime.
-    If no query is provided, returns all memories created or updated after the specified datetime.
 
     Example: "What changed since last week?"
 
@@ -687,9 +669,6 @@ async def recall_changed_since(
             )
         )
 
-    if request.query:
-        CostGuard.validate_query_length(request.query)
-
     limit = request.limit if request.limit is not None else settings.RECALL_LIMIT
     CostGuard.validate_k_limit(limit)
 
@@ -702,13 +681,11 @@ async def recall_changed_since(
             agent_id=agent_id,
             type=request.type,
             limit=limit,
-            query=request.query,
         )
 
         return {
             "agent_id": agent_id,
             "session_id": session.session_id,
-            "query": request.query,
             "since_date": request.since.isoformat(),
             "memories": result["results"],
             "count": result["total_found"],
