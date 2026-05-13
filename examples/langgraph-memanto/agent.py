@@ -99,8 +99,10 @@ context, event, learning, observation, artifact, error
 # LangGraph State
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 class AgentState(MessagesState):
     """Extended state with cross-session memory context."""
+
     memory_context: str = ""
     """Pre-formatted context string from Memanto recall, injected at start."""
 
@@ -108,6 +110,7 @@ class AgentState(MessagesState):
 # ═══════════════════════════════════════════════════════════════════════════════
 # LLM Setup
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def create_llm():
     """Create the LLM with Memanto tools bound."""
@@ -122,6 +125,7 @@ def create_llm():
 # ═══════════════════════════════════════════════════════════════════════════════
 # Graph Nodes
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def recall_memories(state: AgentState) -> AgentState:
     """Node: Recall relevant memories from Memanto at the start of a conversation.
@@ -149,7 +153,10 @@ def agent_node(state: AgentState) -> AgentState:
     llm = create_llm()
 
     # Inject memory context from recall (if available)
-    if state.get("memory_context") and "No relevant memories" not in state["memory_context"]:
+    if (
+        state.get("memory_context")
+        and "No relevant memories" not in state["memory_context"]
+    ):
         context_message = SystemMessage(
             content=f"Here is what I remember from past conversations:\n{state['memory_context']}"
         )
@@ -165,7 +172,9 @@ def agent_node(state: AgentState) -> AgentState:
 def should_continue(state: AgentState) -> Literal["tools", "end"]:
     """Router: Check if the agent called any tools, and if so, route to the tool node."""
     last_message = state["messages"][-1]
-    if hasattr(last_message, "additional_kwargs") and last_message.additional_kwargs.get("tool_calls"):
+    if hasattr(
+        last_message, "additional_kwargs"
+    ) and last_message.additional_kwargs.get("tool_calls"):
         return "tools"
     return "end"
 
@@ -195,6 +204,7 @@ def tool_node(state: AgentState) -> AgentState:
 # Build the Graph
 # ═══════════════════════════════════════════════════════════════════════════════
 
+
 def build_agent() -> StateGraph:
     """Build and compile the LangGraph agent with Memanto integration."""
 
@@ -206,14 +216,14 @@ def build_agent() -> StateGraph:
     builder.add_node("tools", tool_node)
 
     # Add edges
-    builder.add_edge(START, "recall")       # Always recall first
-    builder.add_edge("recall", "agent")      # Then run the agent
+    builder.add_edge(START, "recall")  # Always recall first
+    builder.add_edge("recall", "agent")  # Then run the agent
     builder.add_conditional_edges(
         "agent",
         should_continue,
         {"tools": "tools", "end": END},
     )
-    builder.add_edge("tools", "agent")      # After tools, go back to agent
+    builder.add_edge("tools", "agent")  # After tools, go back to agent
 
     # Compile with in-memory checkpointing for thread-level state
     checkpointer = MemorySaver()
@@ -223,6 +233,7 @@ def build_agent() -> StateGraph:
 # ═══════════════════════════════════════════════════════════════════════════════
 # Interactive Demo CLI
 # ═══════════════════════════════════════════════════════════════════════════════
+
 
 def main():
     """Run the interactive demo.
