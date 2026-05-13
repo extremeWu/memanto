@@ -115,19 +115,43 @@ Agent: Detected conflict with previous preference!
 
 ```python
 @tool
-def memanto_remember(content: str, memory_type: str = "fact") -> str:
-    """Store a memory. Call this when you learn something important about the user."""
-    return client.remember(content, type=memory_type)
+def memanto_remember(
+    content: str,
+    memory_type: str = "observation",
+    title: str | None = None,
+    agent_id: str | None = None,
+) -> str:
+    """Store a memory into Memanto's long-term memory store."""
+    result = client.remember(
+        agent_id=aid,
+        memory_type=memory_type,
+        title=title or content[:80],
+        content=content[:500],
+    )
+    return result.get("message", f"Stored as {memory_type}")
 
 @tool
-def memanto_recall(query: str, memory_type: Optional[str] = None) -> str:
-    """Search memories. Call this to remember past conversations."""
-    return client.recall(query, type=memory_type)
+def memanto_recall(
+    query: str,
+    memory_type: str | None = None,
+    limit: int = 5,
+    agent_id: str | None = None,
+) -> str:
+    """Search Memanto's long-term memory for relevant past information."""
+    kwargs = {"limit": limit}
+    if memory_type:
+        kwargs["type"] = [memory_type]
+    result = client.recall(agent_id=aid, query=query, **kwargs)
+    memories = result.get("memories", [])
+    if not memories:
+        return "No relevant memories found."
+    return json.dumps(memories, indent=2, default=str)
 
 @tool
-def memanto_answer(query: str) -> str:
-    """Get a grounded answer from stored memories (RAG)."""
-    return client.answer(query)
+def memanto_answer(query: str, agent_id: str | None = None) -> str:
+    """Get a grounded AI answer generated directly from Memanto's memory store."""
+    result = client.answer(agent_id=aid, question=query)
+    return result.get("answer", str(result))
 ```
 
 ### Agent Flow
