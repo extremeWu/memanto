@@ -17,27 +17,72 @@ from langchain_core.tools import tool
 
 logger = logging.getLogger(__name__)
 
+# Default demo agent used across sessions
+DEMO_AGENT_ID = "langgraph-demo-agent"
+
+
+def _ensure_demo_agent(client: "SdkClient") -> str | None:
+    """Ensure the demo agent exists and has an active session.
+
+    Creates the agent if it doesn't exist, then activates a session.
+    Returns the agent_id on success, None on failure.
+    """
+    try:
+        try:
+            client.get_agent(DEMO_AGENT_ID)
+        except Exception:
+            # Agent doesn't exist yet — create it
+            client.create_agent(
+                agent_id=DEMO_AGENT_ID,
+                pattern="tool",
+                description="LangGraph cross-session memory demo agent",
+            )
+
+        # Activate session so remember/recall/answer can run
+        client.activate_agent(DEMO_AGENT_ID)
+        return DEMO_AGENT_ID
+    except Exception as e:
+        logger.warning(f"Failed to set up demo agent '{DEMO_AGENT_ID}': {e}")
+        return None
+
+
+_client_instance = None
+_client_agent_id = None
+
 
 def _get_memanto_client():
-    """Lazy-import and return a Memanto client.
+    """Lazy-import and return a Memanto client with a configured demo agent.
 
-    Returns None if MOORCHEH_API_KEY is not set, so the agent
-    can degrade gracefully with a clear error message.
+    Returns a tuple of (client, agent_id) on success, or (None, None)
+    if the required environment variable is missing.
     """
+    global _client_instance, _client_agent_id
+
+    if _client_instance is not None:
+        return _client_instance, _client_agent_id
+
     api_key = os.environ.get("MOORCHEH_API_KEY")
     if not api_key:
-        return None
+        return None, None
     try:
         from memanto.cli.client.sdk_client import SdkClient
 
         client = SdkClient(api_key=api_key)
-        return client
+
+        # Set up the demo agent with an active session
+        agent_id = _ensure_demo_agent(client)
+        if agent_id is None:
+            return None, None
+
+        _client_instance = client
+        _client_agent_id = agent_id
+        return client, agent_id
     except ImportError:
         logger.warning("memanto package not installed")
-        return None
+        return None, None
     except Exception as e:
         logger.warning(f"Failed to initialize Memanto client: {e}")
-        return None
+        return None, None
 
 
 # ─── Tool: remember ───────────────────────────────────────────────────────────
@@ -47,6 +92,7 @@ def _get_memanto_client():
 def memanto_remember(
     content: str,
     memory_type: str = "observation",
+    title: str | None = None,
     agent_id: str | None = None,
 ) -> str:
     """Store a memory into Memanto's long-term memory store.
@@ -56,15 +102,17 @@ def memanto_remember(
 
     Args:
         content: The factual content to remember (e.g., "User prefers dark mode")
-        memory_type: One of: instruction, fact, decision, goal, commitment,
-                     preference, relationship, context, event, learning,
-                     observation, artifact, error
-        agent_id: Optional agent namespace. Defaults to the active agent.
+        memory_type: One of: fact, decision, instruction, commitment, event,
+                     observation, preference, goal, relationship, context,
+                     learning, artifact, error
+        title: Optional short title for the memory (max 100 chars).
+               Defaults to a summary prefix of content.
+        agent_id: Optional agent namespace. Defaults to the demo agent.
 
     Returns:
         A JSON string with the stored memory details, or an error message.
     """
-    client = _get_memanto_client()
+    client, default_agent = _get_memanto_client()
     if client is None:
         return (
             "ERROR: Memanto client not available. "
@@ -72,16 +120,25 @@ def memanto_remember(
         )
 
     try:
-        if agent_id:
-            client.agent_id = agent_id
+        aid = agent_id or default_agent
+        if not aid:
+            return "ERROR: No agent_id configured."
 
-        result = client.remember(content, type=memory_type)
+        # Default title from content if not provided
+        mem_title = title or content[:80]
+
+        result = client.remember(
+            agent_id=aid,
+            memory_type=memory_type,
+            title=mem_title,
+            content=content[:500],
+        )
         return json.dumps(
             {
                 "status": "stored",
                 "memory_type": memory_type,
                 "content_preview": content[:100],
-                "result": str(result),
+                "memory_id": result.get("memory_id", ""),
             },
             indent=2,
         )
@@ -97,6 +154,7 @@ def memanto_recall(
     query: str,
     memory_type: str | None = None,
     limit: int = 5,
+    agent_id: str | None = None,
 ) -> str:
     """Search Memanto's long-term memory for relevant past information.
 
@@ -107,11 +165,12 @@ def memanto_recall(
         query: Natural language search query (e.g., "What does the user like?")
         memory_type: Optional filter — restrict search to one memory type
         limit: Maximum number of results to return (default: 5)
+        agent_id: Optional agent namespace. Defaults to the demo agent.
 
     Returns:
         A list of matching memories with their content, type, and timestamps.
     """
-    client = _get_memanto_client()
+    client, default_agent = _get_memanto_client()
     if client is None:
         return (
             "ERROR: Memanto client not available. "
@@ -119,16 +178,22 @@ def memanto_recall(
         )
 
     try:
+        aid = agent_id or default_agent
+        if not aid:
+            return "ERROR: No agent_id configured."
+
         kwargs = {"limit": limit}
         if memory_type:
-            kwargs["type"] = memory_type
+            kwargs["type"] = [memory_type]
 
-        results = client.recall(query, **kwargs)
-        if not results:
+        result = client.recall(agent_id=aid, query=query, **kwargs)
+        memories = result.get("memories", [])
+
+        if not memories:
             return "No relevant memories found."
 
         formatted = []
-        for i, mem in enumerate(results, 1):
+        for i, mem in enumerate(memories, 1):
             formatted.append(
                 f"{i}. [{mem.get('type', 'unknown')}] "
                 f"{mem.get('content', '')[:200]} "
@@ -143,7 +208,10 @@ def memanto_recall(
 
 
 @tool
-def memanto_answer(query: str) -> str:
+def memanto_answer(
+    query: str,
+    agent_id: str | None = None,
+) -> str:
     """Get a grounded AI answer generated directly from Memanto's memory store.
 
     Unlike `recall` which returns raw memory entries, `answer` runs
@@ -155,11 +223,12 @@ def memanto_answer(query: str) -> str:
 
     Args:
         query: The question to answer using stored memories
+        agent_id: Optional agent namespace. Defaults to the demo agent.
 
     Returns:
         A natural language answer grounded in Memanto's memory store.
     """
-    client = _get_memanto_client()
+    client, default_agent = _get_memanto_client()
     if client is None:
         return (
             "ERROR: Memanto client not available. "
@@ -167,8 +236,13 @@ def memanto_answer(query: str) -> str:
         )
 
     try:
-        answer = client.answer(query)
-        return str(answer)
+        aid = agent_id or default_agent
+        if not aid:
+            return "ERROR: No agent_id configured."
+
+        result = client.answer(agent_id=aid, question=query)
+        answer_text = result.get("answer", str(result))
+        return str(answer_text)
     except Exception as e:
         return f"ERROR generating answer from memories: {e}"
 

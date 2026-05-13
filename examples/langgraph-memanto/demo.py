@@ -7,7 +7,7 @@ two separate conversations with the Memanto memory layer in between.
 No LangGraph needed — uses Memanto directly to show the memory primitive.
 
 Usage:
-    export MOORCHEH_API_KEY="your-api-key-here"
+    export MOORCHEH_API_KEY="***"
     python demo.py
 """
 
@@ -21,6 +21,9 @@ if not API_KEY:
     print("❌ Please set MOORCHEH_API_KEY environment variable")
     print("   Get one at https://console.moorcheh.ai/api-keys")
     exit(1)
+
+DEMO_AGENT_ID = "memanto-demo-alice"
+"""Stable agent ID used for cross-session recall demo."""
 
 
 def print_separator(title: str):
@@ -47,6 +50,30 @@ except Exception as e:
     exit(1)
 
 
+# ─── Ensure Demo Agent ────────────────────────────────────────────────────────
+
+print(f"🔄 Setting up demo agent '{DEMO_AGENT_ID}'...")
+try:
+    try:
+        client.get_agent(DEMO_AGENT_ID)
+        print(f"   ✓ Agent '{DEMO_AGENT_ID}' already exists")
+    except Exception:
+        client.create_agent(
+            agent_id=DEMO_AGENT_ID,
+            pattern="tool",
+            description="Demo agent for LangGraph cross-session memory demo",
+        )
+        print(f"   ✓ Created agent '{DEMO_AGENT_ID}'")
+
+    session_info = client.activate_agent(DEMO_AGENT_ID)
+    print(f"   ✓ Session activated (expires: {session_info.get('expires_at')})")
+except Exception as e:
+    print(f"❌ Failed to set up agent: {e}")
+    exit(1)
+
+AGENT_ID = DEMO_AGENT_ID
+
+
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEMO PART 1: Session A — User Introduction
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -59,28 +86,36 @@ print("\n👤 User: \"Hi, I'm Alice. I work at Acme Corp and prefer dark mode.\"
 print("\n📝 Storing memories via Memanto...")
 
 result = client.remember(
-    "User's name is Alice",
-    type="fact",
+    agent_id=AGENT_ID,
+    memory_type="fact",
+    title="User's name is Alice",
+    content="User's name is Alice",
 )
-print(f"   ✓ Stored fact: {result}")
+print(f"   ✓ Stored fact: memory_id={result.get('memory_id')}")
 
 result = client.remember(
-    "Alice works at Acme Corp as a developer",
-    type="fact",
+    agent_id=AGENT_ID,
+    memory_type="fact",
+    title="Alice works at Acme Corp",
+    content="Alice works at Acme Corp as a developer",
 )
-print(f"   ✓ Stored fact: {result}")
+print(f"   ✓ Stored fact: memory_id={result.get('memory_id')}")
 
 result = client.remember(
-    "Alice prefers dark mode for all interfaces",
-    type="preference",
+    agent_id=AGENT_ID,
+    memory_type="preference",
+    title="Alice prefers dark mode",
+    content="Alice prefers dark mode for all interfaces",
 )
-print(f"   ✓ Stored preference: {result}")
+print(f"   ✓ Stored preference: memory_id={result.get('memory_id')}")
 
 result = client.remember(
-    "First support contact — initial onboarding",
-    type="event",
+    agent_id=AGENT_ID,
+    memory_type="event",
+    title="Initial onboarding contact",
+    content="First support contact — initial onboarding",
 )
-print(f"   ✓ Stored event: {result}")
+print(f"   ✓ Stored event: memory_id={result.get('memory_id')}")
 
 print("\n✅ Session A complete. Memories stored in Memanto.")
 time.sleep(1)
@@ -109,14 +144,17 @@ print_separator("SESSION B — Cross-Session Recall (e.g., Wednesday)")
 print("\n👤 User: \"Hey, what do you remember about me? I need help with settings.\"")
 
 print("\n🔍 Recalling from Memanto (cross-session)...")
-results = client.recall(
-    "What do I know about this user — name, work, preferences?",
+recall_result = client.recall(
+    agent_id=AGENT_ID,
+    query="What do I know about this user — name, work, preferences?",
     limit=5,
 )
 
+memories = recall_result.get("memories", [])
+
 print("\n📚 MEMANTO RECALL RESULTS:")
-if results:
-    for i, mem in enumerate(results, 1):
+if memories:
+    for i, mem in enumerate(memories, 1):
         content = mem.get("content", "N/A")[:150]
         mtype = mem.get("type", "unknown")
         confidence = mem.get("confidence", "N/A")
@@ -142,21 +180,30 @@ print("\n👤 User: \"Actually, I now prefer light mode during work hours.\"")
 print("\n🔄 Detecting potential conflict...")
 
 # Check existing preference
-existing = client.recall("What theme does Alice prefer?", type="preference")
-print(f"   Previous preference found: {[e.get('content') for e in (existing or [])]}")
+existing = client.recall(
+    agent_id=AGENT_ID,
+    query="What theme does Alice prefer?",
+    type=["preference"],
+)
+existing_memories = existing.get("memories", [])
+print(f"   Previous preference found: {[e.get('content') for e in existing_memories]}")
 
 # Store the updated preference
 result = client.remember(
-    "Alice now prefers light mode during work hours (9-5)",
-    type="preference",
+    agent_id=AGENT_ID,
+    memory_type="preference",
+    title="Alice's light mode preference",
+    content="Alice now prefers light mode during work hours (9-5)",
 )
-print(f"   ✓ Updated preference stored: {result}")
+print(f"   ✓ Updated preference stored: memory_id={result.get('memory_id')}")
 
 result = client.remember(
-    "Important: Alice's preference changed from dark mode to light mode",
-    type="decision",
+    agent_id=AGENT_ID,
+    memory_type="decision",
+    title="Alice changed from dark to light mode",
+    content="Important: Alice's preference changed from dark mode to light mode",
 )
-print(f"   ✓ Decision recorded: {result}")
+print(f"   ✓ Decision recorded: memory_id={result.get('memory_id')}")
 
 print("\n✅ Memanto's versioned storage ensures no silent overwrites!")
 print("   Both old and new preferences are retrievable with temporal queries.")
