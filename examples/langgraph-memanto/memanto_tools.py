@@ -9,11 +9,16 @@ Usage:
     llm_with_tools = llm.bind_tools(tools)
 """
 
+from __future__ import annotations
+
 import json
 import logging
 import os
 
 from langchain_core.tools import tool
+
+# Import SdkClient at module level for type annotations
+from memanto.cli.client.sdk_client import SdkClient
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +26,7 @@ logger = logging.getLogger(__name__)
 DEMO_AGENT_ID = "langgraph-demo-agent"
 
 
-def _ensure_demo_agent(client: "SdkClient") -> str | None:
+def _ensure_demo_agent(client: SdkClient) -> str | None:
     """Ensure the demo agent exists and has an active session.
 
     Creates the agent if it doesn't exist, then activates a session.
