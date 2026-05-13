@@ -80,7 +80,7 @@ AGENT_ID = DEMO_AGENT_ID
 
 print_separator("SESSION A — User Introduction (e.g., Monday)")
 
-print("\n👤 User: \"Hi, I'm Alice. I work at Acme Corp and prefer dark mode.\"")
+print('\n👤 User: "Hi, I\'m Alice. I work at Acme Corp and prefer dark mode."')
 
 # Store each fact with appropriate memory types
 print("\n📝 Storing memories via Memanto...")
@@ -141,7 +141,7 @@ time.sleep(1)
 
 print_separator("SESSION B — Cross-Session Recall (e.g., Wednesday)")
 
-print("\n👤 User: \"Hey, what do you remember about me? I need help with settings.\"")
+print('\n👤 User: "Hey, what do you remember about me? I need help with settings."')
 
 print("\n🔍 Recalling from Memanto (cross-session)...")
 recall_result = client.recall(
@@ -158,7 +158,7 @@ if memories:
         content = mem.get("content", "N/A")[:150]
         mtype = mem.get("type", "unknown")
         confidence = mem.get("confidence", "N/A")
-        print(f"\n  {i}. [{mtype}] \"{content}\"")
+        print(f'\n  {i}. [{mtype}] "{content}"')
         print(f"     Confidence: {confidence}")
 else:
     print("  (No results — check your API key and agent setup)")
@@ -175,7 +175,7 @@ time.sleep(1)
 
 print_separator("SESSION C — Preference Update & Conflict Detection")
 
-print("\n👤 User: \"Actually, I now prefer light mode during work hours.\"")
+print('\n👤 User: "Actually, I now prefer light mode during work hours."')
 
 print("\n🔄 Detecting potential conflict...")
 
