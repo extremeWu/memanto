@@ -1,5 +1,7 @@
 # LangGraph + Memanto: Long-Term Memory for Stateful Agents
 
+[![Demo GIF](https://raw.githubusercontent.com/extremeWu/memanto/langgraph-memanto/assets/langgraph-memanto-demo.gif)](https://raw.githubusercontent.com/extremeWu/memanto/langgraph-memanto/assets/langgraph-memanto-demo.gif)
+
 This example demonstrates how to use **Memanto** as the long-term memory layer for a [LangGraph](https://langchain-ai.github.io/langgraph/) agent — giving your graph a "permanent brain" that persists across sessions, conversations, and agent restarts.
 
 ## What This Demonstrates
