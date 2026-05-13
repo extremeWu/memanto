@@ -20,9 +20,8 @@ import sys
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, START, StateGraph
-from typing_extensions import TypedDict
-
 from memanto_memory import MemantoMemory
+from typing_extensions import TypedDict
 
 load_dotenv()
 

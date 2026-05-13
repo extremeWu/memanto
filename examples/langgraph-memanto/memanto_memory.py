@@ -15,7 +15,6 @@ Usage::
 
 from __future__ import annotations
 
-import json
 import os
 import subprocess
 from typing import Any
@@ -148,9 +147,7 @@ class MemantoMemory:
         Returns:
             Answer synthesised from relevant memories.
         """
-        result = self._run_cli(
-            ["memanto", "answer", question], capture=True
-        )
+        result = self._run_cli(["memanto", "answer", question], capture=True)
         return result.stdout or ""
 
     # ------------------------------------------------------------------
@@ -197,7 +194,7 @@ class MemantoMemory:
         The CLI returns human-readable text; this is a best-effort parser.
         Falls back to the raw string if parsing fails.
         """
-        lines = [l.strip() for l in raw.split("\n") if l.strip()]
+        lines = [line.strip() for line in raw.split("\n") if line.strip()]
         memories = []
         current: dict[str, str] = {}
         for line in lines:

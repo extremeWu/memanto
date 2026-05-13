@@ -76,22 +76,22 @@ def session_two() -> None:
     print("#" * 60)
 
     # 1. Ask a direct question (RAG)
-    print("\n--- memanto answer: \"What does the user work on?\" ---")
+    print('\n--- memanto answer: "What does the user work on?" ---')
     answer = memory.answer("What does the user work on?")
     print(answer)
 
     # 2. Recall preferences
-    print("\n--- memanto recall: \"user preference response format\" ---")
+    print('\n--- memanto recall: "user preference response format" ---')
     prefs = memory.recall("user preference response format", limit=3)
     print(prefs)
 
     # 3. Recall general context
-    print("\n--- memanto recall: \"user project\" ---")
+    print('\n--- memanto recall: "user project" ---')
     projects = memory.recall("user project", limit=5)
     print(projects)
 
     # 4. Recall conversation history
-    print("\n--- memanto recall: \"RAG system conversation\" ---")
+    print('\n--- memanto recall: "RAG system conversation" ---')
     history = memory.recall("RAG system conversation", limit=3)
     print(history)
 
