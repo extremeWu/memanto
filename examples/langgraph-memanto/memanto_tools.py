@@ -187,7 +187,7 @@ def memanto_recall(
         if not aid:
             return "ERROR: No agent_id configured."
 
-        kwargs = {"limit": limit}
+        kwargs: dict[str, Any] = {"limit": limit}
         if memory_type:
             kwargs["type"] = [memory_type]
 
