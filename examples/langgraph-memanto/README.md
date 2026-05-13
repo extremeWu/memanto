@@ -4,6 +4,12 @@
 [![Memanto](https://img.shields.io/badge/Memanto-✅_Powered-purple)](https://memanto.ai/)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-yellow)](https://python.org)
 
+[![Demo GIF](https://raw.githubusercontent.com/extremeWu/memanto/langgraph-memanto/assets/langgraph-memanto-demo.gif)](https://raw.githubusercontent.com/extremeWu/memanto/langgraph-memanto/assets/langgraph-memanto-demo.gif)
+
+> **Watch the 30-second demo GIF above** — shows the full cross-session recall flow: architecture overview → morning session storing 6 typed memories → afternoon session recalling them from fresh LangGraph state → verification.
+
+This example shows how to give **LangGraph agents** persistent, cross-session memory using **Memanto** as the external memory layer.
+
 > **A Customer Support Agent that remembers every conversation — across sessions, threads, and days.**
 
 This example demonstrates how to integrate **Memanto** as a persistent long-term memory layer inside a **LangGraph** stateful agent workflow. The agent uses Memanto's three primitives (`remember`, `recall`, `answer`) to maintain context across disjointed conversations — something LangGraph's built-in state alone cannot do.
