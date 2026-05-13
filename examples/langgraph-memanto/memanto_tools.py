@@ -9,10 +9,9 @@ Usage:
     llm_with_tools = llm.bind_tools(tools)
 """
 
-import os
 import json
 import logging
-from typing import Optional
+import os
 
 from langchain_core.tools import tool
 
@@ -48,7 +47,7 @@ def _get_memanto_client():
 def memanto_remember(
     content: str,
     memory_type: str = "observation",
-    agent_id: Optional[str] = None,
+    agent_id: str | None = None,
 ) -> str:
     """Store a memory into Memanto's long-term memory store.
 
@@ -96,7 +95,7 @@ def memanto_remember(
 @tool
 def memanto_recall(
     query: str,
-    memory_type: Optional[str] = None,
+    memory_type: str | None = None,
     limit: int = 5,
 ) -> str:
     """Search Memanto's long-term memory for relevant past information.

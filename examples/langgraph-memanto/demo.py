@@ -13,7 +13,6 @@ Usage:
 
 import os
 import time
-import json
 
 # ─── Demo Configuration ───────────────────────────────────────────────────────
 
@@ -115,7 +114,7 @@ results = client.recall(
     limit=5,
 )
 
-print(f"\n📚 MEMANTO RECALL RESULTS:")
+print("\n📚 MEMANTO RECALL RESULTS:")
 if results:
     for i, mem in enumerate(results, 1):
         content = mem.get("content", "N/A")[:150]
