@@ -34,7 +34,7 @@ Architecture:
            └────────────────┘
 
 Usage:
-    export MOORCHEH_API_KEY="your-api-key-here"
+    export MOORCHEH_API_KEY="***"
     python agent.py
 """
 
