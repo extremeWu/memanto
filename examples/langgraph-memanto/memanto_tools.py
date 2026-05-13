@@ -276,6 +276,6 @@ def format_memory_context(memories: list[dict]) -> str:
         content = mem.get("content", "").strip()
         mtype = mem.get("type", "unknown")
         timestamp = mem.get("timestamp", "")
-        lines.append(f"  {i}. [{mtype}] \"{content}\" ({timestamp})")
+        lines.append(f'  {i}. [{mtype}] "{content}" ({timestamp})')
     lines.append("")
     return "\n".join(lines)
