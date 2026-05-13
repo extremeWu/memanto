@@ -25,7 +25,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint import MemorySaver
+# Note: no checkpointer needed for this deterministic demo.
+# If you add branching/waiting nodes, import and attach MemorySaver
+# with per-session thread_id config.
 
 # ── Memanto Wrapper ──────────────────────────────────────────────────
 
@@ -186,7 +188,7 @@ def build_support_graph(memanto: MemantoBridge) -> StateGraph:
     builder.add_edge("recall", "respond")
     builder.add_edge("respond", END)
 
-    return builder.compile(checkpointer=MemorySaver())
+    return builder.compile()  # no checkpointer — deterministic demo sequence
 
 
 # ── Demo Runner ──────────────────────────────────────────────────────
