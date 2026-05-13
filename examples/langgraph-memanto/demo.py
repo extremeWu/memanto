@@ -7,7 +7,7 @@ two separate conversations with the Memanto memory layer in between.
 No LangGraph needed — uses Memanto directly to show the memory primitive.
 
 Usage:
-    export MOORCHEH_API_KEY="***"
+    export MOORCHEH_API_KEY="your-key-here"
     python demo.py
 """
 
@@ -16,7 +16,7 @@ import time
 
 # ─── Demo Configuration ───────────────────────────────────────────────────────
 
-API_KEY=os.env...EY")
+API_KEY = os.environ.get("MOORCHEH_API_KEY")
 if not API_KEY:
     print("❌ Please set MOORCHEH_API_KEY environment variable")
     print("   Get one at https://console.moorcheh.ai/api-keys")
