@@ -77,6 +77,8 @@ python agent.py
 | `memanto_tools.py` | LangGraph-compatible tool wrappers for Memanto's three primitives |
 | `demo.py` | Script demonstrating cross-session capabilities |
 | `requirements.txt` | Dependencies |
+| `assets/demo.gif` | 23-second terminal demo showing cross-session recall |
+| `assets/demo.cast` | Asciinema recording (playable via `asciinema play`) |
 
 ## 🎬 Demo Walkthrough
 
@@ -157,9 +159,19 @@ Recall  Process + Remember
 
 Memanto achieves **89.8% on LongMemEval** and **87.1% on LoCoMo** — outperforming Mem0, Zep, and Letta. This integration ensures your LangGraph agents benefit from that SOTA performance with zero ingestion latency.
 
-## 📹 Video Demo
+## 📹 Demo Recording
 
-*(Include a 30-second GIF or video link here showing cross-session recall)*
+![Memanto + LangGraph Cross-Session Demo](assets/demo.gif)
+
+*A 23-second terminal walkthrough showing four key capabilities:
+**Session A** stores user memories → **Time passes** (LangGraph state reset) →
+**Session B** recalls those memories cross-session → **Session C** detects and handles preference conflicts.*
+
+You can also replay the recording interactively:
+
+```bash
+asciinema play assets/demo.cast
+```
 
 ## 🔗 Links
 

@@ -1,0 +1,1535 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 744 500" width="744" height="500">
+  <style>
+    @keyframes type {
+      0%, 100% { opacity: 1; }
+    }
+    .terminal-bg { fill: #1a1b26; }
+    .text { font-family: 'Courier New', monospace; font-size: 14px; fill: #a9b1d6; }
+    .green { fill: #9ece6a; }
+    .blue { fill: #7dcfff; }
+    .yellow { fill: #e0af68; }
+    .red { fill: #f7768e; }
+    .magenta { fill: #bb9af7; }
+  </style>
+  <rect class="terminal-bg" width="744" height="500" rx="6"/>
+  
+  <!-- Window title bar -->
+  <rect x="0" y="0" width="744" height="28" fill="#15161e" rx="6"/>
+  <circle cx="16" cy="14" r="5" fill="#f7768e"/>
+  <circle cx="30" cy="14" r="5" fill="#e0af68"/>
+  <circle cx="44" cy="14" r="5" fill="#9ece6a"/>
+  <text x="372.0" y="19" text-anchor="middle" font-family="'Courier New', monospace" font-size="11" fill="#565f89">langgraph-memanto-demo — python demo.py</text>
+
+  <g style="animation: fade0 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162"></text>
+
+    <text class="text" x="12" y="182"></text>
+
+    <text class="text" x="12" y="202"></text>
+
+    <text class="text" x="12" y="222"></text>
+
+    <text class="text" x="12" y="242"></text>
+
+    <text class="text" x="12" y="262"></text>
+
+    <text class="text" x="12" y="282"></text>
+
+    <text class="text" x="12" y="302"></text>
+
+    <text class="text" x="12" y="322"></text>
+
+    <text class="text" x="12" y="342"></text>
+
+    <text class="text" x="12" y="362"></text>
+
+    <text class="text" x="12" y="382"></text>
+
+    <text class="text" x="12" y="402"></text>
+
+    <text class="text" x="12" y="422"></text>
+
+    <text class="text" x="12" y="442"></text>
+
+    <text class="text" x="12" y="462">🔄 Initializing Memanto client...</text>
+
+  </g>
+
+  @keyframes fade0 {
+    0%, 100% { opacity: 0; }
+    0.0% { opacity: 1; }
+    1.2195121951219512% { opacity: 0; }
+  }
+
+  <g style="animation: fade3 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162"></text>
+
+    <text class="text" x="12" y="182"></text>
+
+    <text class="text" x="12" y="202"></text>
+
+    <text class="text" x="12" y="222"></text>
+
+    <text class="text" x="12" y="242"></text>
+
+    <text class="text" x="12" y="262"></text>
+
+    <text class="text" x="12" y="282"></text>
+
+    <text class="text" x="12" y="302"></text>
+
+    <text class="text" x="12" y="322"></text>
+
+    <text class="text" x="12" y="342"></text>
+
+    <text class="text" x="12" y="362"></text>
+
+    <text class="text" x="12" y="382"></text>
+
+    <text class="text" x="12" y="402">🔄 Initializing Memanto client...</text>
+
+    <text class="text" x="12" y="422">🔄 Setting up demo agent &#x27;memanto-demo-alice&#x27;...</text>
+
+    <text class="text" x="12" y="442">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="462">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+  </g>
+
+  @keyframes fade3 {
+    0%, 100% { opacity: 0; }
+    3.7037037037037037% { opacity: 1; }
+    4.923215898825655% { opacity: 0; }
+  }
+
+  <g style="animation: fade6 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162"></text>
+
+    <text class="text" x="12" y="182"></text>
+
+    <text class="text" x="12" y="202"></text>
+
+    <text class="text" x="12" y="222"></text>
+
+    <text class="text" x="12" y="242"></text>
+
+    <text class="text" x="12" y="262"></text>
+
+    <text class="text" x="12" y="282"></text>
+
+    <text class="text" x="12" y="302"></text>
+
+    <text class="text" x="12" y="322"></text>
+
+    <text class="text" x="12" y="342"></text>
+
+    <text class="text" x="12" y="362">🔄 Initializing Memanto client...</text>
+
+    <text class="text" x="12" y="382">🔄 Setting up demo agent &#x27;memanto-demo-alice&#x27;...</text>
+
+    <text class="text" x="12" y="402">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="422">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+    <text class="text" x="12" y="442">============================================================</text>
+
+    <text class="text" x="12" y="462">  SESSION A — User Introduction (e.g., Monday)</text>
+
+  </g>
+
+  @keyframes fade6 {
+    0%, 100% { opacity: 0; }
+    7.407407407407407% { opacity: 1; }
+    8.626919602529359% { opacity: 0; }
+  }
+
+  <g style="animation: fade9 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162"></text>
+
+    <text class="text" x="12" y="182"></text>
+
+    <text class="text" x="12" y="202"></text>
+
+    <text class="text" x="12" y="222"></text>
+
+    <text class="text" x="12" y="242"></text>
+
+    <text class="text" x="12" y="262"></text>
+
+    <text class="text" x="12" y="282"></text>
+
+    <text class="text" x="12" y="302"></text>
+
+    <text class="text" x="12" y="322">🔄 Initializing Memanto client...</text>
+
+    <text class="text" x="12" y="342">🔄 Setting up demo agent &#x27;memanto-demo-alice&#x27;...</text>
+
+    <text class="text" x="12" y="362">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="382">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+    <text class="text" x="12" y="402">============================================================</text>
+
+    <text class="text" x="12" y="422">  SESSION A — User Introduction (e.g., Monday)</text>
+
+    <text class="text" x="12" y="442">============================================================</text>
+
+    <text class="text" x="12" y="462">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+  </g>
+
+  @keyframes fade9 {
+    0%, 100% { opacity: 0; }
+    11.11111111111111% { opacity: 1; }
+    12.330623306233061% { opacity: 0; }
+  }
+
+  <g style="animation: fade12 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162"></text>
+
+    <text class="text" x="12" y="182"></text>
+
+    <text class="text" x="12" y="202"></text>
+
+    <text class="text" x="12" y="222"></text>
+
+    <text class="text" x="12" y="242"></text>
+
+    <text class="text" x="12" y="262"></text>
+
+    <text class="text" x="12" y="282">🔄 Initializing Memanto client...</text>
+
+    <text class="text" x="12" y="302">🔄 Setting up demo agent &#x27;memanto-demo-alice&#x27;...</text>
+
+    <text class="text" x="12" y="322">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="342">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+    <text class="text" x="12" y="362">============================================================</text>
+
+    <text class="text" x="12" y="382">  SESSION A — User Introduction (e.g., Monday)</text>
+
+    <text class="text" x="12" y="402">============================================================</text>
+
+    <text class="text" x="12" y="422">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+    <text class="text" x="12" y="442">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="462">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+  </g>
+
+  @keyframes fade12 {
+    0%, 100% { opacity: 0; }
+    14.814814814814815% { opacity: 1; }
+    16.034327009936767% { opacity: 0; }
+  }
+
+  <g style="animation: fade15 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162"></text>
+
+    <text class="text" x="12" y="182"></text>
+
+    <text class="text" x="12" y="202"></text>
+
+    <text class="text" x="12" y="222">🔄 Initializing Memanto client...</text>
+
+    <text class="text" x="12" y="242">🔄 Setting up demo agent &#x27;memanto-demo-alice&#x27;...</text>
+
+    <text class="text" x="12" y="262">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="282">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+    <text class="text" x="12" y="302">============================================================</text>
+
+    <text class="text" x="12" y="322">  SESSION A — User Introduction (e.g., Monday)</text>
+
+    <text class="text" x="12" y="342">============================================================</text>
+
+    <text class="text" x="12" y="362">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+    <text class="text" x="12" y="382">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="402">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+    <text class="text" x="12" y="422">   ✓ Stored fact: memory_id=mem_def456</text>
+
+    <text class="text" x="12" y="442">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="462">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+  </g>
+
+  @keyframes fade15 {
+    0%, 100% { opacity: 0; }
+    18.51851851851852% { opacity: 1; }
+    19.73803071364047% { opacity: 0; }
+  }
+
+  <g style="animation: fade18 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162"></text>
+
+    <text class="text" x="12" y="182"></text>
+
+    <text class="text" x="12" y="202">🔄 Initializing Memanto client...</text>
+
+    <text class="text" x="12" y="222">🔄 Setting up demo agent &#x27;memanto-demo-alice&#x27;...</text>
+
+    <text class="text" x="12" y="242">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="262">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+    <text class="text" x="12" y="282">============================================================</text>
+
+    <text class="text" x="12" y="302">  SESSION A — User Introduction (e.g., Monday)</text>
+
+    <text class="text" x="12" y="322">============================================================</text>
+
+    <text class="text" x="12" y="342">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+    <text class="text" x="12" y="362">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="382">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+    <text class="text" x="12" y="402">   ✓ Stored fact: memory_id=mem_def456</text>
+
+    <text class="text" x="12" y="422">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="442">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+    <text class="text" x="12" y="462">✅ Session A complete. Memories stored in Memanto.</text>
+
+  </g>
+
+  @keyframes fade18 {
+    0%, 100% { opacity: 0; }
+    22.22222222222222% { opacity: 1; }
+    23.441734417344172% { opacity: 0; }
+  }
+
+  <g style="animation: fade21 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">🔄 Initializing Memanto client...</text>
+
+    <text class="text" x="12" y="162">🔄 Setting up demo agent &#x27;memanto-demo-alice&#x27;...</text>
+
+    <text class="text" x="12" y="182">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="202">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+    <text class="text" x="12" y="222">============================================================</text>
+
+    <text class="text" x="12" y="242">  SESSION A — User Introduction (e.g., Monday)</text>
+
+    <text class="text" x="12" y="262">============================================================</text>
+
+    <text class="text" x="12" y="282">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+    <text class="text" x="12" y="302">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="322">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+    <text class="text" x="12" y="342">   ✓ Stored fact: memory_id=mem_def456</text>
+
+    <text class="text" x="12" y="362">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="382">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+    <text class="text" x="12" y="402">✅ Session A complete. Memories stored in Memanto.</text>
+
+    <text class="text" x="12" y="422">============================================================</text>
+
+    <text class="text" x="12" y="442">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="462">============================================================</text>
+
+  </g>
+
+  @keyframes fade21 {
+    0%, 100% { opacity: 0; }
+    25.925925925925927% { opacity: 1; }
+    27.145438121047878% { opacity: 0; }
+  }
+
+  <g style="animation: fade24 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">   ✓ Agent &#x27;memanto-demo-alice&#x27; already exists</text>
+
+    <text class="text" x="12" y="162">   ✓ Session activated (expires: 2026-05-15T11:00:00+00:00)</text>
+
+    <text class="text" x="12" y="182">============================================================</text>
+
+    <text class="text" x="12" y="202">  SESSION A — User Introduction (e.g., Monday)</text>
+
+    <text class="text" x="12" y="222">============================================================</text>
+
+    <text class="text" x="12" y="242">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+    <text class="text" x="12" y="262">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="282">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+    <text class="text" x="12" y="302">   ✓ Stored fact: memory_id=mem_def456</text>
+
+    <text class="text" x="12" y="322">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="342">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+    <text class="text" x="12" y="362">✅ Session A complete. Memories stored in Memanto.</text>
+
+    <text class="text" x="12" y="382">============================================================</text>
+
+    <text class="text" x="12" y="402">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="422">============================================================</text>
+
+    <text class="text" x="12" y="442">🧠 What happened:</text>
+
+    <text class="text" x="12" y="462">  - The LangGraph thread state has been reset</text>
+
+  </g>
+
+  @keyframes fade24 {
+    0%, 100% { opacity: 0; }
+    29.62962962962963% { opacity: 1; }
+    30.84914182475158% { opacity: 0; }
+  }
+
+  <g style="animation: fade27 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">============================================================</text>
+
+    <text class="text" x="12" y="162">  SESSION A — User Introduction (e.g., Monday)</text>
+
+    <text class="text" x="12" y="182">============================================================</text>
+
+    <text class="text" x="12" y="202">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+    <text class="text" x="12" y="222">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="242">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+    <text class="text" x="12" y="262">   ✓ Stored fact: memory_id=mem_def456</text>
+
+    <text class="text" x="12" y="282">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="302">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+    <text class="text" x="12" y="322">✅ Session A complete. Memories stored in Memanto.</text>
+
+    <text class="text" x="12" y="342">============================================================</text>
+
+    <text class="text" x="12" y="362">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="382">============================================================</text>
+
+    <text class="text" x="12" y="402">🧠 What happened:</text>
+
+    <text class="text" x="12" y="422">  - The LangGraph thread state has been reset</text>
+
+    <text class="text" x="12" y="442">  - No conversation history exists</text>
+
+    <text class="text" x="12" y="462">  - But Memanto still has all the memories!</text>
+
+  </g>
+
+  @keyframes fade27 {
+    0%, 100% { opacity: 0; }
+    33.333333333333336% { opacity: 1; }
+    34.552845528455286% { opacity: 0; }
+  }
+
+  <g style="animation: fade30 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">👤 User: &quot;Hi, I&#x27;m Alice. I work at Acme Corp and prefer dark mode.&quot;</text>
+
+    <text class="text" x="12" y="162">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="182">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+    <text class="text" x="12" y="202">   ✓ Stored fact: memory_id=mem_def456</text>
+
+    <text class="text" x="12" y="222">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="242">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+    <text class="text" x="12" y="262">✅ Session A complete. Memories stored in Memanto.</text>
+
+    <text class="text" x="12" y="282">============================================================</text>
+
+    <text class="text" x="12" y="302">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="322">============================================================</text>
+
+    <text class="text" x="12" y="342">🧠 What happened:</text>
+
+    <text class="text" x="12" y="362">  - The LangGraph thread state has been reset</text>
+
+    <text class="text" x="12" y="382">  - No conversation history exists</text>
+
+    <text class="text" x="12" y="402">  - But Memanto still has all the memories!</text>
+
+    <text class="text" x="12" y="422">============================================================</text>
+
+    <text class="text" x="12" y="442">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="462">============================================================</text>
+
+  </g>
+
+  @keyframes fade30 {
+    0%, 100% { opacity: 0; }
+    37.03703703703704% { opacity: 1; }
+    38.25654923215899% { opacity: 0; }
+  }
+
+  <g style="animation: fade33 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">📝 Storing memories via Memanto...</text>
+
+    <text class="text" x="12" y="162">   ✓ Stored fact: memory_id=mem_abc123</text>
+
+    <text class="text" x="12" y="182">   ✓ Stored fact: memory_id=mem_def456</text>
+
+    <text class="text" x="12" y="202">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="222">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+    <text class="text" x="12" y="242">✅ Session A complete. Memories stored in Memanto.</text>
+
+    <text class="text" x="12" y="262">============================================================</text>
+
+    <text class="text" x="12" y="282">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="302">============================================================</text>
+
+    <text class="text" x="12" y="322">🧠 What happened:</text>
+
+    <text class="text" x="12" y="342">  - The LangGraph thread state has been reset</text>
+
+    <text class="text" x="12" y="362">  - No conversation history exists</text>
+
+    <text class="text" x="12" y="382">  - But Memanto still has all the memories!</text>
+
+    <text class="text" x="12" y="402">============================================================</text>
+
+    <text class="text" x="12" y="422">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="442">============================================================</text>
+
+    <text class="text" x="12" y="462">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+  </g>
+
+  @keyframes fade33 {
+    0%, 100% { opacity: 0; }
+    40.74074074074074% { opacity: 1; }
+    41.96025293586269% { opacity: 0; }
+  }
+
+  <g style="animation: fade36 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162">   ✓ Stored preference: memory_id=mem_ghi789</text>
+
+    <text class="text" x="12" y="182">   ✓ Stored event: memory_id=mem_jkl012</text>
+
+    <text class="text" x="12" y="202">✅ Session A complete. Memories stored in Memanto.</text>
+
+    <text class="text" x="12" y="222">============================================================</text>
+
+    <text class="text" x="12" y="242">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="262">============================================================</text>
+
+    <text class="text" x="12" y="282">🧠 What happened:</text>
+
+    <text class="text" x="12" y="302">  - The LangGraph thread state has been reset</text>
+
+    <text class="text" x="12" y="322">  - No conversation history exists</text>
+
+    <text class="text" x="12" y="342">  - But Memanto still has all the memories!</text>
+
+    <text class="text" x="12" y="362">============================================================</text>
+
+    <text class="text" x="12" y="382">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="402">============================================================</text>
+
+    <text class="text" x="12" y="422">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+    <text class="text" x="12" y="442">🔍 Recalling from Memanto (cross-session)...</text>
+
+    <text class="text" x="12" y="462">📚 MEMANTO RECALL RESULTS:</text>
+
+  </g>
+
+  @keyframes fade36 {
+    0%, 100% { opacity: 0; }
+    44.44444444444444% { opacity: 1; }
+    45.66395663956639% { opacity: 0; }
+  }
+
+  <g style="animation: fade39 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162">✅ Session A complete. Memories stored in Memanto.</text>
+
+    <text class="text" x="12" y="182">============================================================</text>
+
+    <text class="text" x="12" y="202">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="222">============================================================</text>
+
+    <text class="text" x="12" y="242">🧠 What happened:</text>
+
+    <text class="text" x="12" y="262">  - The LangGraph thread state has been reset</text>
+
+    <text class="text" x="12" y="282">  - No conversation history exists</text>
+
+    <text class="text" x="12" y="302">  - But Memanto still has all the memories!</text>
+
+    <text class="text" x="12" y="322">============================================================</text>
+
+    <text class="text" x="12" y="342">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="362">============================================================</text>
+
+    <text class="text" x="12" y="382">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+    <text class="text" x="12" y="402">🔍 Recalling from Memanto (cross-session)...</text>
+
+    <text class="text" x="12" y="422">📚 MEMANTO RECALL RESULTS:</text>
+
+    <text class="text" x="12" y="442">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="462">     Confidence: 0.8</text>
+
+  </g>
+
+  @keyframes fade39 {
+    0%, 100% { opacity: 0; }
+    48.148148148148145% { opacity: 1; }
+    49.367660343270096% { opacity: 0; }
+  }
+
+  <g style="animation: fade42 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">  ⏳ Time passes... (hours/days) — LangGraph state is gone</text>
+
+    <text class="text" x="12" y="162">============================================================</text>
+
+    <text class="text" x="12" y="182">🧠 What happened:</text>
+
+    <text class="text" x="12" y="202">  - The LangGraph thread state has been reset</text>
+
+    <text class="text" x="12" y="222">  - No conversation history exists</text>
+
+    <text class="text" x="12" y="242">  - But Memanto still has all the memories!</text>
+
+    <text class="text" x="12" y="262">============================================================</text>
+
+    <text class="text" x="12" y="282">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="302">============================================================</text>
+
+    <text class="text" x="12" y="322">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+    <text class="text" x="12" y="342">🔍 Recalling from Memanto (cross-session)...</text>
+
+    <text class="text" x="12" y="362">📚 MEMANTO RECALL RESULTS:</text>
+
+    <text class="text" x="12" y="382">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="402">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="422">  2. [fact] &quot;Alice works at Acme Corp as a developer&quot;</text>
+
+    <text class="text" x="12" y="442">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="462">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+  </g>
+
+  @keyframes fade42 {
+    0%, 100% { opacity: 0; }
+    51.851851851851855% { opacity: 1; }
+    53.071364046973805% { opacity: 0; }
+  }
+
+  <g style="animation: fade45 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122">🧠 What happened:</text>
+
+    <text class="text" x="12" y="142">  - The LangGraph thread state has been reset</text>
+
+    <text class="text" x="12" y="162">  - No conversation history exists</text>
+
+    <text class="text" x="12" y="182">  - But Memanto still has all the memories!</text>
+
+    <text class="text" x="12" y="202">============================================================</text>
+
+    <text class="text" x="12" y="222">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="242">============================================================</text>
+
+    <text class="text" x="12" y="262">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+    <text class="text" x="12" y="282">🔍 Recalling from Memanto (cross-session)...</text>
+
+    <text class="text" x="12" y="302">📚 MEMANTO RECALL RESULTS:</text>
+
+    <text class="text" x="12" y="322">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="342">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="362">  2. [fact] &quot;Alice works at Acme Corp as a developer&quot;</text>
+
+    <text class="text" x="12" y="382">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="402">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+    <text class="text" x="12" y="422">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="442">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="462">     Confidence: 0.8</text>
+
+  </g>
+
+  @keyframes fade45 {
+    0%, 100% { opacity: 0; }
+    55.55555555555556% { opacity: 1; }
+    56.77506775067751% { opacity: 0; }
+  }
+
+  <g style="animation: fade48 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">  - But Memanto still has all the memories!</text>
+
+    <text class="text" x="12" y="162">============================================================</text>
+
+    <text class="text" x="12" y="182">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="202">============================================================</text>
+
+    <text class="text" x="12" y="222">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+    <text class="text" x="12" y="242">🔍 Recalling from Memanto (cross-session)...</text>
+
+    <text class="text" x="12" y="262">📚 MEMANTO RECALL RESULTS:</text>
+
+    <text class="text" x="12" y="282">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="302">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="322">  2. [fact] &quot;Alice works at Acme Corp as a developer&quot;</text>
+
+    <text class="text" x="12" y="342">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="362">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+    <text class="text" x="12" y="382">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="402">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="422">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="442">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="462">   The agent remembers Alice from the previous session</text>
+
+  </g>
+
+  @keyframes fade48 {
+    0%, 100% { opacity: 0; }
+    59.25925925925926% { opacity: 1; }
+    60.47877145438121% { opacity: 0; }
+  }
+
+  <g style="animation: fade51 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">  SESSION B — Cross-Session Recall (e.g., Wednesday)</text>
+
+    <text class="text" x="12" y="162">============================================================</text>
+
+    <text class="text" x="12" y="182">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+    <text class="text" x="12" y="202">🔍 Recalling from Memanto (cross-session)...</text>
+
+    <text class="text" x="12" y="222">📚 MEMANTO RECALL RESULTS:</text>
+
+    <text class="text" x="12" y="242">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="262">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="282">  2. [fact] &quot;Alice works at Acme Corp as a developer&quot;</text>
+
+    <text class="text" x="12" y="302">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="322">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+    <text class="text" x="12" y="342">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="362">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="382">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="402">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="422">   The agent remembers Alice from the previous session</text>
+
+    <text class="text" x="12" y="442">   despite having a completely new LangGraph thread state.</text>
+
+    <text class="text" x="12" y="462">============================================================</text>
+
+  </g>
+
+  @keyframes fade51 {
+    0%, 100% { opacity: 0; }
+    62.96296296296296% { opacity: 1; }
+    64.18247515808491% { opacity: 0; }
+  }
+
+  <g style="animation: fade54 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">👤 User: &quot;Hey, what do you remember about me? I need help with settings.&quot;</text>
+
+    <text class="text" x="12" y="162">🔍 Recalling from Memanto (cross-session)...</text>
+
+    <text class="text" x="12" y="182">📚 MEMANTO RECALL RESULTS:</text>
+
+    <text class="text" x="12" y="202">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="222">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="242">  2. [fact] &quot;Alice works at Acme Corp as a developer&quot;</text>
+
+    <text class="text" x="12" y="262">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="282">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+    <text class="text" x="12" y="302">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="322">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="342">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="362">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="382">   The agent remembers Alice from the previous session</text>
+
+    <text class="text" x="12" y="402">   despite having a completely new LangGraph thread state.</text>
+
+    <text class="text" x="12" y="422">============================================================</text>
+
+    <text class="text" x="12" y="442">  SESSION C — Preference Update &amp; Conflict Detection</text>
+
+    <text class="text" x="12" y="462">============================================================</text>
+
+  </g>
+
+  @keyframes fade54 {
+    0%, 100% { opacity: 0; }
+    66.66666666666667% { opacity: 1; }
+    67.88617886178862% { opacity: 0; }
+  }
+
+  <g style="animation: fade57 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">📚 MEMANTO RECALL RESULTS:</text>
+
+    <text class="text" x="12" y="162">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="182">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="202">  2. [fact] &quot;Alice works at Acme Corp as a developer&quot;</text>
+
+    <text class="text" x="12" y="222">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="242">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+    <text class="text" x="12" y="262">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="282">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="302">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="322">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="342">   The agent remembers Alice from the previous session</text>
+
+    <text class="text" x="12" y="362">   despite having a completely new LangGraph thread state.</text>
+
+    <text class="text" x="12" y="382">============================================================</text>
+
+    <text class="text" x="12" y="402">  SESSION C — Preference Update &amp; Conflict Detection</text>
+
+    <text class="text" x="12" y="422">============================================================</text>
+
+    <text class="text" x="12" y="442">👤 User: &quot;Actually, I now prefer light mode during work hours.&quot;</text>
+
+    <text class="text" x="12" y="462">🔄 Detecting potential conflict...</text>
+
+  </g>
+
+  @keyframes fade57 {
+    0%, 100% { opacity: 0; }
+    70.37037037037037% { opacity: 1; }
+    71.58988256549232% { opacity: 0; }
+  }
+
+  <g style="animation: fade60 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102">  1. [fact] &quot;User&#x27;s name is Alice&quot;</text>
+
+    <text class="text" x="12" y="122">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="142">  2. [fact] &quot;Alice works at Acme Corp as a developer&quot;</text>
+
+    <text class="text" x="12" y="162">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="182">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+    <text class="text" x="12" y="202">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="222">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="242">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="262">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="282">   The agent remembers Alice from the previous session</text>
+
+    <text class="text" x="12" y="302">   despite having a completely new LangGraph thread state.</text>
+
+    <text class="text" x="12" y="322">============================================================</text>
+
+    <text class="text" x="12" y="342">  SESSION C — Preference Update &amp; Conflict Detection</text>
+
+    <text class="text" x="12" y="362">============================================================</text>
+
+    <text class="text" x="12" y="382">👤 User: &quot;Actually, I now prefer light mode during work hours.&quot;</text>
+
+    <text class="text" x="12" y="402">🔄 Detecting potential conflict...</text>
+
+    <text class="text" x="12" y="422">   Previous preference found: [&quot;Alice prefers dark mode for all interfaces&quot;]</text>
+
+    <text class="text" x="12" y="442">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="462">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+  </g>
+
+  @keyframes fade60 {
+    0%, 100% { opacity: 0; }
+    74.07407407407408% { opacity: 1; }
+    75.29358626919603% { opacity: 0; }
+  }
+
+  <g style="animation: fade63 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="142">  3. [preference] &quot;Alice prefers dark mode for all interfaces&quot;</text>
+
+    <text class="text" x="12" y="162">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="182">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="202">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="222">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="242">   The agent remembers Alice from the previous session</text>
+
+    <text class="text" x="12" y="262">   despite having a completely new LangGraph thread state.</text>
+
+    <text class="text" x="12" y="282">============================================================</text>
+
+    <text class="text" x="12" y="302">  SESSION C — Preference Update &amp; Conflict Detection</text>
+
+    <text class="text" x="12" y="322">============================================================</text>
+
+    <text class="text" x="12" y="342">👤 User: &quot;Actually, I now prefer light mode during work hours.&quot;</text>
+
+    <text class="text" x="12" y="362">🔄 Detecting potential conflict...</text>
+
+    <text class="text" x="12" y="382">   Previous preference found: [&quot;Alice prefers dark mode for all interfaces&quot;]</text>
+
+    <text class="text" x="12" y="402">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="422">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+    <text class="text" x="12" y="442">✅ Memanto&#x27;s versioned storage ensures no silent overwrites!</text>
+
+    <text class="text" x="12" y="462">   Both old and new preferences are retrievable with temporal queries.</text>
+
+  </g>
+
+  @keyframes fade63 {
+    0%, 100% { opacity: 0; }
+    77.77777777777777% { opacity: 1; }
+    78.99728997289972% { opacity: 0; }
+  }
+
+  <g style="animation: fade66 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">  4. [event] &quot;First support contact — initial onboarding&quot;</text>
+
+    <text class="text" x="12" y="162">     Confidence: 0.8</text>
+
+    <text class="text" x="12" y="182">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="202">   The agent remembers Alice from the previous session</text>
+
+    <text class="text" x="12" y="222">   despite having a completely new LangGraph thread state.</text>
+
+    <text class="text" x="12" y="242">============================================================</text>
+
+    <text class="text" x="12" y="262">  SESSION C — Preference Update &amp; Conflict Detection</text>
+
+    <text class="text" x="12" y="282">============================================================</text>
+
+    <text class="text" x="12" y="302">👤 User: &quot;Actually, I now prefer light mode during work hours.&quot;</text>
+
+    <text class="text" x="12" y="322">🔄 Detecting potential conflict...</text>
+
+    <text class="text" x="12" y="342">   Previous preference found: [&quot;Alice prefers dark mode for all interfaces&quot;]</text>
+
+    <text class="text" x="12" y="362">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="382">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+    <text class="text" x="12" y="402">✅ Memanto&#x27;s versioned storage ensures no silent overwrites!</text>
+
+    <text class="text" x="12" y="422">   Both old and new preferences are retrievable with temporal queries.</text>
+
+    <text class="text" x="12" y="442">============================================================</text>
+
+    <text class="text" x="12" y="462">  ✅ DEMO COMPLETE</text>
+
+  </g>
+
+  @keyframes fade66 {
+    0%, 100% { opacity: 0; }
+    81.48148148148148% { opacity: 1; }
+    82.70099367660343% { opacity: 0; }
+  }
+
+  <g style="animation: fade69 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162">✅ Cross-session recall demonstrated!</text>
+
+    <text class="text" x="12" y="182">   The agent remembers Alice from the previous session</text>
+
+    <text class="text" x="12" y="202">   despite having a completely new LangGraph thread state.</text>
+
+    <text class="text" x="12" y="222">============================================================</text>
+
+    <text class="text" x="12" y="242">  SESSION C — Preference Update &amp; Conflict Detection</text>
+
+    <text class="text" x="12" y="262">============================================================</text>
+
+    <text class="text" x="12" y="282">👤 User: &quot;Actually, I now prefer light mode during work hours.&quot;</text>
+
+    <text class="text" x="12" y="302">🔄 Detecting potential conflict...</text>
+
+    <text class="text" x="12" y="322">   Previous preference found: [&quot;Alice prefers dark mode for all interfaces&quot;]</text>
+
+    <text class="text" x="12" y="342">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="362">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+    <text class="text" x="12" y="382">✅ Memanto&#x27;s versioned storage ensures no silent overwrites!</text>
+
+    <text class="text" x="12" y="402">   Both old and new preferences are retrievable with temporal queries.</text>
+
+    <text class="text" x="12" y="422">============================================================</text>
+
+    <text class="text" x="12" y="442">  ✅ DEMO COMPLETE</text>
+
+    <text class="text" x="12" y="462">============================================================</text>
+
+  </g>
+
+  @keyframes fade69 {
+    0%, 100% { opacity: 0; }
+    85.18518518518519% { opacity: 1; }
+    86.40469738030714% { opacity: 0; }
+  }
+
+  <g style="animation: fade72 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162">============================================================</text>
+
+    <text class="text" x="12" y="182">  SESSION C — Preference Update &amp; Conflict Detection</text>
+
+    <text class="text" x="12" y="202">============================================================</text>
+
+    <text class="text" x="12" y="222">👤 User: &quot;Actually, I now prefer light mode during work hours.&quot;</text>
+
+    <text class="text" x="12" y="242">🔄 Detecting potential conflict...</text>
+
+    <text class="text" x="12" y="262">   Previous preference found: [&quot;Alice prefers dark mode for all interfaces&quot;]</text>
+
+    <text class="text" x="12" y="282">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="302">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+    <text class="text" x="12" y="322">✅ Memanto&#x27;s versioned storage ensures no silent overwrites!</text>
+
+    <text class="text" x="12" y="342">   Both old and new preferences are retrievable with temporal queries.</text>
+
+    <text class="text" x="12" y="362">============================================================</text>
+
+    <text class="text" x="12" y="382">  ✅ DEMO COMPLETE</text>
+
+    <text class="text" x="12" y="402">============================================================</text>
+
+    <text class="text" x="12" y="422">What was demonstrated:</text>
+
+    <text class="text" x="12" y="442">  ✓ Cross-session recall — memories survive LangGraph state resets</text>
+
+    <text class="text" x="12" y="462">  ✓ Typed semantic memory — fact, preference, event, decision types</text>
+
+  </g>
+
+  @keyframes fade72 {
+    0%, 100% { opacity: 0; }
+    88.88888888888889% { opacity: 1; }
+    90.10840108401084% { opacity: 0; }
+  }
+
+  <g style="animation: fade75 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142"></text>
+
+    <text class="text" x="12" y="162">============================================================</text>
+
+    <text class="text" x="12" y="182">👤 User: &quot;Actually, I now prefer light mode during work hours.&quot;</text>
+
+    <text class="text" x="12" y="202">🔄 Detecting potential conflict...</text>
+
+    <text class="text" x="12" y="222">   Previous preference found: [&quot;Alice prefers dark mode for all interfaces&quot;]</text>
+
+    <text class="text" x="12" y="242">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="262">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+    <text class="text" x="12" y="282">✅ Memanto&#x27;s versioned storage ensures no silent overwrites!</text>
+
+    <text class="text" x="12" y="302">   Both old and new preferences are retrievable with temporal queries.</text>
+
+    <text class="text" x="12" y="322">============================================================</text>
+
+    <text class="text" x="12" y="342">  ✅ DEMO COMPLETE</text>
+
+    <text class="text" x="12" y="362">============================================================</text>
+
+    <text class="text" x="12" y="382">What was demonstrated:</text>
+
+    <text class="text" x="12" y="402">  ✓ Cross-session recall — memories survive LangGraph state resets</text>
+
+    <text class="text" x="12" y="422">  ✓ Typed semantic memory — fact, preference, event, decision types</text>
+
+    <text class="text" x="12" y="442">  ✓ Preference updates with conflict detection</text>
+
+    <text class="text" x="12" y="462">  ✓ Grounded answers via recall</text>
+
+  </g>
+
+  @keyframes fade75 {
+    0%, 100% { opacity: 0; }
+    92.5925925925926% { opacity: 1; }
+    93.81210478771455% { opacity: 0; }
+  }
+
+  <g style="animation: fade78 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">🔄 Detecting potential conflict...</text>
+
+    <text class="text" x="12" y="162">   Previous preference found: [&quot;Alice prefers dark mode for all interfaces&quot;]</text>
+
+    <text class="text" x="12" y="182">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="202">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+    <text class="text" x="12" y="222">✅ Memanto&#x27;s versioned storage ensures no silent overwrites!</text>
+
+    <text class="text" x="12" y="242">   Both old and new preferences are retrievable with temporal queries.</text>
+
+    <text class="text" x="12" y="262">============================================================</text>
+
+    <text class="text" x="12" y="282">  ✅ DEMO COMPLETE</text>
+
+    <text class="text" x="12" y="302">============================================================</text>
+
+    <text class="text" x="12" y="322">What was demonstrated:</text>
+
+    <text class="text" x="12" y="342">  ✓ Cross-session recall — memories survive LangGraph state resets</text>
+
+    <text class="text" x="12" y="362">  ✓ Typed semantic memory — fact, preference, event, decision types</text>
+
+    <text class="text" x="12" y="382">  ✓ Preference updates with conflict detection</text>
+
+    <text class="text" x="12" y="402">  ✓ Grounded answers via recall</text>
+
+    <text class="text" x="12" y="422">Next steps:</text>
+
+    <text class="text" x="12" y="442">  1. Run agent.py for the full LangGraph integration</text>
+
+    <text class="text" x="12" y="462">  2. Try with different memory types</text>
+
+  </g>
+
+  @keyframes fade78 {
+    0%, 100% { opacity: 0; }
+    96.29629629629629% { opacity: 1; }
+    97.51580849141824% { opacity: 0; }
+  }
+
+  <g style="animation: fade81 0.01s linear both">
+
+    <text class="text" x="12" y="42"></text>
+
+    <text class="text" x="12" y="62"></text>
+
+    <text class="text" x="12" y="82"></text>
+
+    <text class="text" x="12" y="102"></text>
+
+    <text class="text" x="12" y="122"></text>
+
+    <text class="text" x="12" y="142">   ✓ Updated preference stored: memory_id=mem_mno345</text>
+
+    <text class="text" x="12" y="162">   ✓ Decision recorded: memory_id=mem_pqr678</text>
+
+    <text class="text" x="12" y="182">✅ Memanto&#x27;s versioned storage ensures no silent overwrites!</text>
+
+    <text class="text" x="12" y="202">   Both old and new preferences are retrievable with temporal queries.</text>
+
+    <text class="text" x="12" y="222">============================================================</text>
+
+    <text class="text" x="12" y="242">  ✅ DEMO COMPLETE</text>
+
+    <text class="text" x="12" y="262">============================================================</text>
+
+    <text class="text" x="12" y="282">What was demonstrated:</text>
+
+    <text class="text" x="12" y="302">  ✓ Cross-session recall — memories survive LangGraph state resets</text>
+
+    <text class="text" x="12" y="322">  ✓ Typed semantic memory — fact, preference, event, decision types</text>
+
+    <text class="text" x="12" y="342">  ✓ Preference updates with conflict detection</text>
+
+    <text class="text" x="12" y="362">  ✓ Grounded answers via recall</text>
+
+    <text class="text" x="12" y="382">Next steps:</text>
+
+    <text class="text" x="12" y="402">  1. Run agent.py for the full LangGraph integration</text>
+
+    <text class="text" x="12" y="422">  2. Try with different memory types</text>
+
+    <text class="text" x="12" y="442">  3. Add memanto_answer for RAG-grounded responses</text>
+
+    <text class="text" x="12" y="462">$ </text>
+
+  </g>
+
+  @keyframes fade81 {
+    0%, 100% { opacity: 0; }
+    100.0% { opacity: 1; }
+    101.21951219512195% { opacity: 0; }
+  }
+
+</svg>
