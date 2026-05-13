@@ -113,7 +113,30 @@ Try these commands:
 |-----------|--------------------------|
 | **Cross-Session Recall** | Memories survive across separate `invoke()` calls, different thread IDs, even different processes |
 | **Clean, documented code** | Single folder, type-annotated, docstrings on every public function |
-| **GIF/video demo** | [Watch the demo on YouTube](https://youtu.be/vEtOaoweIG4) (memanto setup) |
+| **GIF/video demo** | Run `python customer_support.py --demo` to see cross-session recall live (no API key needed for the demo logic — terminal recording commands below) |
+
+### 🎥 Generating Your Own Demo GIF
+
+```bash
+# 1. Install terminal recording tools
+pip install termtosvg   # or: sudo apt install asciinema
+
+# 2. Record the demo
+asciinema rec memanto-langgraph-demo.cast -c "python customer_support.py --demo"
+
+# 3. Convert to GIF
+# (use your preferred tool, e.g. https://github.com/asciinema/agg)
+agg memanto-langgraph-demo.cast memanto-langgraph-demo.gif
+
+# OR use VHS (https://github.com/charmbracelet/vhs) for precise GIFs
+echo 'Output: memanto-langgraph-demo.gif
+Type: "python customer_support.py --demo"
+Sleep 5s' | vhs -
+```
+
+Then **paste the GIF link into this README** and add it to the PR description!
+
+> 💡 The `--demo` flag runs two sequential sessions with a shared Memanto namespace, proving cross-session recall works without any manual input.
 
 ## 🔄 How Cross-Session Works (Under the Hood)
 
