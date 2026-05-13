@@ -16,7 +16,7 @@ import time
 
 # ─── Demo Configuration ───────────────────────────────────────────────────────
 
-API_KEY = os.environ.get("MOORCHEH_API_KEY")
+API_KEY=os.env...EY")
 if not API_KEY:
     print("❌ Please set MOORCHEH_API_KEY environment variable")
     print("   Get one at https://console.moorcheh.ai/api-keys")
