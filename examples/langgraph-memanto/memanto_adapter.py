@@ -81,7 +81,7 @@ class MemantoClient:
         """Ask Memanto to generate an answer grounded in stored memories."""
         result = self._client.answer(
             agent_id=self.agent_id,
-            query=query,
+            question=query,  # SdkClient.answer uses question=, not query=
         )
         return result.get("answer", result.get("response", ""))
 
