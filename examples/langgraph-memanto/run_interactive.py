@@ -89,10 +89,11 @@ def make_nodes(memory: MemantoMemory):
                     learned.append(line)
         return {"response": content, "learned": learned}
 
-    def store(state: ChatState) -> None:
+    def store(state: ChatState) -> dict:
         memory.store_interaction(state["message"], state["response"])
         for pref in state.get("learned", []):
             memory.remember(pref, memory_type="preference", tags="user,preference")
+        return {}
 
     return retrieve, respond, store
 
