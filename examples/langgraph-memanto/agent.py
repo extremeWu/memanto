@@ -47,7 +47,6 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
-
 from memanto_tools import MEMANTO_TOOLS, memanto_recall
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -167,7 +166,7 @@ def agent_node(state: AgentState) -> AgentState:
     full_messages = [SystemMessage(content=SYSTEM_PROMPT)] + messages
 
     response = llm.invoke(full_messages)
-    return {"messages": [response]}
+    return AgentState(messages=[response])
 
 
 def should_continue(state: AgentState) -> Literal["tools", "end"]:
