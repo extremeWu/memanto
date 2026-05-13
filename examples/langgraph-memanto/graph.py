@@ -22,9 +22,8 @@ from typing import Annotated, Any, Literal
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
-from typing_extensions import TypedDict
-
 from memanto_helpers import MemantoMemory
+from typing_extensions import TypedDict
 
 # ---------------------------------------------------------------------------
 # State
@@ -91,7 +90,9 @@ def load_memory(state: AgentState) -> dict[str, Any]:
     query = user_msgs[-1].content if user_msgs else "general context"
 
     # 1. Semantic recall — find relevant memories
-    memories = mem.recall(query, limit=8, memory_type=["preference", "fact", "decision", "context"])
+    memories = mem.recall(
+        query, limit=8, memory_type=["preference", "fact", "decision", "context"]
+    )
 
     memory_context = ""
     if memories:

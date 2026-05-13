@@ -24,9 +24,7 @@ import os
 import sys
 
 from dotenv import load_dotenv
-
 from graph import build_graph, reset_memory
-from langgraph.checkpoint.memory import MemorySaver
 from memanto_helpers import MemantoMemory
 
 load_dotenv()
@@ -43,12 +41,15 @@ def interactive_session() -> None:
 
     # Use a fixed user_id so cross-session recall works
     user_id = os.environ.get("DEMO_USER_ID", "alice")
-    thread_id = input(f"Thread ID (default: session-{user_id}): ").strip() or f"session-{user_id}"
+    thread_id = (
+        input(f"Thread ID (default: session-{user_id}): ").strip()
+        or f"session-{user_id}"
+    )
 
     config = {"configurable": {"thread_id": thread_id, "user_id": user_id}}
 
     print(f"\n{'=' * 60}")
-    print(f"  Memanto + LangGraph  —  Customer Support Agent")
+    print("  Memanto + LangGraph  —  Customer Support Agent")
     print(f"  User: {user_id}  |  Thread: {thread_id}")
     print(f"  {'=' * 60}")
     print()
@@ -110,12 +111,19 @@ def demo_cross_session_recall() -> None:
     print("\n  --- Session 1: Teaching a preference ---\n")
 
     result1 = graph.invoke(
-        {"messages": [{"role": "user", "content": "pref: I prefer dark mode for the dashboard UI"}]},
+        {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "pref: I prefer dark mode for the dashboard UI",
+                }
+            ]
+        },
         config={"configurable": {"thread_id": "session-demo-1", "user_id": user_id}},
     )
 
     last = result1["messages"][-1]
-    print(f"  User: I prefer dark mode for the dashboard UI")
+    print("  User: I prefer dark mode for the dashboard UI")
     print(f"  Agent: {last.content}\n")
 
     if result1.get("new_memories"):
@@ -128,7 +136,9 @@ def demo_cross_session_recall() -> None:
         memory_type="preference",
         tags=["productivity"],
     )
-    print(f"  ✅ Saved memory: [preference] The user prefers keyboard shortcuts over mouse navigation")
+    print(
+        "  ✅ Saved memory: [preference] The user prefers keyboard shortcuts over mouse navigation"
+    )
     print()
 
     # ------------------------------------------------------------------
@@ -141,12 +151,19 @@ def demo_cross_session_recall() -> None:
     graph2 = build_graph()
 
     result2 = graph2.invoke(
-        {"messages": [{"role": "user", "content": "Does this user have any UI preferences I should know about?"}]},
+        {
+            "messages": [
+                {
+                    "role": "user",
+                    "content": "Does this user have any UI preferences I should know about?",
+                }
+            ]
+        },
         config={"configurable": {"thread_id": "session-demo-2", "user_id": user_id}},
     )
 
     last2 = result2["messages"][-1]
-    print(f"  User: Does this user have any UI preferences I should know about?")
+    print("  User: Does this user have any UI preferences I should know about?")
     print(f"  Agent: {last2.content}\n")
 
     print("  --- Demo Complete ---")
